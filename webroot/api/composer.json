@@ -1,0 +1,27 @@
+{
+    "name": "kalma/api",
+    "description": "Kalma API",
+    "type": "project",
+    "license": "CC BY-NC-ND 4.0",
+    "authors": [
+        {
+            "name": "FergusBentley",
+            "email": "fergus.bentley@gmail.com"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {
+        "nikic/fast-route": "^1.3",
+        "nyholm/psr7": "^1.2",
+        "nyholm/psr7-server": "^0.4.1"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^8.5"
+    },
+    "autoload": {
+        "psr-4": {
+            "Kalma\\Api\\": "src/",
+            "Kalma\\Api\\Test\\": "test/"
+        }
+    }
+}
