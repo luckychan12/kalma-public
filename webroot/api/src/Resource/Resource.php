@@ -15,17 +15,18 @@
 
 namespace Kalma\Api\Resource;
 
-use PDO;
+use Kalma\Api\Core\DatabaseConnection;
 use Kalma\Api\Core\DatabaseHandler;
+
 require __DIR__ . '/../../vendor/autoload.php';
 
 class Resource
 {
 
-    protected PDO $database_handler;
+    protected DatabaseConnection $database;
 
     public function __construct()
     {
-        $this->database_handler = DatabaseHandler::getConnection();
+        $this->database = DatabaseHandler::getConnection();
     }
 }
