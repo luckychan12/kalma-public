@@ -40,7 +40,7 @@ class DatabaseConnection
      * @param  array  $params The parameters to bind to the prepared statement as an associative array
      * @return array
      */
-    public function fetchAssoc(string $query, ...$params) : array
+    public function fetchAssoc(string $query, array $params) : array
     {
         $stmt = $this->conn->prepare($query);
         foreach ($params as $param => $value) {
@@ -55,7 +55,6 @@ class DatabaseConnection
             );
         }
         catch (Exception $e) {
-
             Logger::log(Logger::ERROR,
                 "Failed to execute query:\n'%s'\n" .
                 "Throws Exception:\n%s",
