@@ -25,10 +25,6 @@ class Router
 {
     private Dispatcher $dispatcher;
 
-    const ACCESS_PUBLIC = 0;
-    const ACCESS_USER = 10;
-    const ACCESS_ADMIN = 20;
-
     public function __construct()
     {
         // Define routes
@@ -41,10 +37,10 @@ class Router
         {
             $root->addGroup('', function(RouteCollector $group)
             {
-                $group->addRoute('POST', '/user/signup', ['User', 'login', static::ACCESS_PUBLIC]);
-                $group->addRoute('POST', '/user/login', ['User', 'login', static::ACCESS_PUBLIC]);
-                $group->addRoute('PUT', '/user/logout', ['User', 'logout', static::ACCESS_USER]);
-                $group->addRoute('GET', '/user/{id:\d+}', ['User', 'read', static::ACCESS_USER]);
+                $group->addRoute('POST', '/user/signup', ['User', 'login', Auth::ACCESS_PUBLIC]);
+                $group->addRoute('POST', '/user/login', ['User', 'login', Auth::ACCESS_PUBLIC]);
+                $group->addRoute('PUT', '/user/logout', ['User', 'logout', Auth::ACCESS_USER]);
+                $group->addRoute('GET', '/user/{id:\d+}', ['User', 'read', Auth::ACCESS_USER]);
             });
         });
     }
