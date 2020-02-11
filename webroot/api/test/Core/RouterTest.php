@@ -31,7 +31,7 @@ final class TestRouter extends TestCase
     {
         $expected = array
         (
-            'uri' => '/user/login',
+            'uri' => '/kalma/api/user/login',
             'status' => Dispatcher::FOUND,
             'resource' => 'User',
             'action' => 'login',
@@ -39,7 +39,7 @@ final class TestRouter extends TestCase
             'access_level' => 0,
         );
 
-        $this->assertEquals($expected, $router->getRoute('POST', '/user/login'));
+        $this->assertEquals($expected, $router->getRoute('POST', '/kalma/api/user/login'));
     }
 
     /**
@@ -50,11 +50,11 @@ final class TestRouter extends TestCase
     {
         $expected = array
         (
-            'uri' => '/user/DUMMY_ROUTE',
+            'uri' => '/kalma/api/user/DUMMY_ROUTE',
             'status' => Dispatcher::NOT_FOUND,
         );
 
-        $this->assertEquals($expected, $router->getRoute('POST', '/user/DUMMY_ROUTE'));
+        $this->assertEquals($expected, $router->getRoute('POST', '/kalma/api/user/DUMMY_ROUTE'));
     }
 
     /**
@@ -65,11 +65,11 @@ final class TestRouter extends TestCase
     {
         $expected = array
         (
-            'uri' => '/user/login',
+            'uri' => '/kalma/api/user/login',
             'status' => Dispatcher::METHOD_NOT_ALLOWED,
             'allowed_methods' => ['POST'],
         );
 
-        $this->assertEquals($expected, $router->getRoute('GET', '/user/login'));
+        $this->assertEquals($expected, $router->getRoute('GET', '/kalma/api/user/login'));
     }
 }
