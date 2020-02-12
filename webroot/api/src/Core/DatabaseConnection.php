@@ -42,25 +42,32 @@ class DatabaseConnection
      */
     public function fetchAssoc(string $query, array $params) : array
     {
-        $stmt = $this->conn->prepare($query);
-        foreach ($params as $param => $value) {
-            $stmt->bindParam(":$param", $value);
+        $stmt = $this->conn->prepare($query, $params);
+        foreach ($params as $param => $value)
+        {
+            $stmt->bindValue(":$param", $value);
         }
-        try {
+
+        try
+        {
             $stmt->execute();
             $stmt->setFetchMode(PDO::FETCH_ASSOC);
-            return array(
-                'success' => TRUE,
-                'data' => $stmt->fetch(),
+            $res = $stmt->fetch();
+            return array
+            (
+                'success' => $res ? true : false,
+                'data' => $res,
             );
         }
-        catch (Exception $e) {
+        catch (Exception $e)
+        {
             Logger::log(Logger::ERROR,
                 "Failed to execute query:\n'%s'\n" .
                 "Throws Exception:\n%s",
                 $query, $e->getMessage());
 
-            return array(
+            return array
+            (
                 "success" => FALSE,
                 "message" => "Failed to execute query",
             );
