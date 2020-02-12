@@ -38,6 +38,6 @@ final class AuthTest extends TestCase
 
         self::assertTrue($res['success']);
         self::assertEquals(10, $res['access_level']);
-        self::assertEquals(1234, $res['user_id']);
+        self::assertEquals(1234, $res['payload']['user_id']);
     }
 }

@@ -62,7 +62,7 @@ class Auth
         {
             return array
             (
-                'success' => true
+                'success' => true,
             );
         }
 
@@ -118,7 +118,7 @@ class Auth
             $decoded = (array) JWT::decode($token, $key, ['RS256']);
 
             $result['success'] = true;
-            $result['user_id'] = $decoded['user_id'] ?? NULL;
+            $result['payload'] = $decoded ?? NULL;
             $result['access_level'] = $decoded['access_level'] ?? 0;
         }
         catch (InvalidArgumentException $e)
