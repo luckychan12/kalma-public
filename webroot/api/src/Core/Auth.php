@@ -91,16 +91,27 @@ class Auth
         $authToken = str_ireplace('bearer ', '', $authorizationHeaders[0]);
         $res = static::validateJWT($authToken);
 
-        if ($res['access_level'] >= $accessLevel)
+        if ($res['success'])
         {
-            return $res;
-        }
+            if ($res['access_level'] >= $accessLevel)
+            {
+                return $res;
+            }
 
-        return array
-        (
-            'success' => false,
-            'message' => 'Insufficient privileges to access the request resource.'
-        );
+            return array
+            (
+                'success' => false,
+                'message' => 'Insufficient privileges to access the request resource.'
+            );
+        }
+        else
+        {
+            return array
+            (
+                'success' => false,
+                'message' => $res['message'],
+            );
+        }
     }
 
     /**
@@ -135,15 +146,16 @@ class Auth
         return $result;
     }
 
-    public static function generateJWT(int $access_level, int $user_id = null) : string
+    public static function generateJWT(int $access_level, int $client_fingerprint, int $user_id = null) : string
     {
         $payload = array(
-            "iss" => "localhost",
-            "aud" => "*",
-            "iat" => time(),
-            "nbf" => time() + 1,
+            'iss' => 'localhost',
+            'aud' => '*',
+            'iat' => time(),
+            'nbf' => time(),
 
-            "access_level" => $access_level,
+            'access_level' => $access_level,
+            'client_fingerprint' => $client_fingerprint
         );
 
         if ($user_id != null)
