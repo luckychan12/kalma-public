@@ -1,10 +1,10 @@
 <?php
 
+require_once __DIR__ . '/../vendor/autoload.php';
+
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Nyholm\Psr7Server\ServerRequestCreator;
 use Kalma\Api\Core\FrontController;
-
-require_once __DIR__ . '/../vendor/autoload.php';
 
 /* Set CORS Headers */
 header("Access-Control-Allow-Origin: *");
