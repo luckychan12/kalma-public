@@ -7,4 +7,9 @@
     <string name="log_in">LOG IN</string>
     <string name="error_message">There was an error logging in. Please check your email and password</string>
     <string name="login_image_desc">PLACEHOLDER IMAGE</string>
+    <string name="api_url">https://kalma.fergcb.uk</string>
+    <string name="api_login">/api/user/login</string>
+    <string name="api_signup">/api/user/signup</string>
+
+
 </resources>
