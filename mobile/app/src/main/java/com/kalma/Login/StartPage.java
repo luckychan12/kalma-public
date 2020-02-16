@@ -39,9 +39,8 @@ public class StartPage extends AppCompatActivity {
     }
 
     private void openSignUpPage(){
-        //TODO Create login page
-        //Intent intent = new Intent(this, LoginActivity.class);
-        //startActivity(intent);
+        Intent intent = new Intent(this, SignUpActivity.class);
+        startActivity(intent);
     }
 
 }
