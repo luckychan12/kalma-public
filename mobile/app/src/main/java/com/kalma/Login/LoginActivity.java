@@ -2,14 +2,16 @@ package com.kalma.Login;
 
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import com.android.volley.*;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.kalma.API_Interaction.APICaller;
 import com.kalma.R;
-import com.kalma.RequestQueueSingleton;
+import com.kalma.API_Interaction.RequestQueueSingleton;
 import android.provider.Settings.Secure;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -24,6 +26,7 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
+        //get view element resources
         txtEmail  = (EditText) findViewById(R.id.txtEmail);
         txtPassword = (EditText) findViewById(R.id.txtPassword);
         buttonLogin = (Button) findViewById(R.id.btnLogin);
@@ -41,7 +44,14 @@ public class LoginActivity extends AppCompatActivity {
 
 
     public void login(String email, String password) {
-        RequestQueue requestQueue = RequestQueueSingleton.getInstance(getApplicationContext()).getRequestQueue();
+        //create a json object and call API to log in
+        APICaller apiCaller = new APICaller(getApplicationContext());
+        apiCaller.post(buildLoginJsonObject(email, password), getResources().getString(R.string.api_login));
+
+    }
+
+    private JSONObject buildLoginJsonObject(String email, String password) {
+        //returns a json object based on input email and password
         JSONObject object = new JSONObject();
         try {
             object.put("email_address", "dummy@example.com");
@@ -50,20 +60,7 @@ public class LoginActivity extends AppCompatActivity {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        String url = getResources().getString(R.string.api_url) + getResources().getString(R.string.api_login);
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url, object,
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        Log.d("Response", response.toString());
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.w("Error.Response", error.toString());
-            }
-        });
-        requestQueue.add(jsonObjectRequest);
+        return object;
     }
 }
 
