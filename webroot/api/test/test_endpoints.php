@@ -46,29 +46,8 @@
     <script>
         $(function(){
             testLogin();
-
-            /*fetch("http://kalma.fergcb.uk/api/user/login", {
-                method : "POST",
-                headers : {
-                    'content-type':'application-json; charset=UTF-8'
-                },
-                body : {
-                    "email_address": "dummy@example.com",
-                    "password": "Password123!",
-                    "client_fingerprint": 123456789
-                },
-            })
-            .then(data => console.log(data))
-            .then(function(res){
-                logResponse(res);
-                if (res.hasOwnProperty('responseJSON')) {
-                    let data = res.responseJSON;
-                    if (data.success)
-                        testRead(data.jwt, data.links.account);
-                }
-            });
-*/
         });
+
         function logResponse(res) {
             console.log(res);
             $("#text").append("<p>" + res.responseText + "</p>");
@@ -82,7 +61,7 @@
         function testLogin() {
             $.ajax({
                 method: "POST",
-                url: "http://localhost/kalma/api/user/login",
+                url: "http://localhost/api/user/login",
                 crossDomain: true,
                 xhrFields: {
                     withCredentials: false
@@ -110,7 +89,7 @@
         function testRead(jwt, readLink) {
             $.ajax({
                 method: "GET",
-                url: "http://localhost/kalma" + readLink,
+                url: "http://localhost/" + readLink,
                 crossDomain: true,
                 xhrFields: {
                     withCredentials: false
@@ -136,7 +115,7 @@
         function testLogout(jwt, logoutLink) {
             $.ajax({
                 method: "POST",
-                url: "http://localhost/kalma" + logoutLink,
+                url: "http://localhost/" + logoutLink,
                 crossDomain: true,
                 xhrFields: {
                     withCredentials: false
