@@ -14,7 +14,21 @@ include_once "header.php";
         font: var(--f-normal);
     }
 </style>
+<script>
+    window.onload = function() {
+        var today = new Date();
+        var day = today.getDate();
+        var month = today.getMonth() + 1;
+        var year = today.getFullYear();
 
+        if (day < 10)
+            day = '0' + day;
+        if (month < 10)
+            month = '0' + month;
+        var now = year+ '-' + month + '-' + day;
+        document.getElementById('dob').setAttribute("max", now);
+    }
+</script>
 <body >
 
 <div class="container-fluid" >
