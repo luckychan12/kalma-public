@@ -35,7 +35,7 @@ class Router
         //        "ACCESS_LEVEL" is an optional integer indicating the access level required to access the resource
         $this->dispatcher = simpleDispatcher(function(RouteCollector $root)
         {
-            $root->addGroup('/kalma/api', function(RouteCollector $group)
+            $root->addGroup('/api', function(RouteCollector $group)
             {
                 $group->addRoute('POST', '/user/signup', ['User', 'signup', Auth::ACCESS_PUBLIC]);
                 $group->addRoute('POST', '/user/login', ['User', 'login', Auth::ACCESS_PUBLIC]);
