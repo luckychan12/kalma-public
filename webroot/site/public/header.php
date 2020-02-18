@@ -4,6 +4,7 @@
 <!doctype html>
 <html lang='en'>
 <head>
+    <title>kalma</title>
     <!-- Meta tags -->
     <meta charset='utf-8'>
     <meta name='viewport' content='width=device-width, initial-scale=1, shrink-to-fit=no'>
@@ -83,7 +84,7 @@
         .show {display: block;}
     </style>
 
-    //Displays the side menu with all the pages
+    <!--Displays the side menu with all the pages-->
     <script>
         function openSideBar() {
             document.getElementById("sideMenu").classList.toggle("show");
