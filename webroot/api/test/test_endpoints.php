@@ -46,14 +46,35 @@
     <script>
         $(function(){
             testLogin();
-        });
 
+            /*fetch("http://kalma.fergcb.uk/api/user/login", {
+                method : "POST",
+                headers : {
+                    'content-type':'application-json; charset=UTF-8'
+                },
+                body : {
+                    "email_address": "dummy@example.com",
+                    "password": "Password123!",
+                    "client_fingerprint": 123456789
+                },
+            })
+            .then(data => console.log(data))
+            .then(function(res){
+                logResponse(res);
+                if (res.hasOwnProperty('responseJSON')) {
+                    let data = res.responseJSON;
+                    if (data.success)
+                        testRead(data.jwt, data.links.account);
+                }
+            });
+*/
+        });
         function logResponse(res) {
             console.log(res);
-            $("#text").html(res.responseText);
+            $("#text").append("<p>" + res.responseText + "</p>");
             if (res.hasOwnProperty("responseJSON")) {
                 let $json = $("#json");
-                $json.append(JSON.stringify(res.responseJSON, null, 4));
+                $json.append("\n\n" + JSON.stringify(res.responseJSON, null, 4));
                 hljs.highlightBlock($json[0]);
             }
         }
@@ -62,6 +83,10 @@
             $.ajax({
                 method: "POST",
                 url: "http://localhost/kalma/api/user/login",
+                crossDomain: true,
+                xhrFields: {
+                    withCredentials: false
+                },
                 accepts: {
                     json: "application/json"
                 },
@@ -73,7 +98,7 @@
                 },
                 complete: function(res) {
                     logResponse(res);
-                    if (res.hasOwnProperty('responseJSON'))
+                    if (res.hasOwnProperty('responseJSON')) {
                         let data = res.responseJSON;
                         if (data.success)
                             testRead(data.jwt, data.links.account);
@@ -86,6 +111,10 @@
             $.ajax({
                 method: "GET",
                 url: "http://localhost/kalma" + readLink,
+                crossDomain: true,
+                xhrFields: {
+                    withCredentials: false
+                },
                 accepts: {
                     json: "application/json"
                 },
@@ -108,6 +137,10 @@
             $.ajax({
                 method: "POST",
                 url: "http://localhost/kalma" + logoutLink,
+                crossDomain: true,
+                xhrFields: {
+                    withCredentials: false
+                },
                 accepts: {
                     json: "application/json"
                 },
