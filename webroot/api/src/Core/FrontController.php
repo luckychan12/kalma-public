@@ -35,11 +35,22 @@ class FrontController
     {
         $router = new Router();
         $uri = $_SERVER['REQUEST_URI'];
-        $route = $router->getRoute($request->getMethod(), $uri);
+        $method = $request->getMethod();
 
         // Create response
         $responseFactory = new Psr17Factory();
-        $response = $responseFactory->createResponse(500); // Default to server error response (if not set by resource)
+        $response = $responseFactory
+            ->createResponse(500) // Default to server error response (if not set by resource)
+            ->withHeader("Access-Control-Allow-Origin", "*")
+            ->withHeader("Access-Control-Allow-Headers", "Authorization, x-requested-with, Content-Type")
+            ->withHeader("Access-Control-Allow-Methods", "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS");
+
+        if ($method == "OPTIONS")
+        {
+            $this->emitResponse($response->withStatus(200));
+        }
+
+        $route = $router->getRoute($method, $uri);
 
         switch($route['status'])
         {
@@ -124,14 +135,15 @@ class FrontController
         header($response_status, true);
 
         // Write headers
-        foreach ($response->getHeaders() as $key => $value) {
+        foreach ($response->getHeaders() as $key => $value)
+        {
             $header_line = sprintf
             (
                 "%s: %s",
                 $key,
-                $response->getHeader($key)
+                implode(", ", $response->getHeader($key))
             );
-            header($header_line, false);
+            header($header_line);
         }
 
         echo $response->getBody();
