@@ -89,7 +89,7 @@
         function testRead(jwt, readLink) {
             $.ajax({
                 method: "GET",
-                url: "http://localhost/" + readLink,
+                url: "http://localhost" + readLink,
                 crossDomain: true,
                 xhrFields: {
                     withCredentials: false
@@ -115,7 +115,7 @@
         function testLogout(jwt, logoutLink) {
             $.ajax({
                 method: "POST",
-                url: "http://localhost/" + logoutLink,
+                url: "http://localhost" + logoutLink,
                 crossDomain: true,
                 xhrFields: {
                     withCredentials: false
