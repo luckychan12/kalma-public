@@ -1,5 +1,19 @@
 <?php
 include_once "header.php";
+include_once "../api_tasks/loginRequest.php";
+if(isset($_POST['login'])) {
+    $pass = $_POST['logPassword'];
+    $email = $_POST['logEmail'];
+    ?>
+    <script >
+        let inPassword = "<?php echo $pass ?>";
+        let inEmail = "<?php echo $email?>";
+        let user = request(inPassword, inEmail);
+    </script>
+
+    <?php
+}
+
 ?>
 
 
@@ -13,8 +27,11 @@ include_once "header.php";
         width:350px;
         font: var(--f-normal);
     }
+    .hide {display: none;}
+
 </style>
 <script>
+
     window.onload = function() {
         var today = new Date();
         var day = today.getDate();
@@ -35,19 +52,23 @@ include_once "header.php";
 <div class="row" style="margin-top: 20px">
     <div class="col-md-1"></div>
     <div class="col-lg-5" style="padding:10px;background-color: var(--c-primary-dark);font:var(--f-normal) ;color: var(--c-text-on-primary);border-top-left-radius:20px; border-bottom-left-radius: 20px">
-        <h2 style="text-align: center">Login</h2>
-        <form style="text-align: center">
-            <input type="email" placeholder="Email" id="logEmail">
+        <h2 id="loginHeader" style="text-align: center">Login</h2>
+        <form action="loginAndSignup.php" method="post" style="text-align: center">
+            <input type="email" placeholder="Email" name="logEmail">
             <br>
-            <input type="password" placeholder="Password" id="logPassword">
+            <input type="password" placeholder="Password" name="logPassword">
             <br>
             <input style="width: 100px;background-color: var(--c-secondary); color:var(--c-text-on-secondary)" type="submit" name="login" value="Submit">
         </form>
     </div>
     <div class="col-lg-5" style="padding:10px;background-color: var(--c-primary-dark);font:var(--f-normal) ;color: var(--c-text-on-primary);border-top-right-radius:20px; border-bottom-right-radius: 20px">
         <h2 style="text-align: center; ">Sign up</h2>
-        <form action="dashboard.php" method="post" style="text-align: center">
+        <form action="loginAndSignup.php" method="post" style="text-align: center">
             <input type="email" placeholder="Email" id="email">
+            <br>
+            <input type="text" placeholder="First Name" id="firstName">
+            <br>
+            <input type="text" placeholder="Last Name" id="lastName">
             <br>
             <input type="password" placeholder="Password" id="password">
             <br>

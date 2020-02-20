@@ -1,4 +1,5 @@
 <?php
+
 ?>
 
 <!doctype html>
@@ -82,6 +83,7 @@
         }
 
         .show {display: block;}
+        .hide {display: none;}
     </style>
 
     <!--Displays the side menu with all the pages-->
@@ -109,7 +111,7 @@
     <div class="container-fluid " style="width:100%;position: relative;padding:0; z-index: 10">
         <ul>
             <div class="menu" style="z-index=2">
-                <button class="btn fas fa-bars"  onclick="openSideBar()"></button>
+                <button id="sideButton" class="btn fas fa-bars" onclick="openSideBar()"></button>
                 <div id="sideMenu" class="menu-content">
                     <a href="dashboard.php">Dashboard</a>
                     <a href="#mindful">Mindful Minutes</a>
