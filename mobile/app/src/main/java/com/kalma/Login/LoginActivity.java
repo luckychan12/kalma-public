@@ -27,9 +27,9 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
 
         //get view element resources
-        txtEmail  = (EditText) findViewById(R.id.txtEmail);
-        txtPassword = (EditText) findViewById(R.id.txtPassword);
-        buttonLogin = (Button) findViewById(R.id.btnLogin);
+        txtEmail  = findViewById(R.id.txtEmail);
+        txtPassword = findViewById(R.id.txtPassword);
+        buttonLogin = findViewById(R.id.btnLogin);
         //buttonReset = (Button) findViewById(R.id.buttonReset);
 
         buttonLogin.setOnClickListener(new View.OnClickListener(){

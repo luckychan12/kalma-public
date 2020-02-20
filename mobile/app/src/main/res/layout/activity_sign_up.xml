@@ -36,7 +36,7 @@
         app:layout_constraintHorizontal_bias="0.496"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.434"
+        app:layout_constraintVertical_bias="0.395"
         tools:targetApi="o" />
 
     <EditText
@@ -45,6 +45,7 @@
         android:layout_height="50dp"
         android:autofillHints=""
         android:background="@color/colorBGLightShade"
+        android:clickable="true"
         android:ems="10"
         android:hint="@string/dateofbirth_marker"
         android:inputType="date"
@@ -53,8 +54,9 @@
         app:layout_constraintHorizontal_bias="0.496"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.712"
-        tools:targetApi="o" />
+        app:layout_constraintVertical_bias="0.706"
+        tools:targetApi="o"
+        android:focusable="false" />
 
     <EditText
         android:id="@+id/txtPassword"
@@ -71,7 +73,7 @@
         app:layout_constraintHorizontal_bias="0.496"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.518"
+        app:layout_constraintVertical_bias="0.487"
         tools:targetApi="o" />
 
     <EditText
@@ -88,7 +90,7 @@
         app:layout_constraintHorizontal_bias="0.496"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.334"
+        app:layout_constraintVertical_bias="0.287"
         tools:targetApi="o" />
 
     <EditText
@@ -105,7 +107,7 @@
         app:layout_constraintHorizontal_bias="0.496"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.622"
+        app:layout_constraintVertical_bias="0.603"
         tools:targetApi="o" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
