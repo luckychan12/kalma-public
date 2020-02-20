@@ -1,21 +1,24 @@
 package com.kalma.Login;
 
 import androidx.appcompat.app.AppCompatActivity;
-
 import android.app.DatePickerDialog;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
-
 import com.kalma.API_Interaction.APICaller;
 import com.kalma.R;
-
-import java.text.DateFormat;
+import net.danlew.android.joda.JodaTimeAndroid;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+import org.json.JSONException;
+import org.json.JSONObject;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
+
+//TODO Implement error handling and data validation
 
 public class SignUpActivity extends AppCompatActivity {
     EditText txtFirstName, txtLastName, txtPassword, txtEmail, txtDOB;
@@ -25,6 +28,7 @@ public class SignUpActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        JodaTimeAndroid.init(this);
         setContentView(R.layout.activity_sign_up);
         txtFirstName = findViewById(R.id.txtFirstName);
         txtLastName = findViewById(R.id.txtLastName);
@@ -51,10 +55,14 @@ public class SignUpActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 String firstName = txtFirstName.getText().toString();
-                String lastNAme = txtLastName.getText().toString();
+                String lastName = txtLastName.getText().toString();
                 String password = txtPassword.getText().toString();
                 String email = txtEmail.getText().toString();
-                System.out.println(txtDOB.getText());
+
+                DateTime dateTimeGMT = new DateTime(txtDOB, DateTimeZone.UTC);
+                long epochSecs = (dateTimeGMT.getMillis() / 1000);
+                signUp(firstName, lastName, password, email, epochSecs);
+
             }
         });
 
@@ -67,7 +75,25 @@ public class SignUpActivity extends AppCompatActivity {
         });
     }
 
-    private void signup(String firstName, String lastName, String password, String email, int DOB) {
+    private void signUp(String firstName, String lastName, String password, String email, long DOB) {
         APICaller apiCaller = new APICaller(getApplicationContext());
+        apiCaller.post(buildSignUpJsonObject(firstName, lastName, password, email, DOB), getResources().getString(R.string.api_signup));
     }
+
+    private JSONObject buildSignUpJsonObject(String firstName, String lastName, String password, String email, long DOB) {
+        //TODO use input data instead of dummy data
+        //returns a json object based on input email and password
+        JSONObject object = new JSONObject();
+        try {
+            object.put("email_address", email);
+            object.put("password",password);
+            object.put("first_name",firstName);
+            object.put("last_name", lastName);
+            object.put("date_of_birth", DOB);
+         } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return object;
+    }
+
 }
