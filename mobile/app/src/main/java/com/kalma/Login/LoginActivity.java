@@ -1,20 +1,17 @@
 package com.kalma.Login;
 
-import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
-import android.provider.Settings;
-import android.util.Log;
+import android.provider.Settings.Secure;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import com.android.volley.*;
-import com.android.volley.toolbox.JsonObjectRequest;
+import androidx.appcompat.app.AppCompatActivity;
 import com.kalma.API_Interaction.APICaller;
 import com.kalma.R;
-import com.kalma.API_Interaction.RequestQueueSingleton;
-import android.provider.Settings.Secure;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+//TODO Implement error handling and data validation
 
 public class LoginActivity extends AppCompatActivity {
     EditText txtEmail, txtPassword;
@@ -51,6 +48,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private JSONObject buildLoginJsonObject(String email, String password) {
+        //TODO use input data instead of dummy data
         //returns a json object based on input email and password
         JSONObject object = new JSONObject();
         try {
