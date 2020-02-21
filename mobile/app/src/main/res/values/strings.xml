@@ -7,12 +7,16 @@
     <string name="log_in">LOG IN</string>
     <string name="error_message">There was an error logging in. Please check your email and password</string>
     <string name="login_image_desc">PLACEHOLDER IMAGE</string>
-    <string name="api_url">https://kalma.fergcb.uk</string>
+    <string name="api_url">http://localhost</string>
     <string name="api_login">/api/user/login</string>
     <string name="api_signup">/api/user/signup</string>
     <string name="lastname_marker">LastName</string>
     <string name="dateofbirth_marker">DateOfBirth</string>
     <string name="firstname_marker">FirstName</string>
+    <string name="title_activity_home_">Home_Activity</string>
+    <string name="title_home">Home</string>
+    <string name="title_dashboard">Dashboard</string>
+    <string name="title_notifications">Notifications</string>
 
 
 </resources>
