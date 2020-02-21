@@ -2,14 +2,8 @@
 include_once "header.php";
 include_once "../api_tasks/loginRequest.php";
 if(isset($_POST['login'])) {
-    $pass = $_POST['logPassword'];
-    $email = $_POST['logEmail'];
+    validateLogin($_POST['logPassword'],$_POST['logEmail']);
     ?>
-    <script >
-        let inPassword = "<?php echo $pass ?>";
-        let inEmail = "<?php echo $email?>";
-        let user = request(inPassword, inEmail);
-    </script>
 
     <?php
 }
