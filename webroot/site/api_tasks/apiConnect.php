@@ -51,3 +51,17 @@ function requestLogin($inPassword,$inEmail,$inClientFingerprint){
     }
 
 </script>
+
+<script>
+    function requestLogout(jwt, route){
+        $.ajax({
+            method:"POST",
+            url: "http://localhost" + route,
+            headers : {'Authorization' : jwt},
+            dataType: "json",
+            complete: function(result){
+                signout(result);
+            }
+        })
+    }
+</script>

@@ -1,5 +1,6 @@
 <?php
-
+include_once "../controller/loginNOutController.php";
+//TODO hide the side menu and logout button on the login page
 ?>
 
 <!doctype html>
@@ -12,6 +13,7 @@
     <link rel="stylesheet" href="../assets/kalma-theme.css">
     <link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css'>
     <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+
     <style>
         ul {
             position: sticky;
@@ -33,7 +35,6 @@
             color: var(--c-text-on-primary);
             font: var(--f-normal);
             text-decoration: none;
-            padding-right: 50px;
             
         }
         li a:hover {
@@ -125,6 +126,7 @@
             <li style="text-align: center">
                 <a style="font: var(--f-brand); font-size: 35px;  margin:0" href="#">kalma</a>
             </li>
+            <button alt="logout" style="float:right;" id="signOut" class="btn fas fa-sign-out-alt" onclick="requestSignout()"></button>
 
         </ul>
     </div>
