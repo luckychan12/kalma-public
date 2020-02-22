@@ -35,18 +35,29 @@ class User extends Resource
     {
         $am = AccountManager::getInstance();
         $body = $req->getParsedBody();
-        $creationResult = $am->createUser($body);
-        $res->getBody()->write(json_encode($creationResult));
-
-        if ($creationResult['success'])
+        if ($body)
         {
-            return $res->withStatus(200);
+            $creationResult = $am->createUser($body);
+            $res->getBody()->write(json_encode($creationResult));
+
+            if ($creationResult['success'])
+            {
+                return $res->withStatus(200);
+            }
+            else
+            {
+                return $res->withStatus(400);
+            }
         }
         else
         {
+            $res->getBody()->write(json_encode(array
+            (
+                'success' => false,
+                'message' => 'Malformed request body.',
+            )));
             return $res->withStatus(400);
         }
-
     }
 
     /**
