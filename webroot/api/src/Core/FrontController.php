@@ -74,6 +74,7 @@ class FrontController
             case Dispatcher::FOUND:
                 // Route found
                 // Pass request to resource to create the response
+                $request = $request->withParsedBody(json_decode(file_get_contents('php://input'), true));
                 $response = $this->visitRoute($request, $response, $route);
                 break;
         }
