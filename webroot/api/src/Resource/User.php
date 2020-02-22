@@ -44,8 +44,7 @@ class User extends Resource
         }
         else
         {
-            $res->getBody()->write(json_encode(array('message' => 'No user data provided in request body.')));
-                return $res->withStatus(400);
+            return $res->withStatus(400);
         }
 
     }
@@ -66,7 +65,7 @@ class User extends Resource
             $am = AccountManager::getInstance();
             $verificationResult = $am->verifyCredentials($body['email_address'], $body['password'], $body['client_fingerprint']);
             $verified = $verificationResult['success'];
-            $status = $verificationResult['status'] ?? $verified ? 200 : 400;
+            $status = isset($verificationResult['status']) ? $verificationResult['status'] : ($verified ? 200 : 400);
 
             $resBody = $verificationResult;
             unset($resBody['status']); // Don't send status in response body
@@ -120,12 +119,12 @@ class User extends Resource
             return $res->withStatus(401);
         }
 
-
-        $result = $this->database->fetchAssoc
+        $result = $this->database->fetch
         (
             'SELECT * FROM `user_account` WHERE `user_id` = :user_id',
             array('user_id' => $args[0])
         );
+
         $data = $result['data'];
         if ($data)
         {
