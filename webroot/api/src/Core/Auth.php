@@ -45,7 +45,7 @@ class Auth
      * Read the private SHA256 key from file
      * @return string
      */
-    private static function getPrivateKey() : string
+    public static function getPrivateKey() : string
     {
         return file_get_contents(__DIR__ . '/../../private.key');
     }
@@ -149,7 +149,7 @@ class Auth
     public static function generateJWT(int $access_level, int $client_fingerprint, int $user_id = null) : string
     {
         $payload = array(
-            'iss' => 'localhost',
+            'iss' => 'kalma',
             'aud' => '*',
             'iat' => time(),
             'nbf' => time(),
