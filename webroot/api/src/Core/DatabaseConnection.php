@@ -40,7 +40,7 @@ class DatabaseConnection
      * @param  array  $params The parameters to bind to the prepared statement as an associative array
      * @return array
      */
-    public function fetchAssoc(string $query, array $params) : array
+    public function fetch(string $query, array $params) : array
     {
         $stmt = $this->conn->prepare($query, $params);
         foreach ($params as $param => $value)
@@ -52,10 +52,10 @@ class DatabaseConnection
         {
             $stmt->execute();
             $stmt->setFetchMode(PDO::FETCH_ASSOC);
-            $res = $stmt->fetch();
+            $res = $stmt->fetchAll();
             return array
             (
-                'success' => $res ? true : false,
+                'success' => ($res === false) ? false : true,
                 'data' => $res,
             );
         }
@@ -68,7 +68,7 @@ class DatabaseConnection
 
             return array
             (
-                "success" => FALSE,
+                "success" => false,
                 "message" => "Failed to execute query",
             );
         }
