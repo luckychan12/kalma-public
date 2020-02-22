@@ -4,7 +4,6 @@
     use Kalma\Api\Core\Auth;
 
     $jwt = Auth::generateJWT(10, 1234);
-    sleep(1); // Wait for auth key to become valid
 ?>
 
 <!DOCTYPE html>
@@ -61,7 +60,7 @@
         function testLogin() {
             $.ajax({
                 method: "POST",
-                url: "http://localhost/api/user/login",
+                url: "http://localhost/kalma/api/user/login",
                 crossDomain: true,
                 xhrFields: {
                     withCredentials: false
@@ -70,11 +69,11 @@
                     json: "application/json"
                 },
                 dataType: "json",
-                data: {
+                data: JSON.stringify({
                     "email_address": "dummy@example.com",
                     "password": "Password123!",
                     "client_fingerprint": 123456789
-                },
+                }),
                 complete: function(res) {
                     logResponse(res);
                     if (res.hasOwnProperty('responseJSON')) {
@@ -89,7 +88,7 @@
         function testRead(jwt, readLink) {
             $.ajax({
                 method: "GET",
-                url: "http://localhost" + readLink,
+                url: "http://localhost/kalma" + readLink,
                 crossDomain: true,
                 xhrFields: {
                     withCredentials: false
@@ -115,7 +114,7 @@
         function testLogout(jwt, logoutLink) {
             $.ajax({
                 method: "POST",
-                url: "http://localhost" + logoutLink,
+                url: "http://localhost/kalma" + logoutLink,
                 crossDomain: true,
                 xhrFields: {
                     withCredentials: false
