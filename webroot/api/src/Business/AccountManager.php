@@ -17,8 +17,11 @@ namespace Kalma\Api\Business;
 
 use DateTime;
 use Exception;
+use Firebase\JWT\JWT;
 use Kalma\Api\Core\Auth;
+use Kalma\Api\Core\Config;
 use Kalma\Api\Core\DatabaseHandler;
+use Kalma\Api\Core\Logger;
 
 class AccountManager
 {
@@ -44,17 +47,78 @@ class AccountManager
             return $validationResult;
         }
 
+        $db = DatabaseHandler::getConnection();
+
+        $queryParams = array
+        (
+            'email_address' => $user_data['email_address'],
+            'password_hash' => password_hash($user_data['password'], PASSWORD_BCRYPT),
+            'first_name' => $user_data['first_name'],
+            'last_name' => $user_data['last_name'],
+            'date_of_birth' => date('y-m-d', $user_data['date_of_birth']),
+        );
+
+        $queryResult = $db->fetch
+        (
+            'CALL `create_user` (:email_address, :password_hash, :first_name, :last_name, :date_of_birth)',
+            $queryParams
+        );
+
+        if ($queryResult['success'])
+        {
+            $data = $queryResult['data'];
+            if (isset($data['error']))
+            {
+                return array
+                (
+                    'success' => false,
+                    'message' => $data['error'],
+                );
+            }
+            else
+            {
+                if (Config::get('mail_enabled'))
+                {
+                    $confirmation_payload = array
+                    (
+                        'iss' => 'kalma',
+                        'aud' => '*',
+                        'iat' => time(),
+                        'nbf' => time() + 10,
+
+                        'user_id' => $data['user_id'],
+                    );
+
+                    $key = Auth::getPrivateKey();
+                    $confirmation_jwt = JWT::encode($confirmation_payload, $key, 'RS256');
+
+                    $content = file_get_contents(__DIR__ . '/../templates/confirmation_email.html');
+                    $url = Config::get('site_root') . Config::get('api_root');
+                    $confirmation_link = "$url/user/confirm/?confirmation=" . $confirmation_jwt;
+
+                    $to = $user_data['email_address'];
+                    $subject = 'Confirm Your Account';
+                    $message = str_replace('{{link}}',  $confirmation_link, $content);
+                    $headers = 'From: ';
+                    mail($to, $subject, $message, $headers);
+                }
+
+                return array
+                (
+                    'success' => true,
+                    'message' => 'Your account has been created, and a confirmation email has been sent to the email address you supplied.'
+                );
+
+            }
+        }
+
+
         // TEMP
         return array
         (
-            'success' => true,
-            'message' => 'Almost done! Please check your inbox for a confirmation email, before you can login in. (Not really I haven\' finished implementing this yet pls forgive)'
+            'success' => false,
+            'message' => 'Failed to create user account.',
         );
-
-        // TODO: Complete signup endpoint
-        // Attempt to create user record
-        // $db = \Kalma\Api\Core\DatabaseHandler::getConnection();
-        // $queryResult = $db->fetchAssoc('');
 
     }
 
@@ -87,11 +151,11 @@ class AccountManager
             return array
             (
                 'success' => false,
-                'message' => 'Failed to create user account. The provided password is too weak.'
+                'message' => 'Failed to create user account. The provided password is too weak or contains invalid characters.'
             );
         }
 
-        if (sizeof($user_data['first_name']) > 50)
+        if (strlen($user_data['first_name']) > 50)
         {
             return array
             (
@@ -100,7 +164,7 @@ class AccountManager
             );
         }
 
-        if (sizeof($user_data['last_name']) > 50)
+        if (strlen($user_data['last_name']) > 50)
         {
             return array
             (
@@ -143,11 +207,12 @@ class AccountManager
      */
     private function validatePassword(string $password) : bool
     {
-        return preg_match
+        $match = preg_match
         (
-            '/(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[ !"#$%&\'()*+,\-.:;<=>?@[\\\]\^_`{\|}~])[A-Za-z0-9 !"#$%&\'()*+,\-.:;<=>?@[\\\]\^_`{\|}~]{8,}/',
+            '/^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[ !"#$%&\'()*+,\-.:;<=>?@\[\]\\\^_`{|}~])[A-Za-z0-9 !"#$%&\'()*+,\-.:;<=>?@\[\]\\\^_`{|}~]{8,}$/',
             $password,
         );
+        return $match == 1;
     }
 
     /**
@@ -159,11 +224,12 @@ class AccountManager
     {
         $min_age = 16;
         try {
-            $dob = new DateTime($dob_timestamp);
+            $dob = new DateTime("@$dob_timestamp");
             $now = new DateTime();
             $age = $now->diff($dob);
             return $age->y >= $min_age;
         } catch (Exception $e) {
+            Logger::log(Logger::ERROR, "Failed to parse date timestamp '$dob_timestamp' in AccountManager::validateAge()");
             return false;
         }
     }
@@ -178,41 +244,44 @@ class AccountManager
     public function verifyCredentials(string $email, string $pass, int $client_fingerprint) : array
     {
         $db = DatabaseHandler::getConnection();
-        $result = $db->fetchAssoc
+        $result = $db->fetch
         (
             'SELECT user_id, password_hash, activated FROM `user` WHERE email_address = (:email_address)',
             array('email_address' => $email),
         );
 
-        if (!$result) {
-            return array
-            (
-                'success' => false,
-                'message' => 'Database error.',
-                'status' => 500,
-            );
-        }
-
         if ($result['success'])
         {
-            $data = $result['data'];
-            if (password_verify($pass, $data['password_hash']))
+            $rows = $result['data'];
+            if (count($rows) > 0)
             {
-                if ($data['activated'] == 1)
+                $data = $rows[0];
+                if (password_verify($pass, $data['password_hash']))
                 {
-                    return array
-                    (
-                        'success' => true,
-                        'jwt' => Auth::generateJWT(Auth::ACCESS_USER, $client_fingerprint, $data['user_id']),
-                        'user_id' => $data['user_id'],
-                    );
+                    if ($data['activated'] == 1)
+                    {
+                        return array
+                        (
+                            'success' => true,
+                            'jwt' => Auth::generateJWT(Auth::ACCESS_USER, $client_fingerprint, $data['user_id']),
+                            'user_id' => $data['user_id'],
+                        );
+                    }
+                    else
+                    {
+                        return array
+                        (
+                            'success' => false,
+                            'message' => 'You must confirm your account before you can log in.',
+                        );
+                    }
                 }
                 else
                 {
                     return array
                     (
                         'success' => false,
-                        'message' => 'You must confirm your account before you can log in.',
+                        'message' => 'Incorrect email or password.',
                     );
                 }
             }
@@ -221,16 +290,19 @@ class AccountManager
                 return array
                 (
                     'success' => false,
-                    'message' => 'Invalid email or password.',
+                    'message' => 'No user exists with this email address.',
                 );
             }
         }
-
-        return array
-        (
-            'verified' => false,
-            'message' => 'Database error',
-        );
+        else
+         {
+            return array
+            (
+                'success' => false,
+                'message' => 'Database error.',
+                'status' => 500,
+            );
+        }
     }
 
 }
