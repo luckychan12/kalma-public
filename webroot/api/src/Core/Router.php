@@ -35,7 +35,8 @@ class Router
         //        "ACCESS_LEVEL" is an optional integer indicating the access level required to access the resource
         $this->dispatcher = simpleDispatcher(function(RouteCollector $root)
         {
-            $root->addGroup('/api', function(RouteCollector $group)
+            $api_root = Config::get("api_root");
+            $root->addGroup($api_root, function(RouteCollector $group)
             {
                 $group->addRoute('POST', '/user/signup', ['User', 'signup', Auth::ACCESS_PUBLIC]);
                 $group->addRoute('POST', '/user/login', ['User', 'login', Auth::ACCESS_PUBLIC]);
