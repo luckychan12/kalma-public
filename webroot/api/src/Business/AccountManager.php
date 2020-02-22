@@ -66,7 +66,7 @@ class AccountManager
 
         if ($queryResult['success'])
         {
-            $data = $queryResult['data'];
+            $data = $queryResult['data'][0];
             if (isset($data['error']))
             {
                 return array

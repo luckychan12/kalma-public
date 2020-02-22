@@ -125,25 +125,37 @@ class User extends Resource
             array('user_id' => $args[0])
         );
 
-        $data = $result['data'];
-        if ($data)
+        if ($result['success'])
         {
-            $res->getBody()->write(json_encode(array
-            (
-                'success' => true,
-                'user' => $data,
-                'links' => array
+            $rows = $result['data'];
+            if (count($rows) > 0)
+            {
+                $account_data = $rows[0];
+                $res->getBody()->write(json_encode(array
                 (
-                    'logout' => "/api/user/$args[0]/logout",
-                ),
-            )));
-            return $res->withStatus(200);
+                    'success' => true,
+                    'user' => $account_data,
+                    'links' => array
+                    (
+                        'logout' => "/api/user/$args[0]/logout",
+                    ),
+                )));
+                return $res->withStatus(200);
+            }
+            else {
+                $res->getBody()->write(json_encode(array
+                (
+                    'success' => false,
+                    'message' => "Failed to read data for user with ID '$args[0]'. No such user exists.",
+                )));
+                return $res->withStatus(400);
+            }
         }
 
         $res->getBody()->write(json_encode(array
         (
             'success' => false,
-            'message' => "Failed to read data for user with ID '$args[0]'",
+            'message' => "Failed to read data for user with ID '$args[0]'.",
         )));
         return $res->withStatus(400);
     }
