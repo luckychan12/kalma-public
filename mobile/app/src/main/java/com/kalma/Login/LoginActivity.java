@@ -17,7 +17,6 @@ public class LoginActivity extends AppCompatActivity {
     EditText txtEmail, txtPassword;
     Button buttonLogin;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,7 +52,7 @@ public class LoginActivity extends AppCompatActivity {
         JSONObject object = new JSONObject();
         try {
             object.put("email_address", "dummy@example.com");
-            object.put("password","Password!123");
+            object.put("password","Passwodrd123!");
             object.put("client_fingerprint", Long.parseLong(Secure.getString(LoginActivity.this.getContentResolver(), Secure.ANDROID_ID),16));
         } catch (JSONException e) {
             e.printStackTrace();

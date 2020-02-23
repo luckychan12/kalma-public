@@ -1,9 +1,12 @@
 package com.kalma.API_Interaction;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources;
 import android.provider.Settings;
 import android.util.Log;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -11,11 +14,14 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.gson.JsonIOException;
 import com.kalma.Login.LoginActivity;
 import com.kalma.R;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.io.UnsupportedEncodingException;
 
 public class APICaller {
     //set application context to use getResource methods
@@ -24,7 +30,7 @@ public class APICaller {
         this.context = context;
     }
 
-    public void post(JSONObject content, String location) {
+    public void post(final JSONObject content, String location) {
         RequestQueue requestQueue = RequestQueueSingleton.getInstance(context.getApplicationContext()).getRequestQueue();
         String url = context.getResources().getString(R.string.api_url) + location;
         //create request
@@ -35,12 +41,25 @@ public class APICaller {
                         //TODO handle API response and return JSON response
                         Log.d("Response", response.toString());
                     }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.w("Error.Response", error.toString());
-            }
-        });
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error ) {
+                        try{
+                            String jsonInput = new String(error.networkResponse.data, "utf-8");
+                            JSONObject responseBody = new JSONObject(jsonInput);
+                            String message = responseBody.getString("message");
+                            Log.w("Error.Response", jsonInput);
+                            Toast toast = Toast.makeText(context, message , Toast.LENGTH_LONG);
+                            toast.show();
+                        }
+                        catch (JSONException je){}
+                        catch (UnsupportedEncodingException errorr) {
+                        }
+                    }
+
+                }
+        );
         //add request to queue to be sent to API
         requestQueue.add(jsonObjectRequest);
     }
@@ -58,7 +77,17 @@ public class APICaller {
             }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
-                    Log.w("Error.Response", error.toString());
+                    try{
+                        String jsonInput = new String(error.networkResponse.data, "utf-8");
+                        JSONObject responseBody = new JSONObject(jsonInput);
+                        String message = responseBody.getString("message");
+                        Log.w("Error.Response", jsonInput);
+                        Toast toast = Toast.makeText(context, message , Toast.LENGTH_LONG);
+                        toast.show();
+                    }
+                    catch (JSONException je){}
+                    catch (UnsupportedEncodingException errorr) {
+                    }
                 }
             });
             requestQueue.add(jsonObjectRequest);
