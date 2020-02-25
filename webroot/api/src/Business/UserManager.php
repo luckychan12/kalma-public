@@ -17,22 +17,21 @@ namespace Kalma\Api\Business;
 
 use DateTime;
 use Exception;
-use Firebase\JWT\JWT;
 use Kalma\Api\Core\Auth;
 use Kalma\Api\Core\Config;
 use Kalma\Api\Core\DatabaseHandler;
 use Kalma\Api\Core\Logger;
 
-class AccountManager
+class UserManager
 {
 
-    private static AccountManager $instance;
+    private static UserManager $instance;
 
-    public static function getInstance() : AccountManager
+    public static function getInstance() : UserManager
     {
         if (!isset(self::$instance))
         {
-            self::$instance = new AccountManager();
+            self::$instance = new UserManager();
         }
 
         return self::$instance;
@@ -89,15 +88,13 @@ class AccountManager
                         'user_id' => $data['user_id'],
                     );
 
-                    $key = Auth::getPrivateKey();
-                    $confirmation_jwt = JWT::encode($confirmation_payload, $key, 'RS256');
-
-                    $content = file_get_contents(__DIR__ . '/../templates/confirmation_email.html');
+                    $confirmation_jwt = Auth::generateJWT($confirmation_payload);
                     $url = Config::get('site_root') . Config::get('api_root');
                     $confirmation_link = "$url/user/confirm/?confirmation=" . $confirmation_jwt;
 
                     $to = $user_data['email_address'];
                     $subject = 'Confirm Your Account';
+                    $content = file_get_contents(__DIR__ . '/../templates/confirmation_email.html');
                     $message = str_replace('{{link}}',  $confirmation_link, $content);
                     $headers = 'From: ';
                     mail($to, $subject, $message, $headers);
@@ -238,10 +235,9 @@ class AccountManager
      * Query the database to check whether a user record exists with matching email address and password
      * @param string $email
      * @param string $pass
-     * @param int    $client_fingerprint
      * @return array         Return
      */
-    public function verifyCredentials(string $email, string $pass, int $client_fingerprint) : array
+    public function verifyCredentials(string $email, string $pass) : array
     {
         $db = DatabaseHandler::getConnection();
         $result = $db->fetch
@@ -263,7 +259,6 @@ class AccountManager
                         return array
                         (
                             'success' => true,
-                            'jwt' => Auth::generateJWT(Auth::ACCESS_USER, $client_fingerprint, $data['user_id']),
                             'user_id' => $data['user_id'],
                         );
                     }
@@ -273,6 +268,7 @@ class AccountManager
                         (
                             'success' => false,
                             'message' => 'You must confirm your account before you can log in.',
+                            'status' => 403,
                         );
                     }
                 }
@@ -282,6 +278,7 @@ class AccountManager
                     (
                         'success' => false,
                         'message' => 'Incorrect email or password.',
+                        'status' => 401,
                     );
                 }
             }
@@ -291,6 +288,7 @@ class AccountManager
                 (
                     'success' => false,
                     'message' => 'No user exists with this email address.',
+                    'status' => 400,
                 );
             }
         }
@@ -303,6 +301,127 @@ class AccountManager
                 'status' => 500,
             );
         }
+    }
+
+    /**
+     * Create a session for a given user and client
+     * @param int    $user_id            The ID of the user starting a session
+     * @param int    $client_fingerprint A unique identifier for the user's client
+     * @return array
+     */
+    public function createSession(int $user_id, int $client_fingerprint) : array
+    {
+        $db = DatabaseHandler::getConnection();
+        $result = $db->fetch
+        (
+            'CALL `create_session` (:user_id, :client_fingerprint)',
+            array('user_id' => $user_id, "client_fingerprint" => $client_fingerprint),
+        );
+
+        if ($result['success'])
+        {
+            $rows = $result['data'];
+            if (count($rows) > 0)
+            {
+                $data = $rows[0];
+                $session_id = $data['session_id'];
+                $access_token = Auth::generateAccessToken($user_id);
+                $refresh_token = Auth::generateRefreshToken($session_id);
+                return array
+                (
+                    'success' => true,
+                    'access_token' => $access_token,
+                    'refresh_token' => $refresh_token
+                );
+            }
+        }
+
+        return array
+        (
+            'success' => false,
+            'message' => 'A database error has occurred.',
+        );
+    }
+
+    /**
+     * Validate a refresh token. If valid, return a new set of tokens
+     * @param string $refresh_token
+     * @param int $client_fingerprint
+     * @return array
+     */
+    public function refreshSession(string $refresh_token, int $client_fingerprint) : array
+    {
+
+        $validationResult = Auth::validateJWT($refresh_token);
+
+        if (!$validationResult['success'])
+        {
+            return array
+            (
+                'success' => false,
+                'status' => 400,
+                'message' => $validationResult['message'],
+            );
+        }
+
+        $payload = $validationResult['payload'];
+
+        if (!isset($payload['sub']))
+        {
+            return array
+            (
+                'success' => false,
+                'status' => 400,
+                'message' => 'Invalid refresh token. No session id given.',
+            );
+        }
+
+        $session_id = $payload['sub'];
+
+        $db = DatabaseHandler::getConnection();
+        $result = $db->fetch(
+            'SELECT `user_id`, `client_fingerprint` FROM `session` WHERE `session`.`session_id` = :session_id;',
+            array('session_id' => $session_id),
+        );
+
+        if (!$result['success'])
+        {
+            return array
+            (
+                'success' => false,
+                'status' => 500,
+                'message' => 'A database error has occurred.',
+            );
+        }
+
+        // If no records are returned, the session ID is invalid
+        $rows = $result['data'];
+        if (count($rows) == 0)
+        {
+            return array
+            (
+                'success' => false,
+                'status' => 400,
+                'message' => 'Refresh token has no valid session ID.',
+            );
+        }
+
+        // If the client fingerprints don't match, the refresh token is being used on a different client to the target
+        $data = $rows[0];
+        if ($data['client_fingerprint'] != $client_fingerprint)
+        {
+            return array
+            (
+                'success' => false,
+                'status' => 400,
+                'message' => 'The requested session belongs to a different client.',
+            );
+        }
+
+        // If the refresh token is valid, issue new access and refresh tokens
+        $res = static::createSession($data['user_id'], $client_fingerprint);
+        $res['status'] = $res['success'] ? 200 : 500;
+        return $res;
     }
 
 }
