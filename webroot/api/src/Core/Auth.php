@@ -30,7 +30,7 @@ class Auth
 {
     const ACCESS_PUBLIC = 0;
     const ACCESS_USER = 10;
-    const ACCESS_ADMIN = 20;
+    const ACCESS_ADMIN = 100;
 
     /**
      * Read the public SHA256 key from file
@@ -45,7 +45,7 @@ class Auth
      * Read the private SHA256 key from file
      * @return string
      */
-    public static function getPrivateKey() : string
+    private static function getPrivateKey() : string
     {
         return file_get_contents(__DIR__ . '/../../private.key');
     }
@@ -53,12 +53,13 @@ class Auth
     /**
      * Check Authorization HTTP header for valid JWT
      * @param  Request $request     The HTTP Request to be completed
-     * @param  int     $accessLevel The access level required to complete the request
+     * @param  int     $access_level The access level required to complete the request
      * @return array                An array containing the payload of the validated JWT
      */
-    public static function authorize(Request $request, int $accessLevel) : array
+    public static function authorize(Request $request, int $access_level) : array
     {
-        if ($accessLevel == static::ACCESS_PUBLIC)
+        // No authorization required for public endpoints
+        if ($access_level == static::ACCESS_PUBLIC)
         {
             return array
             (
@@ -76,10 +77,10 @@ class Auth
             );
         }
 
-        $authorizationHeaders = $request->getHeader("authorization");
+        $authorization_headers = $request->getHeader("authorization");
 
         // If the authorization header is set and has exactly one value
-        if ($authorizationHeaders == null || count($authorizationHeaders) != 1)
+        if ($authorization_headers == null || count($authorization_headers) != 1)
         {
             return array
             (
@@ -88,14 +89,22 @@ class Auth
             );
         }
 
-        $authToken = str_ireplace('bearer ', '', $authorizationHeaders[0]);
-        $res = static::validateJWT($authToken);
+        // Extract the access token
+        $access_token = str_ireplace('bearer ', '', $authorization_headers[0]);
 
+        // Validate the token
+        $res = static::validateJWT($access_token);
         if ($res['success'])
         {
-            if ($res['access_level'] >= $accessLevel)
+            $payload = $res['payload'];
+            if (isset($payload['sub']))
             {
-                return $res;
+                $user_id = $payload['sub'];
+                $user_access_level = static::getAccessLevel($user_id);
+                if ($user_access_level >= $access_level)
+                {
+                    return $res;
+                }
             }
 
             return array
@@ -106,11 +115,11 @@ class Auth
         }
         else
         {
-            return array
-            (
-                'success' => false,
-                'message' => $res['message'],
-            );
+                return array
+                (
+                    'success' => false,
+                    'message' => $res['message'],
+                );
         }
     }
 
@@ -130,7 +139,6 @@ class Auth
 
             $result['success'] = true;
             $result['payload'] = $decoded ?? NULL;
-            $result['access_level'] = $decoded['access_level'] ?? 0;
         }
         catch (InvalidArgumentException $e)
         {
@@ -146,25 +154,61 @@ class Auth
         return $result;
     }
 
-    public static function generateJWT(int $access_level, int $client_fingerprint, int $user_id = null) : string
+    /**
+     * Generate and return an R256 encoded JSON Web Token with a given payload
+     * @param array $payload
+     * @return string
+     */
+    public static function generateJWT(array $payload) : string
+    {
+        $key = static::getPrivateKey();
+        return JWT::encode($payload, $key, 'RS256');
+    }
+
+    /**
+     * Generate a short-lifetime, stateful JWT containing a user ID
+     * @param int $user_id
+     * @return string
+     */
+    public static function generateAccessToken(int $user_id) : string
     {
         $payload = array(
-            'iss' => 'kalma',
-            'aud' => '*',
+            'iss' => 'kalma/api',
+            'aud' => 'kalma/api',
             'iat' => time(),
-            'nbf' => time(),
-
-            'access_level' => $access_level,
-            'client_fingerprint' => $client_fingerprint
+            'exp' => time() + 15 * 60, // Expires in 15 minutes
+            'sub' => $user_id
         );
 
-        if ($user_id != null)
-        {
-            $payload['user_id'] = $user_id;
-        }
+        return static::generateJWT($payload);
+    }
 
-        $key = static::getPrivateKey();
+    /**
+     * Generate a long-lifetime, stateful JWT containing a session ID
+     * @param int $session_id
+     * @return string
+     */
+    public static function generateRefreshToken(int $session_id) : string
+    {
+        $payload = array(
+            'iss' => 'kalma/api',
+            'aud' => 'kalma/api',
+            'iat' => time(),
+            'exp' => time() + 28 * 24 * 60 * 60, // Expires in 28 days
+            'sub' => $session_id
+        );
 
-        return JWT::encode($payload, $key, 'RS256');
+        return static::generateJWT($payload);
+    }
+
+    /**
+     * Return the access level of a given user account
+     * @param int $user_id
+     * @return int
+     */
+    public static function getAccessLevel(int $user_id) : int
+    {
+        // TODO: Fetch access level from database record for given user
+        return 10;
     }
 }

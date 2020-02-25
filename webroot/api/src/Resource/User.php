@@ -15,7 +15,7 @@
 
 namespace Kalma\Api\Resource;
 
-use Kalma\Api\Business\AccountManager;
+use Kalma\Api\Business\UserManager;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
 
@@ -33,7 +33,7 @@ class User extends Resource
      */
     public function signup(Request $req, Response $res, ?array $payload, ...$args) : Response
     {
-        $am = AccountManager::getInstance();
+        $am = UserManager::getInstance();
         $body = $req->getParsedBody();
         if ($body)
         {
@@ -73,30 +73,72 @@ class User extends Resource
         $body = $req->getParsedBody();
         if (isset($body['email_address']) && isset($body['password']) && isset($body['client_fingerprint']))
         {
-            $am = AccountManager::getInstance();
-            $verificationResult = $am->verifyCredentials($body['email_address'], $body['password'], $body['client_fingerprint']);
-            $verified = $verificationResult['success'];
-            $status = isset($verificationResult['status']) ? $verificationResult['status'] : ($verified ? 200 : 400);
+            $um = UserManager::getInstance();
+            $verificationResult = $um->verifyCredentials($body['email_address'], $body['password'], $body['client_fingerprint']);
 
-            $resBody = $verificationResult;
-            unset($resBody['status']); // Don't send status in response body
-            if ($verified)
+            $verified = $verificationResult['success'];
+            if (!$verified)
             {
-                $resBody['links'] = array
-                (
-                    'account' => "/api/user/{$verificationResult['user_id']}/account",
-                    'logout'  => "/api/user/{$verificationResult['user_id']}/logout",
-                );
+                $status = $verificationResult['status'] ?? 500;
+                unset($verificationResult['status']); // Don't send status in response body
+                $res->getBody()->write(json_encode($verificationResult));
+                return $res->withStatus($status);
             }
 
+            $user_id = $verificationResult['user_id'];
+            $client_fingerprint = $body['client_fingerprint'];
+            $session = $um->createSession($user_id, $client_fingerprint);
+
+            if (!$session['success'])
+            {
+                $res->getBody()->write(json_encode($session));
+                return $res->withStatus(500);
+            }
+
+            $resBody = $session;
+            $resBody['links'] = array
+            (
+                'account' => "/api/user/$user_id/account",
+                'logout'  => "/api/user/$user_id/logout",
+            );
             $res->getBody()->write(json_encode($resBody));
-            return $res->withStatus($status);
+            return $res->withStatus(200);
         }
 
         $res->getBody()->write(json_encode(array
         (
             'success' => false,
             'message' => 'Malformed request body',
+        )));
+        return $res->withStatus(400);
+    }
+
+    /**
+     * User REFRESH
+     * Take a refresh token, validate it, and return a new access token and refresh token
+     * @param Request $req
+     * @param Response $res
+     * @param array|null $payload
+     * @param mixed ...$args
+     * @return Response
+     */
+    public function refresh(Request $req, Response $res, ?array $payload, ...$args) : Response
+    {
+        $body = $req->getParsedBody();
+        if (isset($body['refresh_token']) && isset($body['client_fingerprint']))
+        {
+            $um = UserManager::getInstance();
+            $result = $um->refreshSession($body['refresh_token'], $body['client_fingerprint']);
+            $status = $result['status'];
+            unset($result['status']);
+            $res->getBody()->write(json_encode($result));
+            return $res->withStatus($status);
+        }
+
+        $res->getBody()->write(json_encode(array
+        (
+            'success' => false,
+            'message' => 'Malformed request body.'
         )));
         return $res->withStatus(400);
     }
@@ -121,7 +163,7 @@ class User extends Resource
             return $res->withStatus(400);
         }
 
-        if (!isset($payload['user_id']) || $args[0] != $payload['user_id']) {
+        if (!isset($payload['sub']) || $args[0] != $payload['sub']) {
             $res->getBody()->write(json_encode(array
             (
                 'success' => false,

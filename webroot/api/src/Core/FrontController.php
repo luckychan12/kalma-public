@@ -79,7 +79,7 @@ class FrontController
                 break;
         }
 
-        $this->emitResponse($response);
+        $this->emitResponse($response->withHeader('Content-Type', 'application/json; charset=UTF-8'));
     }
 
     /**
