@@ -1,70 +1,29 @@
 <?php
+require '../vendor/autoload.php';
+
 use GuzzleHttp\Client;
 
+class ApiConnect
+{
+    private $client;
+    function __construct()
+    {
+        $this->client =  new Client([
+            // Base URI is used with relative requests
+            'base_uri' => 'http://localhost/',
+            // You can set any number of default request options.
+            'timeout'  => 2.0,
+        ]);
+    }
+
+    function requestLogin($inPassword,$inEmail,$inClientFingerprint){
+        $res = $this->client->request('POST', 'api/user/login', ['json' => ["email_address" => "dummy@example.com", "password"=> "Password123!", "client_fingerprint" => "123456789"]]);
+        $messageBody = $res->getBody()->read(2048);
+        $json = json_decode($messageBody);
+        //echo '<p>'.$json->access_token.')</p>';
+        return $json;
+    }
+}
 
 ?>
-<script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous">
-</script>
 
-<?php
-//Sends password to the api and checks it and saves a jwt
-function requestLogin($inPassword,$inEmail,$inClientFingerprint){
-    ?>
-    <script>
-
-        var details = {"email_address":"<?php echo $inEmail ?>","password":"<?php echo $inPassword ?>","client_fingerprint":"<?php echo $inClientFingerprint ?>"};
-        $.ajax({
-            method: "POST",
-            url: "http://localhost/api/user/login",
-            dataType: "json",
-            data: details,
-            complete: function(result){
-                if (result.hasOwnProperty('responseJSON')) {
-                    let res = result.responseJSON;
-                    if(res.success) {
-                        sessionStorage.setItem('jwt', res.jwt);
-                        sessionStorage.setItem('id', res.user_id);
-                        location.href ="../public/dashboard.php";
-                    }
-
-
-                }
-            }
-        });
-    </script>
-<?php
-    }
-//Retrieves data from the api
-
-    ?>
-
-
-<script>
-    function getData(jwt,route){
-        $.ajax({
-            method: "GET",
-            url: "http://localhost" + route,
-            headers : {'Authorization' : jwt},
-            dataType: "json",
-            success: function(result) {
-                    handleDashboard(result);
-                }
-
-        });
-    }
-
-</script>
-
-<script>
-    function requestLogout(jwt, route){
-        $.ajax({
-            method:"POST",
-            url: "http://localhost" + route,
-            headers : {'Authorization' : jwt},
-            dataType: "json",
-            complete: function(result){
-                signout(result);
-            }
-        })
-    }
-</script>

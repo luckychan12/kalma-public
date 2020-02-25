@@ -3,9 +3,6 @@ include_once "header.php";
 include_once "../controller/loginNOutController.php";
 if(isset($_POST['login'])) {
     validateLogin($_POST['logPassword'],$_POST['logEmail']);
-    ?>
-
-    <?php
 }
 
 ?>
