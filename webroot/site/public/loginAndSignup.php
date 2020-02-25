@@ -4,7 +4,6 @@ include_once "../controller/loginNOutController.php";
 if(isset($_POST['login'])) {
     validateLogin($_POST['logPassword'],$_POST['logEmail']);
 }
-
 ?>
 
 
@@ -65,7 +64,6 @@ if(isset($_POST['login'])) {
             <br>
             <input type="date"  id="dob" min="1900-01-01">
             <br>
-
             <input style="width: 100px;background-color: var(--c-secondary); color:var(--c-text-on-secondary)" type="submit" name="signup" value="Submit">
         </form>
     </div>
