@@ -366,7 +366,7 @@ class UserManager
 
         $payload = $validationResult['payload'];
 
-        if (!isset($payload['sub']))
+        if (!isset($payload['sid']))
         {
             return array
             (
@@ -376,7 +376,7 @@ class UserManager
             );
         }
 
-        $session_id = $payload['sub'];
+        $session_id = $payload['sid'];
 
         $db = DatabaseHandler::getConnection();
         $result = $db->fetch(
