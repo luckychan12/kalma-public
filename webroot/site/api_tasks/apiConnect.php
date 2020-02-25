@@ -15,13 +15,19 @@ class ApiConnect
             'timeout'  => 2.0,
         ]);
     }
-
+    //TODO add a client fingerprint
     function requestLogin($inPassword,$inEmail,$inClientFingerprint){
-        $res = $this->client->request('POST', 'api/user/login', ['json' => ["email_address" => "dummy@example.com", "password"=> "Password123!", "client_fingerprint" => "123456789"]]);
+        $res = $this->client->request('POST', 'api/user/login', ['json' => ["email_address" => $inEmail, "password"=> $inPassword, "client_fingerprint" => "123456789"]]);
         $messageBody = $res->getBody()->read(2048);
-        $json = json_decode($messageBody);
-        //echo '<p>'.$json->access_token.')</p>';
-        return $json;
+        $data = json_decode($messageBody);
+        return $data;
+    }
+
+    function getData($link){
+        $res = $this->client->request('GET', $link, ['headers' => ["Authorization" => 'bearer '.$_SESSION['access_token']]]);
+        $messageBody = $res->getBody()->read(2048);
+        $data = json_decode($messageBody);
+        return $data;
     }
 }
 
