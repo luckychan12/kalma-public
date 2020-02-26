@@ -224,11 +224,40 @@ class User extends Resource
      */
     public function logout(Request $req, Response $res, ?array $payload, ...$args) : Response
     {
-        if (count($args) != 1) {
+        $body = $req->getParsedBody();
+        if (!isset($body['client_fingerprint']))
+        {
             $res->getBody()->write(json_encode(array
             (
                 'success' => false,
-                'message' => 'Invalid URL parameters passed.',
+                'message' => 'Malformed request body.',
+            )));
+            return $res->withStatus(400);
+        }
+
+        $user_id = $payload['sub'];
+        $client_fingerprint = $body['client_fingerprint'];
+
+        $queryResult = $this->database->execute
+        (
+            'DELETE FROM `session` 
+                 WHERE `session`.`user_id` = :user_id 
+                 AND `session`.`client_fingerprint` = :client_fingerprint;',
+            array('user_id' => $user_id, 'client_fingerprint' => $client_fingerprint),
+        );
+
+        if (!$queryResult['success'])
+        {
+            $res->getBody()->write(json_encode($queryResult));
+            return $res->withStatus(500);
+        }
+
+        if ($queryResult['rows_affected'] == 0)
+        {
+            $res->getBody()->write(json_encode(array
+            (
+                'success' => false,
+                'message' => 'No session exists for this user at the given client.',
             )));
             return $res->withStatus(400);
         }
@@ -236,7 +265,7 @@ class User extends Resource
         $res->getBody()->write(json_encode(array
         (
             'success' => true,
-            'message' => 'Successfully logged you out. Just kidding, I haven\'t finished implementing this yet.',
+            'message' => 'Successfully logged you out.',
         )));
         return $res->withStatus(200);
 

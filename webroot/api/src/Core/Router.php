@@ -41,7 +41,7 @@ class Router
                 $group->addRoute('POST', '/user/signup', ['User', 'signup', Auth::ACCESS_PUBLIC]);
                 $group->addRoute('POST', '/user/login', ['User', 'login', Auth::ACCESS_PUBLIC]);
                 $group->addRoute('POST', '/user/refresh', ['User', 'refresh', Auth::ACCESS_PUBLIC]);
-                $group->addRoute('POST', '/user/{id:\d+}/logout', ['User', 'logout', Auth::ACCESS_USER]);
+                $group->addRoute('POST', '/user/logout', ['User', 'logout', Auth::ACCESS_USER]);
                 $group->addRoute('GET', '/user/{id:\d+}/account', ['User', 'read', Auth::ACCESS_USER]);
             });
         });
