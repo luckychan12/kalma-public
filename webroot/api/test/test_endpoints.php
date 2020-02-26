@@ -1,11 +1,3 @@
-<?php
-    require_once __DIR__ . '/../vendor/autoload.php';
-
-    use Kalma\Api\Core\Auth;
-
-    $jwt = Auth::generateJWT(10, 1234);
-?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -42,8 +34,21 @@
             integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU="
             crossorigin="anonymous"></script>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ClientJS/0.1.11/client.min.js"></script>
+
     <script>
+
+        let client_fingerprint;
+
         $(function(){
+
+            let client = new ClientJS();
+            let browser = client.getBrowser() + " " + client.getBrowserVersion();
+            let os = client.getOS() + " " + client.getOSVersion();
+            let device = client.getDeviceType();
+            client_fingerprint = `${client.getFingerprint()}`;
+            console.log(client_fingerprint);
+
             testLogin();
         });
 
@@ -72,23 +77,23 @@
                 data: JSON.stringify({
                     "email_address": "dummy@example.com",
                     "password": "Password123!",
-                    "client_fingerprint": 123456789
+                    "client_fingerprint": client_fingerprint
                 }),
                 complete: function(res) {
                     logResponse(res);
                     if (res.hasOwnProperty('responseJSON')) {
                         let data = res.responseJSON;
                         if (data.success)
-                            testRead(data.jwt, data.links.account);
+                            testRead(data.access_token, data.links.account);
                     }
                 },
             });
         }
 
-        function testRead(jwt, readLink) {
+        function testRead(access_token, readLink) {
             $.ajax({
                 method: "GET",
-                url: "http://localhost/kalma" + readLink,
+                url: "http://localhost" + readLink,
                 crossDomain: true,
                 xhrFields: {
                     withCredentials: false
@@ -98,38 +103,41 @@
                 },
                 dataType: "json",
                 headers : {
-                    'Authorization' : jwt
+                    'Authorization' : `Bearer ${access_token}`
                 },
                 complete: function(res) {
                     logResponse(res);
                     if (res.hasOwnProperty("responseJSON")) {
                         let data = res.responseJSON;
                         if (data.success)
-                            testLogout(jwt, data.links.logout);
+                            testLogout(access_token, data.links.logout);
                     }
                 },
             });
         }
 
-        function testLogout(jwt, logoutLink) {
-            $.ajax({
-                method: "POST",
-                url: "http://localhost/kalma" + logoutLink,
-                crossDomain: true,
-                xhrFields: {
-                    withCredentials: false
-                },
-                accepts: {
-                    json: "application/json"
-                },
-                dataType: "json",
-                headers : {
-                    'Authorization' : jwt
-                },
-                complete: function(res) {
-                    logResponse(res);
-                },
-            });
+        function testLogout(access_token, logoutLink) {
+            setTimeout(function(){
+                $.ajax({
+                    method: "POST",
+                    url: "http://localhost" + logoutLink,
+                    crossDomain: true,
+                    xhrFields: {
+                        withCredentials: false
+                    },
+                    accepts: {
+                        json: "application/json"
+                    },
+                    dataType: "json",
+                    data : JSON.stringify({"client_fingerprint" : client_fingerprint}),
+                    headers : {
+                        'Authorization' : `Bearer ${access_token}`
+                    },
+                    complete: function(res) {
+                        logResponse(res);
+                    },
+                });
+            }, 100);
         }
 
     </script>
