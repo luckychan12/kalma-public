@@ -99,7 +99,7 @@ class User extends Resource
             $resBody['links'] = array
             (
                 'account' => "/api/user/$user_id/account",
-                'logout'  => "/api/user/$user_id/logout",
+                'logout'  => "/api/user/logout",
             );
             $res->getBody()->write(json_encode($resBody));
             return $res->withStatus(200);
@@ -190,7 +190,7 @@ class User extends Resource
                     'user' => $account_data,
                     'links' => array
                     (
-                        'logout' => "/api/user/$args[0]/logout",
+                        'logout' => "/api/user/logout",
                     ),
                 )));
                 return $res->withStatus(200);
