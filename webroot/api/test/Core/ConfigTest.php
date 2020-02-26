@@ -13,7 +13,7 @@ final class ConfigTest extends TestCase
 {
     public function testReadsValueForValidKey() : void
     {
-        $this->assertEquals('localhost', Config::get('db_host'));
+        $this->assertEquals('fergcb.uk', Config::get('db_host'));
     }
 
     public function testReturnsNullForInvalidKey() : void

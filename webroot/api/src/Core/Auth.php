@@ -195,7 +195,7 @@ class Auth
             'aud' => 'kalma/api',
             'iat' => time(),
             'exp' => time() + 28 * 24 * 60 * 60, // Expires in 28 days
-            'sub' => $session_id
+            'sid' => $session_id
         );
 
         return static::generateJWT($payload);

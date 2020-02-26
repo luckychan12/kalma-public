@@ -23,6 +23,7 @@ require __DIR__ . '/../../vendor/autoload.php';
 
 class User extends Resource
 {
+
     /**
      * Attempt to create a user account. Return a success/failure bool with a message.
      * @param Request $req
@@ -74,7 +75,7 @@ class User extends Resource
         if (isset($body['email_address']) && isset($body['password']) && isset($body['client_fingerprint']))
         {
             $um = UserManager::getInstance();
-            $verificationResult = $um->verifyCredentials($body['email_address'], $body['password'], $body['client_fingerprint']);
+            $verificationResult = $um->verifyCredentials($body['email_address'], $body['password']);
 
             $verified = $verificationResult['success'];
             if (!$verified)
@@ -98,8 +99,8 @@ class User extends Resource
             $resBody = $session;
             $resBody['links'] = array
             (
-                'account' => "/api/user/$user_id/account",
-                'logout'  => "/api/user/$user_id/logout",
+                'account' => $this->api_root . "/user/$user_id/account",
+                'logout'  => $this->api_root . "/user/logout",
             );
             $res->getBody()->write(json_encode($resBody));
             return $res->withStatus(200);
@@ -184,13 +185,25 @@ class User extends Resource
             if (count($rows) > 0)
             {
                 $account_data = $rows[0];
+
+                $session_result = $this->database->fetch
+                (
+                    'SELECT `client_fingerprint`, `created_time`, `expiry_time` FROM `session` WHERE `user_id` = :user_id;',
+                    array('user_id' => $args[0]),
+                );
+
+                if ($session_result['success'] && count($session_result['data']) > 0)
+                {
+                    $account_data['sessions'] = $session_result['data'];
+                }
+
                 $res->getBody()->write(json_encode(array
                 (
                     'success' => true,
                     'user' => $account_data,
                     'links' => array
                     (
-                        'logout' => "/api/user/$args[0]/logout",
+                        'logout' => $this->api_root . '/user/logout',
                     ),
                 )));
                 return $res->withStatus(200);
@@ -224,11 +237,40 @@ class User extends Resource
      */
     public function logout(Request $req, Response $res, ?array $payload, ...$args) : Response
     {
-        if (count($args) != 1) {
+        $body = $req->getParsedBody();
+        if (!isset($body['client_fingerprint']))
+        {
             $res->getBody()->write(json_encode(array
             (
                 'success' => false,
-                'message' => 'Invalid URL parameters passed.',
+                'message' => 'Malformed request body.',
+            )));
+            return $res->withStatus(400);
+        }
+
+        $user_id = $payload['sub'];
+        $client_fingerprint = $body['client_fingerprint'];
+
+        $queryResult = $this->database->execute
+        (
+            'DELETE FROM `session` 
+                 WHERE `session`.`user_id` = :user_id 
+                 AND `session`.`client_fingerprint` = :client_fingerprint;',
+            array('user_id' => $user_id, 'client_fingerprint' => $client_fingerprint),
+        );
+
+        if (!$queryResult['success'])
+        {
+            $res->getBody()->write(json_encode($queryResult));
+            return $res->withStatus(500);
+        }
+
+        if ($queryResult['rows_affected'] == 0)
+        {
+            $res->getBody()->write(json_encode(array
+            (
+                'success' => false,
+                'message' => 'No session exists for this user at the given client.',
             )));
             return $res->withStatus(400);
         }
@@ -236,7 +278,7 @@ class User extends Resource
         $res->getBody()->write(json_encode(array
         (
             'success' => true,
-            'message' => 'Successfully logged you out. Just kidding, I haven\'t finished implementing this yet.',
+            'message' => 'Successfully logged you out.',
         )));
         return $res->withStatus(200);
 

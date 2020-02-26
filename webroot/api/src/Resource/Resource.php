@@ -15,6 +15,7 @@
 
 namespace Kalma\Api\Resource;
 
+use Kalma\Api\Core\Config;
 use Kalma\Api\Core\DatabaseConnection;
 use Kalma\Api\Core\DatabaseHandler;
 
@@ -24,9 +25,11 @@ class Resource
 {
 
     protected DatabaseConnection $database;
+    protected string $api_root;
 
     public function __construct()
     {
         $this->database = DatabaseHandler::getConnection();
+        $this->api_root = Config::get('api_root');
     }
 }

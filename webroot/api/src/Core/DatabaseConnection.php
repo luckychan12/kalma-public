@@ -62,16 +62,47 @@ class DatabaseConnection
         catch (Exception $e)
         {
             Logger::log(Logger::ERROR,
-                "Failed to execute query:\n'%s'\n" .
-                "Throws Exception:\n%s",
+                "Failed to execute query:\n\t'%s'\n" .
+                "\tThrows Exception:\n\t%s",
                 $query, $e->getMessage());
 
             return array
             (
-                "success" => false,
-                "message" => "Failed to execute query",
+                'success' => false,
+                'message' => 'Failed to execute query.',
             );
         }
+    }
+
+    public function execute(string $query, array $params) : array
+    {
+        $stmt = $this->conn->prepare($query, $params);
+        foreach ($params as $param => $value)
+        {
+            $stmt->bindValue(":$param", $value);
+        }
+
+        if($stmt->execute())
+        {
+            return array
+            (
+                'success' => true,
+                'rows_affected' => $stmt->rowCount(),
+            );
+        }
+        else
+        {
+            Logger::log(Logger::ERROR, "Failed to execute query: \n\t'%s'" .
+                                       "Error Info: \n\t %s",
+                                        $query, $this->conn->errorInfo());
+
+            return array
+            (
+                'success' => false,
+                'message' => 'Failed to execute query.',
+            );
+        }
+
     }
 
 }

@@ -306,10 +306,10 @@ class UserManager
     /**
      * Create a session for a given user and client
      * @param int    $user_id            The ID of the user starting a session
-     * @param int    $client_fingerprint A unique identifier for the user's client
+     * @param string    $client_fingerprint A unique identifier for the user's client
      * @return array
      */
-    public function createSession(int $user_id, int $client_fingerprint) : array
+    public function createSession(int $user_id, string $client_fingerprint) : array
     {
         $db = DatabaseHandler::getConnection();
         $result = $db->fetch
@@ -346,10 +346,10 @@ class UserManager
     /**
      * Validate a refresh token. If valid, return a new set of tokens
      * @param string $refresh_token
-     * @param int $client_fingerprint
+     * @param string $client_fingerprint
      * @return array
      */
-    public function refreshSession(string $refresh_token, int $client_fingerprint) : array
+    public function refreshSession(string $refresh_token, string $client_fingerprint) : array
     {
 
         $validationResult = Auth::validateJWT($refresh_token);
@@ -366,7 +366,7 @@ class UserManager
 
         $payload = $validationResult['payload'];
 
-        if (!isset($payload['sub']))
+        if (!isset($payload['sid']))
         {
             return array
             (
@@ -376,7 +376,7 @@ class UserManager
             );
         }
 
-        $session_id = $payload['sub'];
+        $session_id = $payload['sid'];
 
         $db = DatabaseHandler::getConnection();
         $result = $db->fetch(
