@@ -23,6 +23,7 @@ require __DIR__ . '/../../vendor/autoload.php';
 
 class User extends Resource
 {
+
     /**
      * Attempt to create a user account. Return a success/failure bool with a message.
      * @param Request $req
@@ -98,8 +99,8 @@ class User extends Resource
             $resBody = $session;
             $resBody['links'] = array
             (
-                'account' => "/api/user/$user_id/account",
-                'logout'  => "/api/user/logout",
+                'account' => $this->api_root . "/user/$user_id/account",
+                'logout'  => $this->api_root . "/user/logout",
             );
             $res->getBody()->write(json_encode($resBody));
             return $res->withStatus(200);
@@ -190,7 +191,7 @@ class User extends Resource
                     'user' => $account_data,
                     'links' => array
                     (
-                        'logout' => "/api/user/logout",
+                        'logout' => $this->api_root . '/user/logout',
                     ),
                 )));
                 return $res->withStatus(200);
