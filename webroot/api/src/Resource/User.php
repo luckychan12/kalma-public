@@ -75,7 +75,7 @@ class User extends Resource
         if (isset($body['email_address']) && isset($body['password']) && isset($body['client_fingerprint']))
         {
             $um = UserManager::getInstance();
-            $verificationResult = $um->verifyCredentials($body['email_address'], $body['password'], $body['client_fingerprint']);
+            $verificationResult = $um->verifyCredentials($body['email_address'], $body['password']);
 
             $verified = $verificationResult['success'];
             if (!$verified)
@@ -185,6 +185,18 @@ class User extends Resource
             if (count($rows) > 0)
             {
                 $account_data = $rows[0];
+
+                $session_result = $this->database->fetch
+                (
+                    'SELECT `client_fingerprint`, `created_time`, `expiry_time` FROM `session` WHERE `user_id` = :user_id;',
+                    array('user_id' => $args[0]),
+                );
+
+                if ($session_result['success'] && count($session_result['data']) > 0)
+                {
+                    $account_data['sessions'] = $session_result['data'];
+                }
+
                 $res->getBody()->write(json_encode(array
                 (
                     'success' => true,
