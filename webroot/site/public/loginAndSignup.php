@@ -1,9 +1,10 @@
 <?php
 include_once "header.php";
 include_once "../controller/loginNOutController.php";
-if(isset($_POST['login'])) {
-    validateLogin($_POST['logPassword'],$_POST['logEmail']);
-}
+
+
+//TODO add accessibility
+
 ?>
 
 
@@ -20,6 +21,7 @@ if(isset($_POST['login'])) {
     .hide {display: none;}
 
 </style>
+
 <script>
 
     window.onload = function() {
@@ -43,11 +45,12 @@ if(isset($_POST['login'])) {
     <div class="col-md-1"></div>
     <div class="col-lg-5" style="padding:10px;background-color: var(--c-primary-dark);font:var(--f-normal) ;color: var(--c-text-on-primary);border-top-left-radius:20px; border-bottom-left-radius: 20px">
         <h2 id="loginHeader" style="text-align: center">Login</h2>
-        <form action="loginAndSignup.php" method="post" style="text-align: center">
+        <form action="../controller/loginNOutController.php" method="post" style="text-align: center">
             <input type="email" placeholder="Email" name="logEmail">
             <br>
             <input type="password" placeholder="Password" name="logPassword">
             <br>
+            <input type="hidden" name="fingerprint" id="hiddenFingerprint">
             <input style="width: 100px;background-color: var(--c-secondary); color:var(--c-text-on-secondary)" type="submit" name="login" value="Submit">
         </form>
     </div>
@@ -70,3 +73,9 @@ if(isset($_POST['login'])) {
 </div>
 </div>
 </body>
+
+<script>
+    let client = new ClientJS();
+    let fingerprint = client.getFingerprint();
+    document.getElementById("hiddenFingerprint").value = fingerprint;
+</script>

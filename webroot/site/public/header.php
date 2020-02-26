@@ -13,7 +13,7 @@ include_once "../controller/loginNOutController.php";
     <link rel="stylesheet" href="../assets/kalma-theme.css">
     <link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css'>
     <script src="https://kit.fontawesome.com/a076d05399.js"></script>
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ClientJS/0.1.11/client.min.js"></script>
     <style>
         ul {
             position: sticky;
