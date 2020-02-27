@@ -1,15 +1,17 @@
 package com.kalma.API_Interaction;
 
 import android.content.Context;
+import android.provider.Settings;
 
 public class AuthStrings {
     private static AuthStrings authStrings;
-    private static String JWTAuthToken;
+    private static String authToken;
+    private static String refreshToken;
     private static Context context;
 
     private AuthStrings(Context ctx){
         context = ctx;
-        JWTAuthToken = getJWTAuthToken();
+        authToken = getAuthToken();
     }
 
 
@@ -20,30 +22,34 @@ public class AuthStrings {
         return authStrings;
     }
 
-    public static synchronized  AuthStrings getInstance(Context context, String _JWTAuthToken){
-        if (authStrings == null){
-            authStrings = new AuthStrings(context);
-        }
-        if (JWTAuthToken == null){
-            JWTAuthToken = _JWTAuthToken;
-        }
-        return authStrings;
+
+    public void setAuthToken(String token){
+        authToken = token;
+    }
+
+    public void setRefreshToken(String token){
+        refreshToken = token;
     }
 
 
-    public String getJWTAuthToken() {
-        if (JWTAuthToken == null){
-            //TODO implement auto logout when unable to
-        }
-        return JWTAuthToken;
+    public String getAuthToken() {
+        return authToken;
     }
 
-    public void forgetJWTAuthToken() {
-        JWTAuthToken = null;
+    public String getRefreshToken() {
+        return refreshToken;
     }
 
-    public String getDeviceToken(){
-        return "";
+    public void forgetAuthToken() {
+        authToken = null;
+    }
+
+    public void forgetRefreshToken() {
+        refreshToken = null;
+    }
+
+    public Long getDeviceToken(){
+        return Long.parseLong(Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID),16);
     }
 
 
