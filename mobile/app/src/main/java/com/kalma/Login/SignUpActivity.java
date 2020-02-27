@@ -93,7 +93,24 @@ public class SignUpActivity extends AppCompatActivity {
 
     private void signUp(String firstName, String lastName, String password, String email, long DOB) {
         APICaller apiCaller = new APICaller(getApplicationContext());
+        apiCaller.post(buildSignUpJsonObject(firstName, lastName, password, email, DOB), getResources().getString(R.string.api_signup), new ServerCallback() {
+                    @Override
+                    public void onSuccess(JSONObject response) {
+                        try {
+                            JSONObject responseBody = response;
+                            String message = responseBody.getString("message");
+                            Toast toast = Toast.makeText(getApplicationContext(), message , Toast.LENGTH_LONG);
+                            toast.show();
+                            Log.d("Response", response.toString());
+                            gotoLogin();
+                        } catch (JSONException je) {
+                            Log.e("JSONException", "onErrorResponse: ", je);
+                        }
+                    }
 
+
+                }
+        );
     }
 
     private JSONObject buildSignUpJsonObject(String firstName, String lastName, String password, String email, long DOB) {
