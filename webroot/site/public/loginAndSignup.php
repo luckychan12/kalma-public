@@ -1,8 +1,9 @@
 <?php
+
 include_once "header.php";
-include_once "../controller/loginNOutController.php";
 
 
+//TODO ask to allow cookies and remember me
 //TODO add accessibility
 
 ?>
@@ -45,7 +46,7 @@ include_once "../controller/loginNOutController.php";
     <div class="col-md-1"></div>
     <div class="col-lg-5" style="padding:10px;background-color: var(--c-primary-dark);font:var(--f-normal) ;color: var(--c-text-on-primary);border-top-left-radius:20px; border-bottom-left-radius: 20px">
         <h2 id="loginHeader" style="text-align: center">Login</h2>
-        <form action="../controller/loginNOutController.php" method="post" style="text-align: center">
+        <form action="../controller/loginController.php" method="post" style="text-align: center">
             <input type="email" placeholder="Email" name="logEmail">
             <br>
             <input type="password" placeholder="Password" name="logPassword">
