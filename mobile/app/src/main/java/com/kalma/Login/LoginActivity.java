@@ -61,10 +61,12 @@ public class LoginActivity extends AppCompatActivity {
                     @Override
                     public void onSuccess(JSONObject response) {
                         try {
+                            //retrieve access token and store.
                             JSONObject responseBody = response;
                             String token = responseBody.getString("access_token");
                             AuthStrings.getInstance(getApplicationContext()).setAuthToken(token);
                             Log.d("Response", response.toString());
+                            //open home page
                             onSuccessfulLogin();
                         } catch (JSONException je) {
                             Log.e("JSONException", "onErrorResponse: ", je);
@@ -74,6 +76,7 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onFail(VolleyError error) {
                 try{
+                    //retrieve error message and display
                     String jsonInput = new String(error.networkResponse.data, "utf-8");
                     JSONObject responseBody = new JSONObject(jsonInput);
                     String message = responseBody.getString("message");
