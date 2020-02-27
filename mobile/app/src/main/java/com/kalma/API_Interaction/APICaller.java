@@ -38,8 +38,13 @@ public class APICaller {
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
-                        //TODO handle API response and return JSON response
-                        Log.d("Response", response.toString());
+                        try {
+                            JSONObject responseBody = response;
+                            String token  = responseBody.getString("access_token");
+                            AuthStrings.getInstance(context).setAuthToken(token);
+                            Log.d("Response", response.toString());
+                        }
+                        catch (JSONException je){}
                     }
                 },
                 new Response.ErrorListener() {
@@ -49,12 +54,16 @@ public class APICaller {
                             String jsonInput = new String(error.networkResponse.data, "utf-8");
                             JSONObject responseBody = new JSONObject(jsonInput);
                             String message = responseBody.getString("message");
+                            AuthStrings.getInstance(context).setAuthToken(null);
                             Log.w("Error.Response", jsonInput);
                             Toast toast = Toast.makeText(context, message , Toast.LENGTH_LONG);
                             toast.show();
                         }
-                        catch (JSONException je){}
-                        catch (UnsupportedEncodingException errorr) {
+                        catch (JSONException je){
+                            Log.e("JSONException", "onErrorResponse: ", je);
+                        }
+                        catch (UnsupportedEncodingException err) {
+                            Log.e("EncodingError", "onErrorResponse: ", err);
                         }
                     }
 
@@ -85,8 +94,11 @@ public class APICaller {
                         Toast toast = Toast.makeText(context, message , Toast.LENGTH_LONG);
                         toast.show();
                     }
-                    catch (JSONException je){}
-                    catch (UnsupportedEncodingException errorr) {
+                    catch (JSONException je){
+                        Log.e("JSONException", "onErrorResponse: ", je);
+                    }
+                    catch (UnsupportedEncodingException err) {
+                        Log.e("EncodingError", "onErrorResponse: ", err);
                     }
                 }
             });
