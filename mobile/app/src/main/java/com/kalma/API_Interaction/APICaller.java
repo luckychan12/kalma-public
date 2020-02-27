@@ -29,7 +29,6 @@ public class APICaller {
     public APICaller(Context context){
         this.context = context;
     }
-
     public void post(final JSONObject content, String location, final ServerCallback callback) {
         RequestQueue requestQueue = RequestQueueSingleton.getInstance(context.getApplicationContext()).getRequestQueue();
         String url = context.getResources().getString(R.string.api_url) + location;
@@ -46,14 +45,13 @@ public class APICaller {
                     public void onErrorResponse(VolleyError error ) {
                         callback.onFail(error);
                     }
-
                 }
         );
         //add request to queue to be sent to API
         requestQueue.add(jsonObjectRequest);
     }
 
-    public void getData(JSONObject request, String location ){
+    public void getData(JSONObject request, String location, final ServerCallback callback ){
         RequestQueue requestQueue = RequestQueueSingleton.getInstance(context.getApplicationContext()).getRequestQueue();
         try {
             String url = context.getResources().getString(R.string.api_url) + location;
@@ -61,25 +59,12 @@ public class APICaller {
             JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, request, new Response.Listener<JSONObject>() {
                 @Override
                 public void onResponse(JSONObject response) {
-                    //TODO deal with GET response
+                    callback.onSuccess(response);
                 }
             }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
-                    try{
-                        String jsonInput = new String(error.networkResponse.data, "utf-8");
-                        JSONObject responseBody = new JSONObject(jsonInput);
-                        String message = responseBody.getString("message");
-                        Log.w("Error.Response", jsonInput);
-                        Toast toast = Toast.makeText(context, message , Toast.LENGTH_LONG);
-                        toast.show();
-                    }
-                    catch (JSONException je){
-                        Log.e("JSONException", "onErrorResponse: ", je);
-                    }
-                    catch (UnsupportedEncodingException err) {
-                        Log.e("EncodingError", "onErrorResponse: ", err);
-                    }
+                    callback.onFail(error);
                 }
             });
             requestQueue.add(jsonObjectRequest);
