@@ -1,6 +1,7 @@
 package com.kalma.Login;
 
 import androidx.appcompat.app.AppCompatActivity;
+
 import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
@@ -16,7 +17,9 @@ import com.kalma.API_Interaction.APICaller;
 import com.kalma.API_Interaction.AuthStrings;
 import com.kalma.API_Interaction.ServerCallback;
 import com.kalma.R;
+
 import net.danlew.android.joda.JodaTimeAndroid;
+
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
@@ -99,7 +102,7 @@ public class SignUpActivity extends AppCompatActivity {
                         try {
                             JSONObject responseBody = response;
                             String message = responseBody.getString("message");
-                            Toast toast = Toast.makeText(getApplicationContext(), message , Toast.LENGTH_LONG);
+                            Toast toast = Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG);
                             toast.show();
                             Log.d("Response", response.toString());
                             gotoLogin();
@@ -108,7 +111,21 @@ public class SignUpActivity extends AppCompatActivity {
                         }
                     }
 
-
+                    @Override
+                    public void onFail(VolleyError error) {
+                        try {
+                            String jsonInput = new String(error.networkResponse.data, "utf-8");
+                            JSONObject responseBody = new JSONObject(jsonInput);
+                            String message = responseBody.getString("message");
+                            Log.w("Error.Response", jsonInput);
+                            Toast toast = Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG);
+                            toast.show();
+                        } catch (JSONException je) {
+                            Log.e("JSONException", "onErrorResponse: ", je);
+                        } catch (UnsupportedEncodingException err) {
+                            Log.e("EncodingError", "onErrorResponse: ", err);
+                        }
+                    }
                 }
         );
     }
@@ -118,11 +135,11 @@ public class SignUpActivity extends AppCompatActivity {
         JSONObject object = new JSONObject();
         try {
             object.put("email_address", email);
-            object.put("password",password);
-            object.put("first_name",firstName);
+            object.put("password", password);
+            object.put("first_name", firstName);
             object.put("last_name", lastName);
             object.put("date_of_birth", DOB);
-         } catch (JSONException e) {
+        } catch (JSONException e) {
             e.printStackTrace();
         }
         return object;
