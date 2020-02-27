@@ -9,11 +9,13 @@ public class RequestQueueSingleton {
     private RequestQueue requestQueue;
     private static Context context;
 
+    //private Constructor
     private RequestQueueSingleton(Context ctx){
         context = ctx;
         requestQueue = getRequestQueue();
     }
 
+    //return instance of class if already created or call constructor
     public static synchronized  RequestQueueSingleton getInstance(Context context){
         if (requestQueueSingleton == null){
             requestQueueSingleton = new RequestQueueSingleton(context);
