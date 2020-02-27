@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Confirm Your Email Address</title>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css?family=Nunito:400,900|Open+Sans&display=swap');
+
+        :root {
+            /* Colours */
+
+            --c-primary: #1a237e;
+            --c-primary-light: #534bae;
+            --c-primary-dark: #000051;
+
+            --c-secondary: #ffc400;
+            --c-secondary-light: #fff64f;
+            --c-secondary-dark: #c79400;
+
+            --c-bg-light: #f5f5f5;
+            --c-bg-light-shade: #e1e1e1;
+            --c-bg-dark: #2e2d33;
+            --c-bg-dark-shade: #27262b;
+
+            --c-text-on-primary: #ffffff;
+            --c-text-on-secondary: #000000;
+            --c-text-on-light: #000000;
+            --c-text-on-dark: #fefefe;
+
+            /* Default to dark theme */
+            --c-bg: var(--c-bg-dark);
+            --c-bg-shade: var(--c-bg-dark-shade);
+            --c-text-on-bg: var(--c-text-on-dark);
+
+            /* Fonts */
+            --f-brand: 'Nunito', sans-serif;
+            --f-normal: 'Open Sans', sans-serif;
+
+        }
+
+        /* Use dark theme if user prefers dark mode */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --c-bg: var(--c-bg-dark);
+                --c-bg-shade: var(--c-bg-dark-shade);
+                --c-text-on-bg: var(--c-text-on-dark);
+            }
+        }
+
+        /* Use light theme if user prefers light mode */
+        @media (prefers-color-scheme: light) {
+            :root {
+                --c-bg: var(--c-bg-light);
+                --c-bg-shade: var(--c-bg-light-shade);
+                --c-text-on-bg: var(--c-text-on-light);
+            }
+        }
+
+        body {
+            background-color: var(--c-bg);
+            color: var(--c-text-on-bg);
+            font-family: var(--f-normal);
+            padding: 10px 10%;
+        }
+
+        h1 {
+            font-family: var(--f-brand);
+            font-weight: 900;
+            color: var(--c-primary-light);
+            width: 100%;
+            text-align: center;
+        }
+
+        .call-to-action {
+            background-color: var(--c-bg-shade);
+            padding: 20px;
+        }
+
+        a {
+            color: var(--c-secondary-dark);
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        a:visited {
+            color: var(--c-primary-light);
+        }
+
+        a:hover {
+            color: var(--c-secondary);
+            text-decoration: underline;
+        }
+    </style>
+
+</head>
+<body>
+
+<main>
+    <h1>Confirm Your Email Address</h1>
+    <p>Almost done! Follow the link below to confirm your account and start using Kalma today:</p>
+    <div class="call-to-action">
+        <a href="{{link}}">{{link}}</a>
+    </div>
+</main>
+
+</body>
+</html>

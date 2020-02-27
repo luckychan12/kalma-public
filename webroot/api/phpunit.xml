@@ -5,6 +5,7 @@
             <file>test/Core/ConfigTest.php</file>
             <file>test/Core/DatabaseHandlerTest.php</file>
             <file>test/Core/RouterTest.php</file>
+            <file>test/Core/AuthTest.php</file>
         </testsuite>
     </testsuites>
 </phpunit>

@@ -21,9 +21,9 @@ use \Exception;
 class DatabaseHandler
 {
 
-    private static PDO $connection;
+    private static DatabaseConnection $connection;
 
-    public static function getConnection() : ?PDO
+    public static function getConnection() : DatabaseConnection
     {
         // If a database connection doesn't already exist, create one
         if (!isset(self::$connection)) {
@@ -49,7 +49,7 @@ class DatabaseHandler
             // Enable explicit error reporting
             $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-            self::$connection = $conn;
+            self::$connection = new DatabaseConnection($conn);
         }
 
         return self::$connection;

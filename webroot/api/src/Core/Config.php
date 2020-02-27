@@ -39,6 +39,10 @@ class Config
                 $parts = explode('=', $line);
                 $key = $parts[0];
                 $value = str_replace("\r", '', substr($line, strlen($key) + 1));
+                if ($value == 'true') $value = true;
+                elseif ($value == 'false') $value = false;
+                elseif (is_numeric($value)) $value = 0 + $value;
+                if ($value)
                 $assoc[$key] = $value;
             }
         }
@@ -50,9 +54,9 @@ class Config
      * Retrieve a config value from the settings file
      *
      * @param  string $key The setting to retrieve
-     * @return string      The configured value. NULL if undefined.
+     * @return mixed       The configured value. NULL if undefined.
      */
-    public static function get(string $key) : ?string
+    public static function get(string $key)
     {
         if (!isset(self::$config)) {
             self::$config = self::loadData();

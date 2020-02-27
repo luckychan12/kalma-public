@@ -25,10 +25,6 @@ class Router
 {
     private Dispatcher $dispatcher;
 
-    const ACCESS_PUBLIC = 0;
-    const ACCESS_USER = 10;
-    const ACCESS_ADMIN = 20;
-
     public function __construct()
     {
         // Define routes
@@ -39,12 +35,14 @@ class Router
         //        "ACCESS_LEVEL" is an optional integer indicating the access level required to access the resource
         $this->dispatcher = simpleDispatcher(function(RouteCollector $root)
         {
-            $root->addGroup('', function(RouteCollector $group)
+            $api_root = Config::get("api_root");
+            $root->addGroup($api_root, function(RouteCollector $group)
             {
-                $group->addRoute('POST', '/user/signup', ['User', 'login', static::ACCESS_PUBLIC]);
-                $group->addRoute('POST', '/user/login', ['User', 'login', static::ACCESS_PUBLIC]);
-                $group->addRoute('PUT', '/user/logout', ['User', 'logout', static::ACCESS_USER]);
-                $group->addRoute('GET', '/user/{id:\d+}', ['User', 'read', static::ACCESS_USER]);
+                $group->addRoute('POST', '/user/signup', ['User', 'signup', Auth::ACCESS_PUBLIC]);
+                $group->addRoute('POST', '/user/login', ['User', 'login', Auth::ACCESS_PUBLIC]);
+                $group->addRoute('POST', '/user/refresh', ['User', 'refresh', Auth::ACCESS_PUBLIC]);
+                $group->addRoute('POST', '/user/logout', ['User', 'logout', Auth::ACCESS_USER]);
+                $group->addRoute('GET', '/user/{id:\d+}/account', ['User', 'read', Auth::ACCESS_USER]);
             });
         });
     }

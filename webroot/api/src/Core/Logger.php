@@ -55,7 +55,12 @@ class Logger
         $dayOfMonth = date('j');
         $weekOfMonth = floor($dayOfMonth / 7.5); // Get week of month 0-4
         $log_file = date('Y-m_') . $weekOfMonth;
-        $log_path = __DIR__ . "/../../logs/$log_file.log";
+        $log_dir = __DIR__ . '/../../logs';
+        if (!is_dir($log_dir))
+        {
+            mkdir($log_dir);
+        }
+        $log_path = $log_dir . "/$log_file.log";
         $formatted_message = self::format(strtoupper($type) . ": $message", $args);
         file_put_contents(
             $log_path,

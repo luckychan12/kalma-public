@@ -5,14 +5,14 @@ namespace Kalma\API\Test\Core;
 
 require __DIR__ . '/../../vendor/autoload.php';
 
+use Kalma\Api\Core\DatabaseConnection;
 use Kalma\Api\Core\DatabaseHandler;
 use PHPUnit\Framework\TestCase;
-use \PDO;
 
 final class DatabaseHandlerTest extends TestCase
 {
     public function testConnectsToDatabase() : void
     {
-        $this->assertInstanceOf(PDO::class, DatabaseHandler::getConnection());
+        $this->assertInstanceOf(DatabaseConnection::class, DatabaseHandler::getConnection());
     }
 }
