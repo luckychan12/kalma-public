@@ -30,7 +30,7 @@ public class APICaller {
         this.context = context;
     }
 
-    public void post(final JSONObject content, String location) {
+    public void post(final JSONObject content, String location, final ServerCallback callback) {
         RequestQueue requestQueue = RequestQueueSingleton.getInstance(context.getApplicationContext()).getRequestQueue();
         String url = context.getResources().getString(R.string.api_url) + location;
         //create request
@@ -38,33 +38,13 @@ public class APICaller {
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
-                        try {
-                            JSONObject responseBody = response;
-                            String token  = responseBody.getString("access_token");
-                            AuthStrings.getInstance(context).setAuthToken(token);
-                            Log.d("Response", response.toString());
-                        }
-                        catch (JSONException je){}
+                        callback.onSuccess(response);
                     }
                 },
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error ) {
-                        try{
-                            String jsonInput = new String(error.networkResponse.data, "utf-8");
-                            JSONObject responseBody = new JSONObject(jsonInput);
-                            String message = responseBody.getString("message");
-                            AuthStrings.getInstance(context).setAuthToken(null);
-                            Log.w("Error.Response", jsonInput);
-                            Toast toast = Toast.makeText(context, message , Toast.LENGTH_LONG);
-                            toast.show();
-                        }
-                        catch (JSONException je){
-                            Log.e("JSONException", "onErrorResponse: ", je);
-                        }
-                        catch (UnsupportedEncodingException err) {
-                            Log.e("EncodingError", "onErrorResponse: ", err);
-                        }
+                        callback.onFail(error);
                     }
 
                 }
