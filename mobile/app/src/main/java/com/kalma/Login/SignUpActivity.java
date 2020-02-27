@@ -86,7 +86,10 @@ public class SignUpActivity extends AppCompatActivity {
         });
     }
 
-
+    private void gotoLogin() {
+        Intent intent = new Intent(this, LoginActivity.class);
+        startActivity(intent);
+    }
 
     private void signUp(String firstName, String lastName, String password, String email, long DOB) {
         APICaller apiCaller = new APICaller(getApplicationContext());
