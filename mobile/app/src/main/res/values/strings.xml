@@ -17,6 +17,17 @@
     <string name="title_home">Home</string>
     <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>
+    <string name="kalma">kalma</string>
+    <string name="add_data">Add Data</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="height_logger">Height Logger</string>
+    <string name="sleep_tracker">Sleep Tracker</string>
+    <string name="weight_logger">Weight Logger</string>
+    <string name="mindful_minutes">Mindful Minutes</string>
+    <string name="daily_step_count">Daily Step count</string>
+    <string name="homelayout">HomeLayout</string>
 
 
 </resources>
