@@ -7,6 +7,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import androidx.appcompat.app.AppCompatActivity;
 import com.kalma.API_Interaction.APICaller;
+import com.kalma.API_Interaction.AuthStrings;
 import com.kalma.R;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -52,8 +53,8 @@ public class LoginActivity extends AppCompatActivity {
         JSONObject object = new JSONObject();
         try {
             object.put("email_address", "dummy@example.com");
-            object.put("password","Passwodrd123!");
-            object.put("client_fingerprint", Long.parseLong(Secure.getString(LoginActivity.this.getContentResolver(), Secure.ANDROID_ID),16));
+            object.put("password","Password123!");
+            object.put("client_fingerprint", AuthStrings.getInstance(this).getDeviceToken());
         } catch (JSONException e) {
             e.printStackTrace();
         }

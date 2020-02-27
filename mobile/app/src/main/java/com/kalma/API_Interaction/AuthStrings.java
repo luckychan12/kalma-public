@@ -13,8 +13,7 @@ public class AuthStrings {
         context = ctx;
         authToken = getAuthToken();
     }
-
-
+    
     public static synchronized  AuthStrings getInstance(Context context){
         if (authStrings == null){
             authStrings = new AuthStrings(context);
