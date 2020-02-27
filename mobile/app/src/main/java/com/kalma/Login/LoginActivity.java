@@ -67,7 +67,24 @@ public class LoginActivity extends AppCompatActivity {
                         }
                     }
 
-
+            @Override
+            public void onFail(VolleyError error) {
+                try{
+                    String jsonInput = new String(error.networkResponse.data, "utf-8");
+                    JSONObject responseBody = new JSONObject(jsonInput);
+                    String message = responseBody.getString("message");
+                    AuthStrings.getInstance(getApplicationContext()).setAuthToken(null);
+                    Log.w("Error.Response", jsonInput);
+                    Toast toast = Toast.makeText(getApplicationContext(), message , Toast.LENGTH_LONG);
+                    toast.show();
+                }
+                catch (JSONException je){
+                    Log.e("JSONException", "onErrorResponse: ", je);
+                }
+                catch (UnsupportedEncodingException err) {
+                    Log.e("EncodingError", "onErrorResponse: ", err);
+                }
+            }
                 }
         );
 
