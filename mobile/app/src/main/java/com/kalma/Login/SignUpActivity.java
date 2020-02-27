@@ -2,18 +2,29 @@ package com.kalma.Login;
 
 import androidx.appcompat.app.AppCompatActivity;
 import android.app.DatePickerDialog;
+import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.Toast;
+
+import com.android.volley.VolleyError;
 import com.kalma.API_Interaction.APICaller;
+import com.kalma.API_Interaction.AuthStrings;
+import com.kalma.API_Interaction.ServerCallback;
 import com.kalma.R;
 import net.danlew.android.joda.JodaTimeAndroid;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
@@ -58,8 +69,8 @@ public class SignUpActivity extends AppCompatActivity {
                 String lastName = txtLastName.getText().toString();
                 String password = txtPassword.getText().toString();
                 String email = txtEmail.getText().toString();
-
-                DateTime dateTimeGMT = new DateTime(txtDOB, DateTimeZone.UTC);
+                DateTimeFormatter formatter = DateTimeFormat.forPattern("dd/MM/yyy");
+                DateTime dateTimeGMT = new DateTime(formatter.parseDateTime(txtDOB.getText().toString()), DateTimeZone.UTC);
                 long epochSecs = (dateTimeGMT.getMillis() / 1000);
                 signUp(firstName, lastName, password, email, epochSecs);
 
@@ -75,13 +86,14 @@ public class SignUpActivity extends AppCompatActivity {
         });
     }
 
+
+
     private void signUp(String firstName, String lastName, String password, String email, long DOB) {
         APICaller apiCaller = new APICaller(getApplicationContext());
-        //apiCaller.post(buildSignUpJsonObject(firstName, lastName, password, email, DOB), getResources().getString(R.string.api_signup));
+
     }
 
     private JSONObject buildSignUpJsonObject(String firstName, String lastName, String password, String email, long DOB) {
-        //TODO use input data instead of dummy data
         //returns a json object based on input email and password
         JSONObject object = new JSONObject();
         try {
