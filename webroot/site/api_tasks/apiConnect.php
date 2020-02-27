@@ -59,7 +59,6 @@ class ApiConnect
             $data = json_decode($messageBody);
         }
         catch (\GuzzleHttp\Exception\ClientException $e){
-            echo '<p> '.$e->getMessage().' </p>';
             return "error";
         }
         return $data;
@@ -67,6 +66,8 @@ class ApiConnect
 
     /**
      * Get new tokens
+     *
+     * Work in progress
      * @param $clientFingerprint
      */
     function refreshToken($clientFingerprint){

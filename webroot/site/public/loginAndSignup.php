@@ -3,8 +3,7 @@
 include_once "header.php";
 
 
-//TODO ask to allow cookies and remember me
-//TODO add accessibility
+//TODO add sign up functionality
 
 ?>
 

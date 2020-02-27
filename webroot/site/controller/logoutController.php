@@ -11,5 +11,3 @@ $data = $api->signOut($_GET['clientFingerprint']);
 if($data->success){
     echo '<script> location.href = "../public/loginAndSignup.php"</script>';
 }
-
-echo '<p>'.$data.'</p>';

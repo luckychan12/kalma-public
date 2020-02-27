@@ -16,7 +16,6 @@ if(isset($_POST['login'])) {
         $_SESSION['account_link'] = $data->links->account;
         $_SESSION['refresh_token'] = $data->refresh_token;
         $_SESSION['logout_link'] = $data->links->logout;
-        echo '<p>'.$_SESSION['access_token'].'</p>';
         echo '<script> location.href = "../public/dashboard.php"</script>';
     }
     else
