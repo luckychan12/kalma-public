@@ -50,6 +50,11 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
+    private void onSuccessfulLogin(){
+        Intent intent = new Intent(this, HomeActivity.class);
+        startActivity(intent);
+    }
+
 
     public void login(String email, String password) {
         //create a json object and call API to log in
@@ -62,6 +67,7 @@ public class LoginActivity extends AppCompatActivity {
                             String token = responseBody.getString("access_token");
                             AuthStrings.getInstance(getApplicationContext()).setAuthToken(token);
                             Log.d("Response", response.toString());
+                            onSuccessfulLogin();
                         } catch (JSONException je) {
                             Log.e("JSONException", "onErrorResponse: ", je);
                         }
@@ -95,8 +101,8 @@ public class LoginActivity extends AppCompatActivity {
         //returns a json object based on input email and password
         JSONObject object = new JSONObject();
         try {
-            object.put("email_address", "dummy@example.com");
-            object.put("password", "Password123!");
+            object.put("email_address", email);
+            object.put("password", password);
             object.put("client_fingerprint", AuthStrings.getInstance(this).getDeviceToken());
         } catch (JSONException e) {
             e.printStackTrace();
