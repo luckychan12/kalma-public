@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/darker_gray"
+    tools:context=".MainApp.HomeActivity">
+
+    <RelativeLayout
+        android:id="@+id/relativeLayout"
+        android:layout_width="413dp"
+        android:layout_height="588dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <Button
+            android:id="@+id/btnAddData"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginStart="229dp"
+            android:layout_marginLeft="229dp"
+            android:layout_marginTop="383dp"
+            android:layout_marginEnd="34dp"
+            android:layout_marginRight="34dp"
+            android:layout_marginBottom="55dp"
+            android:background="@color/colorBGDarkShade"
+            android:text="@string/add_data"
+            android:textColor="@color/colorSecondary" />
+
+        <Button
+            android:id="@+id/btnSleepTracker"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginStart="27dp"
+            android:layout_marginLeft="27dp"
+            android:layout_marginTop="12dp"
+            android:layout_marginEnd="236dp"
+            android:layout_marginRight="236dp"
+            android:layout_marginBottom="426dp"
+            android:background="@color/colorBGDarkShade"
+            android:text="@string/sleep_tracker"
+            android:textColor="@color/colorSecondary" />
+
+        <Button
+            android:id="@+id/btnStepCount"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginStart="229dp"
+            android:layout_marginLeft="229dp"
+            android:layout_marginTop="15dp"
+            android:layout_marginEnd="34dp"
+            android:layout_marginRight="34dp"
+            android:layout_marginBottom="423dp"
+            android:background="@color/colorBGDarkShade"
+            android:text="@string/daily_step_count"
+            android:textColor="@color/colorSecondary" />
+
+        <Button
+            android:id="@+id/btnMindMins"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginStart="31dp"
+            android:layout_marginLeft="31dp"
+            android:layout_marginTop="199dp"
+            android:layout_marginEnd="232dp"
+            android:layout_marginRight="232dp"
+            android:layout_marginBottom="239dp"
+            android:background="@color/colorBGDarkShade"
+            android:text="@string/mindful_minutes"
+            android:textColor="@color/colorSecondary" />
+
+        <Button
+            android:id="@+id/btnHeightLogger"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginStart="29dp"
+            android:layout_marginLeft="29dp"
+            android:layout_marginTop="380dp"
+            android:layout_marginEnd="234dp"
+            android:layout_marginRight="234dp"
+            android:layout_marginBottom="58dp"
+            android:background="@color/colorBGDarkShade"
+            android:text="@string/height_logger"
+            android:textColor="@color/colorSecondary" />
+
+        <Button
+            android:id="@+id/btnWeightLogger"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginStart="229dp"
+            android:layout_marginLeft="229dp"
+            android:layout_marginTop="198dp"
+            android:layout_marginEnd="34dp"
+            android:layout_marginRight="34dp"
+            android:layout_marginBottom="240dp"
+            android:background="@color/colorBGDarkShade"
+            android:text="@string/weight_logger"
+            android:textColor="@color/colorSecondary" />
+
+    </RelativeLayout>
+
+    <TableRow
+        android:layout_width="409dp"
+        android:layout_height="69dp"
+        android:background="@color/colorPrimary"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.996" >
+
+        <Button
+            style = "?android:attr/buttonBarButtonStyle"
+            android:id="@+id/btnHome"
+            android:layout_width="103dp"
+            android:layout_height="match_parent"
+            android:text="home" />
+
+        <Button
+            style = "?android:attr/buttonBarButtonStyle"
+            android:id="@+id/btnProfile"
+            android:layout_width="98dp"
+            android:layout_height="match_parent"
+            android:text="profile" />
+
+        <Button
+            style = "?android:attr/buttonBarButtonStyle"
+            android:id="@+id/btnCalander"
+            android:layout_width="98dp"
+            android:layout_height="match_parent"
+            android:text="calander" />
+
+        <Button
+            style = "?android:attr/buttonBarButtonStyle"
+            android:id="@+id/btnOther"
+            android:layout_width="98dp"
+            android:layout_height="match_parent"
+            android:text="settings" />
+
+    </TableRow>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
