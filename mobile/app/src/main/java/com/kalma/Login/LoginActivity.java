@@ -23,8 +23,6 @@ import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
 
-//TODO Implement error handling and data validation
-
 public class LoginActivity extends AppCompatActivity {
     EditText txtEmail, txtPassword;
     Button buttonLogin;

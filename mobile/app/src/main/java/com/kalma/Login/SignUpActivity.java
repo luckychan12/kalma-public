@@ -77,7 +77,7 @@ public class SignUpActivity extends AppCompatActivity {
 
     private void signUp(String firstName, String lastName, String password, String email, long DOB) {
         APICaller apiCaller = new APICaller(getApplicationContext());
-        apiCaller.post(buildSignUpJsonObject(firstName, lastName, password, email, DOB), getResources().getString(R.string.api_signup));
+        //apiCaller.post(buildSignUpJsonObject(firstName, lastName, password, email, DOB), getResources().getString(R.string.api_signup));
     }
 
     private JSONObject buildSignUpJsonObject(String firstName, String lastName, String password, String email, long DOB) {
