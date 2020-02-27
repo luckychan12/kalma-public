@@ -1,7 +1,16 @@
 <?php
-include_once "../controller/loginNOutController.php";
-//TODO hide the side menu and logout button on the login page
+session_start();
+require_once '../controller/clientFingerprint.php';
+
+//calls to initiate logout sequence
+//starts by getting the clients fingerprint
+if(isset($_POST['logout'])){
+    getFingerprint('logout');
+}
+
 ?>
+
+
 
 <!doctype html>
 <html lang='en'>
@@ -106,29 +115,41 @@ include_once "../controller/loginNOutController.php";
         }
 
     </script>
+
 </head>
 
 
     <div class="container-fluid " style="width:100%;position: relative;padding:0; z-index: 10">
         <ul>
+            <form action="" method="post">
             <div class="menu" style="z-index=2">
-                <button id="sideButton" class="btn fas fa-bars" onclick="openSideBar()"></button>
+                <button type="button" title="Side Menu" id="sideButton" class="btn fas fa-bars" onclick="openSideBar()"></button>
                 <div id="sideMenu" class="menu-content">
                     <a href="dashboard.php">Dashboard</a>
-                    <a href="#mindful">Mindful Minutes</a>
-                    <a href="#step">Step Tracker</a>
-                    <a href="#sleep">Sleep Tracker</a>
-                    <a href="#weight">Weight Tracker</a>
-                    <a href="#height">Height Tracker</a>
-                    <a href="#profile">Profile</a>
+                    <a href="#mindful" >Mindful Minutes</a>
+                    <a href="#step" >Step Tracker</a>
+                    <a href="#sleep" >Sleep Tracker</a>
+                    <a href="#weight" >Weight Tracker</a>
+                    <a href="#height" >Height Tracker</a>
+                    <a href="#profile" >Profile</a>
                 </div>
             </div>
             <li style="text-align: center">
-                <a style="font: var(--f-brand); font-size: 35px;  margin:0" href="#">kalma</a>
+                <a style="font: var(--f-brand); font-size: 35px;  margin:0"  href="#">kalma</a>
             </li>
-            <button alt="logout" style="float:right;" id="signOut" class="btn fas fa-sign-out-alt" onclick="requestSignout()"></button>
-
+                <button type="submit" name="logout" style="float:right;" id="signOut" class="btn fas fa-sign-out-alt" title="Logout" value="">
+            </form>
         </ul>
     </div>
+<?php
 
+//hides the menu buttons that ares accessible on the login page
 
+if ($_SERVER['REQUEST_URI'] == "/Kalma/webroot/site/public/loginAndSignup.php"){
+    echo '<script>document.getElementById("signOut").classList.add("hide");
+          document.getElementById("sideButton").classList.add("hide")</script>';
+}
+else{
+    echo '<script>document.getElementById("signOut").classList.remove("hide");
+          document.getElementById("sideButton").classList.remove("hide")</script>';
+}
