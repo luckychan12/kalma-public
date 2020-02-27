@@ -57,11 +57,13 @@ class ApiConnect
             $res = $this->client->request('GET', $link, ['headers' => ["Authorization" => 'bearer ' . $_SESSION['access_token']]]);
             $messageBody = $res->getBody()->read(2048);
             $data = json_decode($messageBody);
+            return $data;
         }
         catch (\GuzzleHttp\Exception\ClientException $e){
-            return "error";
+            session_destroy();
+            echo '<script>location.href = "../public/loginAndSignup.php"</script>';
         }
-        return $data;
+
     }
 
     /**
