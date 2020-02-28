@@ -15,6 +15,7 @@
 
 namespace Kalma\Api\Core;
 
+use Kalma\Api\Response\Exception\ResponseException;
 use \PDO;
 use \Exception;
 
@@ -23,6 +24,11 @@ class DatabaseHandler
 
     private static DatabaseConnection $connection;
 
+    /**
+     * Return a Database interface object for querying
+     * @return DatabaseConnection
+     * @throws ResponseException
+     */
     public static function getConnection() : DatabaseConnection
     {
         // If a database connection doesn't already exist, create one
@@ -44,7 +50,7 @@ class DatabaseHandler
                     $e->getMessage()
                 );
 
-                return NULL;
+                throw new ResponseException(500, 3500, 'Oops! An error has occurred processing your request.', 'Failed to connect to the database.');
             }
             // Enable explicit error reporting
             $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
