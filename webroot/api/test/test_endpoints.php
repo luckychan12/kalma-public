@@ -47,7 +47,6 @@
             let os = client.getOS() + " " + client.getOSVersion();
             let device = client.getDeviceType();
             client_fingerprint = `${client.getFingerprint()}`;
-            console.log(client_fingerprint);
 
             testLogin();
         });
@@ -65,7 +64,7 @@
         function testLogin() {
             $.ajax({
                 method: "POST",
-                url: "http://localhost/kalma/api/user/login",
+                url: "http://localhost/api/user/login",
                 crossDomain: true,
                 xhrFields: {
                     withCredentials: false
@@ -83,7 +82,7 @@
                     logResponse(res);
                     if (res.hasOwnProperty('responseJSON')) {
                         let data = res.responseJSON;
-                        if (data.success)
+                        if (!data.error)
                             testRead(data.access_token, data.links.account);
                     }
                 },
@@ -109,7 +108,7 @@
                     logResponse(res);
                     if (res.hasOwnProperty("responseJSON")) {
                         let data = res.responseJSON;
-                        if (data.success)
+                        if (!data.error)
                             testLogout(access_token, data.links.logout);
                     }
                 },
