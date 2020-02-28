@@ -1,0 +1,35 @@
+<resources>
+    <string name="app_name">Kalma</string>
+    <string name="StartPageButtonText">LOG IN</string>
+    <string name="sign_up">SIGN UP</string>
+    <string name="emailMarker">Email</string>
+    <string name="passwordMarker">Password</string>
+    <string name="log_in">LOG IN</string>
+    <string name="error_message">There was an error logging in. Please check your email and password</string>
+    <string name="login_image_desc">PLACEHOLDER IMAGE</string>
+    <string name="api_url">http://192.168.0.20</string>
+    <string name="api_login">/api/user/login</string>
+    <string name="api_signup">/api/user/signup</string>
+    <string name="lastname_marker">LastName</string>
+    <string name="dateofbirth_marker">DateOfBirth</string>
+    <string name="firstname_marker">FirstName</string>
+    <string name="title_activity_home_">Home_Activity</string>
+    <string name="title_home">Home</string>
+    <string name="title_dashboard">Dashboard</string>
+    <string name="title_notifications">Notifications</string>
+    <string name="kalma">kalma</string>
+    <string name="add_data">Add Data</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="height_logger">Height Logger</string>
+    <string name="sleep_tracker">Sleep Tracker</string>
+    <string name="weight_logger">Weight Logger</string>
+    <string name="mindful_minutes">Mindful Minutes</string>
+    <string name="daily_step_count">Daily Step count</string>
+    <string name="homelayout">HomeLayout</string>
+    <string name="default_email">dummy@example.com</string>
+    <string name="default_password">Password123!</string>
+
+
+</resources>

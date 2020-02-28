@@ -325,13 +325,15 @@ class UserManager
             {
                 $data = $rows[0];
                 $session_id = $data['session_id'];
-                $access_token = Auth::generateAccessToken($user_id);
-                $refresh_token = Auth::generateRefreshToken($session_id);
+                [$access_token, $access_expiry] = Auth::generateAccessToken($user_id);
+                [$refresh_token, $refresh_expiry] = Auth::generateRefreshToken($session_id);
                 return array
                 (
                     'success' => true,
                     'access_token' => $access_token,
-                    'refresh_token' => $refresh_token
+                    'access_expiry' => $access_expiry,
+                    'refresh_token' => $refresh_token,
+                    'refresh_expiry' => $refresh_expiry,
                 );
             }
         }
