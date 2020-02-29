@@ -73,13 +73,25 @@ public class SignUpActivity extends AppCompatActivity {
                 String lastName = txtLastName.getText().toString();
                 String password = txtPassword.getText().toString();
                 String email = txtEmail.getText().toString();
-                //convert date string into DateTime object and generate epoch value
-                DateTimeFormatter formatter = DateTimeFormat.forPattern("dd/MM/yyy");
-                DateTime dateTimeGMT = new DateTime(formatter.parseDateTime(txtDOB.getText().toString()), DateTimeZone.UTC);
-                long epochSecs = (dateTimeGMT.getMillis() / 1000);
-                //Attempt to sign up
-                 signUp(firstName, lastName, password, email, epochSecs);
 
+                //Attempt to sign up
+                if (!(firstName.isEmpty() || lastName.isEmpty() || password.isEmpty() || email.isEmpty() || txtDOB.getText().toString().isEmpty())){
+                    if (validateString(firstName) && validateString(lastName)){
+                        //convert date string into DateTime object and generate epoch value
+                        DateTimeFormatter formatter = DateTimeFormat.forPattern("dd/MM/yyy");
+                        DateTime dateTimeGMT = new DateTime(formatter.parseDateTime(txtDOB.getText().toString()), DateTimeZone.UTC);
+                        long epochSecs = (dateTimeGMT.getMillis() / 1000);
+                        signUp(firstName, lastName, password, email, epochSecs);
+                    }
+                    else{
+                        Toast toast = Toast.makeText(getApplicationContext(), "First name and Last can only contain letters 'A' - 'Z'", Toast.LENGTH_LONG);
+                        toast.show();
+                    }
+                }
+                else{
+                    Toast toast = Toast.makeText(getApplicationContext(), "All fields must be filled.", Toast.LENGTH_LONG);
+                    toast.show();
+                }
             }
         });
 
