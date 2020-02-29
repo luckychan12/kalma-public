@@ -27,6 +27,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
@@ -77,7 +78,7 @@ public class SignUpActivity extends AppCompatActivity {
                 DateTime dateTimeGMT = new DateTime(formatter.parseDateTime(txtDOB.getText().toString()), DateTimeZone.UTC);
                 long epochSecs = (dateTimeGMT.getMillis() / 1000);
                 //Attempt to sign up
-                signUp(firstName, lastName, password, email, epochSecs);
+                 signUp(firstName, lastName, password, email, epochSecs);
 
             }
         });
@@ -133,6 +134,23 @@ public class SignUpActivity extends AppCompatActivity {
                     }
                 }
         );
+    }
+
+    //validates that input string only contains letters
+    public boolean validateString(String str) {
+        if (str == null){
+            return false;
+        }
+        str = str.toLowerCase();
+        //Convert sting to char array and loop through letters individually
+        char[] charArray = str.toCharArray();
+        for (char ch : charArray) {
+            //Check if letter value is between ascii 'a' and ascii 'z'
+            if (!(ch >= 'a' && ch <= 'z')) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private JSONObject buildSignUpJsonObject(String firstName, String lastName, String password, String email, long DOB) {
