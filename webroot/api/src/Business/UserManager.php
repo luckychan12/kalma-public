@@ -38,7 +38,6 @@ class UserManager
     /**
      * Create a user record in the database
      * @param array $user_data
-     * @return bool
      * @throws ResponseException
      */
     public function createUser(array $user_data) : void

@@ -35,8 +35,10 @@ class User extends Resource
     {
         $am = UserManager::getInstance();
         $body = $req->getParsedBody();
-        $creationResult = $am->createUser($body);
-        $res->setBody($creationResult);
+        $am->createUser($body);
+        $res->setBody(array(
+            'message' => 'We successfully signed you up. Check your inbox for an email with instructions on how to activate your account.',
+        ));
         return $res;
     }
 
