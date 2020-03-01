@@ -22,6 +22,7 @@ use Kalma\Api\Response\JsonResponse;
 use Kalma\Api\Response\Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use RuntimeException;
+use Exception;
 
 
 class FrontController
@@ -30,6 +31,7 @@ class FrontController
     /**
      * Process a PSR7 Request. Finds the appropriate route and visits it.
      * @param Request $request
+     * @throws Exception
      */
     public function dispatchRequest(Request $request) : void
     {
@@ -56,8 +58,14 @@ class FrontController
             $response = $this->visitRoute($request, $response, $route);
             $response->setStatus(200);
         }
-        catch (ResponseException $e) {
-            $response = new JsonErrorResponse($uri, $e);
+        catch (ResponseException $re) {
+            $response = new JsonErrorResponse($uri, $re);
+        }
+        catch (Exception $e)
+        {
+            Logger::log(Logger::ERROR, $e->getMessage());
+            $re = new ResponseException(500, 4000, 'Oops! Something went wrong processing your request.');
+            $response = new JsonErrorResponse($uri, $re);
         }
 
         $this->emitResponse($response);
