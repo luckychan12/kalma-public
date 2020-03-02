@@ -153,6 +153,10 @@ else if ($filepath == "/Kalma/webroot/site/public/errorPage.php"){
     echo '<script>document.getElementById("signOut").classList.add("hide");
           document.getElementById("sideButton").classList.add("hide")</script>';
 }
+else if($filepath == "/Kalma/webroot/site/public/logoutSuccess.php"){
+    echo '<script>document.getElementById("signOut").classList.add("hide");
+          document.getElementById("sideButton").classList.add("hide")</script>';
+}
 else{
     echo '<script>document.getElementById("signOut").classList.remove("hide");
           document.getElementById("sideButton").classList.remove("hide")</script>';
