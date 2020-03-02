@@ -71,7 +71,6 @@ class ApiConnect
             echo '<script>location.href = "../public/errorPage.php"</script>';
             return $response;
         }
-
     }
 
     /**
