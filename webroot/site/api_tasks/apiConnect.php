@@ -38,6 +38,7 @@ class ApiConnect
             $res = $this->client->request('POST', 'api/user/login', ['json' => ["email_address" => $inEmail, "password" => $inPassword, "client_fingerprint" => $inClientFingerprint]]);
             $messageBody = $res->getBody()->read(2048);
             $data = json_decode($messageBody);
+            return $data;
         }
         catch (ClientException $e){
             $response = json_decode($e->getResponse()->getBody()->getContents());
@@ -46,7 +47,7 @@ class ApiConnect
             $_SESSION['error_message'] = $response->message;
             return $response;
         }
-        return $data;
+
 
     }
 
