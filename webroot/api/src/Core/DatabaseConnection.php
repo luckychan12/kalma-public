@@ -17,6 +17,7 @@ namespace Kalma\Api\Core;
 
 
 use Exception;
+use Kalma\Api\Response\Exception\ResponseException;
 use PDO;
 
 class DatabaseConnection
@@ -36,9 +37,10 @@ class DatabaseConnection
     /**
      * Execute a SELECT statement and return the results as an associative array
      *
-     * @param  string $query  The SQL query to execute, with parameters marked with colons ':'
-     * @param  array  $params The parameters to bind to the prepared statement as an associative array
+     * @param string $query The SQL query to execute, with parameters marked with colons ':'
+     * @param array $params The parameters to bind to the prepared statement as an associative array
      * @return array
+     * @throws ResponseException
      */
     public function fetch(string $query, array $params) : array
     {
@@ -53,11 +55,12 @@ class DatabaseConnection
             $stmt->execute();
             $stmt->setFetchMode(PDO::FETCH_ASSOC);
             $res = $stmt->fetchAll();
-            return array
-            (
-                'success' => ($res === false) ? false : true,
-                'data' => $res,
-            );
+            if ($res === false)
+            {
+                throw new ResponseException(500, 3000, 'Oops! Something went wrong processing your request.', 'A database error has occurred.');
+            }
+
+            return $res;
         }
         catch (Exception $e)
         {
@@ -66,15 +69,18 @@ class DatabaseConnection
                 "\tThrows Exception:\n\t%s",
                 $query, $e->getMessage());
 
-            return array
-            (
-                'success' => false,
-                'message' => 'Failed to execute query.',
-            );
+            throw new ResponseException(500, 3001, 'Oops! Something went wrong processing your request.', 'An SQL error has occurred.');
         }
     }
 
-    public function execute(string $query, array $params) : array
+    /**
+     * Execute an SQL statement with no output
+     * @param string $query
+     * @param array $params
+     * @return int          The number of rows affected by the statement.
+     * @throws ResponseException
+     */
+    public function execute(string $query, array $params) : int
     {
         $stmt = $this->conn->prepare($query, $params);
         foreach ($params as $param => $value)
@@ -84,11 +90,7 @@ class DatabaseConnection
 
         if($stmt->execute())
         {
-            return array
-            (
-                'success' => true,
-                'rows_affected' => $stmt->rowCount(),
-            );
+            return $stmt->rowCount();
         }
         else
         {
@@ -96,11 +98,8 @@ class DatabaseConnection
                                        "Error Info: \n\t %s",
                                         $query, $this->conn->errorInfo());
 
-            return array
-            (
-                'success' => false,
-                'message' => 'Failed to execute query.',
-            );
+
+            throw new ResponseException(500, 3001, 'Oops! Something went wrong processing your request.', 'An SQL error has occurred.');
         }
 
     }

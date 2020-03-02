@@ -9,8 +9,6 @@
  * @package    Api
  * @subpackage Core
  * @license    http://creativecommons.org/licenses/by-nc-nd/4.0/  CC BY-NC-ND 4.0
- * @version    0.1
- * @since      File available since Pre-Alpha
  */
 
 namespace Kalma\Api\Core;
@@ -18,6 +16,8 @@ namespace Kalma\Api\Core;
 use FastRoute\Dispatcher;
 use FastRoute\RouteCollector;
 use function FastRoute\simpleDispatcher;
+use Kalma\Api\Business\Auth;
+use Kalma\Api\Response\Exception\ResponseException;
 
 require __DIR__ . '/../../vendor/autoload.php';
 
@@ -35,15 +35,11 @@ class Router
         //        "ACCESS_LEVEL" is an optional integer indicating the access level required to access the resource
         $this->dispatcher = simpleDispatcher(function(RouteCollector $root)
         {
-            $api_root = Config::get("api_root");
-            $root->addGroup($api_root, function(RouteCollector $group)
-            {
-                $group->addRoute('POST', '/user/signup', ['User', 'signup', Auth::ACCESS_PUBLIC]);
-                $group->addRoute('POST', '/user/login', ['User', 'login', Auth::ACCESS_PUBLIC]);
-                $group->addRoute('POST', '/user/refresh', ['User', 'refresh', Auth::ACCESS_PUBLIC]);
-                $group->addRoute('POST', '/user/logout', ['User', 'logout', Auth::ACCESS_USER]);
-                $group->addRoute('GET', '/user/{id:\d+}/account', ['User', 'read', Auth::ACCESS_USER]);
-            });
+            $root->addRoute('POST', '/user/signup',          ['User', 'signup',  Auth::ACCESS_PUBLIC]);
+            $root->addRoute('POST', '/user/login',           ['User', 'login',   Auth::ACCESS_PUBLIC]);
+            $root->addRoute('POST', '/user/refresh',         ['User', 'refresh', Auth::ACCESS_PUBLIC]);
+            $root->addRoute('POST', '/user/logout',          ['User', 'logout',  Auth::ACCESS_USER]);
+            $root->addRoute('GET', '/user/{id:\d+}/account', ['User', 'read',    Auth::ACCESS_USER]);
         });
     }
 
@@ -58,41 +54,38 @@ class Router
      *     'allowed_methods' => ['GET'...]      // (Optional) An array of all allowed HTTP methods for this route
      * )
      *
-     * @param  string $method
-     * @param  string $uri    The request URI to find a route for
+     * @param string $method
+     * @param string $uri The request URI to find a route for
      * @return array          A 2+ element array containing
+     * @throws ResponseException
      */
     public function getRoute(string $method, string $uri) : array
     {
-        // Strip URI query string
-        if (false !== $pos = strpos($uri, '?'))
-        {
-            $uri = substr($uri, 0, $pos);
-        }
-        $uri = rawurldecode($uri);
-
         // Fetch route
         $routeInfo = $this->dispatcher->dispatch($method, $uri);
-        $route = array
-        (
-            'uri' => $uri,
-            'status' => $routeInfo[0],
-        );
+        $status = $routeInfo[0];
 
         // Format route according to status
-        if ($route['status'] == Dispatcher::METHOD_NOT_ALLOWED)
+        switch($status)
         {
-            $route['allowed_methods'] = $routeInfo[1];
+            case Dispatcher::NOT_FOUND:
+                throw new ResponseException(404, 1404, 'We couldn\'t find the resource you requested.', 'Not found.');
+                break;
+            case Dispatcher::METHOD_NOT_ALLOWED:
+                throw new ResponseException(405, 1405, 'We couldn\'t access the resource you requested.',
+                        'Method not allowed. Allowed Methods: ' . json_encode($routeInfo[1]));
+                break;
+            case Dispatcher::FOUND:
+            default:
+                $handler = $routeInfo[1];
+                return array(
+                    'resource' => $handler[0],
+                    'action' => $handler[1],
+                    'args' => $routeInfo[2],
+                    'access_level' => $handler[2] ?? Auth::ACCESS_PUBLIC,
+                );
+                break;
         }
-        elseif ($route['status'] == Dispatcher::FOUND)
-        {
-            $handler = $routeInfo[1];
-            $route['resource'] = $handler[0];
-            $route['action'] = $handler[1];
-            $route['args'] = $routeInfo[2];
-            $route['access_level'] = $handler[2] ?? 0;
-        }
-        return $route;
     }
 
 }

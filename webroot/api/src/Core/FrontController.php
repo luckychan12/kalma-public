@@ -9,19 +9,20 @@
  * @package    Api
  * @subpackage Core
  * @license    http://creativecommons.org/licenses/by-nc-nd/4.0/  CC BY-NC-ND 4.0
- * @version    0.1
- * @since      File available since Pre-Alpha
  */
 
 namespace Kalma\Api\Core;
 
 require __DIR__ . '/../../vendor/autoload.php';
 
-use FastRoute\Dispatcher;
-use Nyholm\Psr7\Factory\Psr17Factory;
+use Kalma\Api\Business\Auth;
+use Kalma\Api\Response\Exception\ResponseException;
+use Kalma\Api\Response\JsonErrorResponse;
+use Kalma\Api\Response\JsonResponse;
+use Kalma\Api\Response\Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
-use Psr\Http\Message\ResponseInterface as Response;
 use RuntimeException;
+use Exception;
 
 
 class FrontController
@@ -30,6 +31,7 @@ class FrontController
     /**
      * Process a PSR7 Request. Finds the appropriate route and visits it.
      * @param Request $request
+     * @throws Exception
      */
     public function dispatchRequest(Request $request) : void
     {
@@ -37,88 +39,71 @@ class FrontController
         $uri = $_SERVER['REQUEST_URI'];
         $method = $request->getMethod();
 
-        // Create response
-        $responseFactory = new Psr17Factory();
-        $response = $responseFactory
-            ->createResponse(500) // Default to server error response (if not set by resource)
-            ->withHeader("Access-Control-Allow-Origin", "*")
-            ->withHeader("Access-Control-Allow-Headers", "Authorization, x-requested-with, Content-Type")
-            ->withHeader("Access-Control-Allow-Methods", "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS");
+        // Strip API root
+        $api_root = Config::get("api_root");
+        $uri = substr($uri, strlen($api_root));
 
-        if ($method == "OPTIONS")
+        // Strip URI query string
+        if (false !== $pos = strpos($uri, '?'))
         {
-            $this->emitResponse($response->withStatus(200));
+            $uri = substr($uri, 0, $pos);
+        }
+        $uri = rawurldecode($uri);
+
+        try
+        {
+            $route = $router->getRoute($method, $uri);
+            $response = new JsonResponse($uri);
+            $request = $request->withParsedBody(json_decode(file_get_contents('php://input'), true));
+            $response = $this->visitRoute($request, $response, $route);
+            $response->setStatus(200);
+        }
+        catch (ResponseException $re) {
+            $response = new JsonErrorResponse($uri, $re);
+        }
+        catch (Exception $e)
+        {
+            Logger::log(Logger::ERROR, $e->getMessage());
+            $re = new ResponseException(500, 4000, 'Oops! Something went wrong processing your request.');
+            $response = new JsonErrorResponse($uri, $re);
         }
 
-        $route = $router->getRoute($method, $uri);
-
-        switch($route['status'])
-        {
-            case Dispatcher::NOT_FOUND:
-                // 404 Not Found
-                $response = $response->withStatus(404);
-                $response->getBody()->write(json_encode(array
-                (
-                    'message' => $response->getReasonPhrase(),
-                )));
-                break;
-            case Dispatcher::METHOD_NOT_ALLOWED:
-                // 405 Method Not Allowed
-                $response = $response->withStatus(405);
-                $response->getBody()->write(json_encode(array
-                (
-                    'message' => $response->getReasonPhrase(),
-                    'allowed_methods' => $route['allowed_methods'],
-                )));
-                break;
-            case Dispatcher::FOUND:
-                // Route found
-                // Pass request to resource to create the response
-                $request = $request->withParsedBody(json_decode(file_get_contents('php://input'), true));
-                $response = $this->visitRoute($request, $response, $route);
-                break;
-        }
-
-        $this->emitResponse($response->withHeader('Content-Type', 'application/json; charset=UTF-8'));
+        $this->emitResponse($response);
     }
 
     /**
      * Instantiate the Resource class for a given route and call the specified action method, if it exists
      * @param Request $request
      * @param Response $response
-     * @param array   $route
+     * @param array $route
      * @return Response
+     * @throws ResponseException
      */
     private function visitRoute(Request $request, Response $response, array $route) : Response
     {
+        $authPayload = Auth::authorize($request, $route['access_level']);
 
-        $authResult = Auth::authorize($request, $route['access_level']);
-        if ($authResult['success'])
-        {
-            // Instantiate Resource
-            $resourceClass = '\\Kalma\\Api\\Resource\\' . $route['resource'];
-            $resource = new $resourceClass();
+        // Instantiate Resource
+        $resourceClass = '\\Kalma\\Api\\Resource\\' . $route['resource'];
+        $resource = new $resourceClass();
 
-            // Call Resource action
-            $params = $route['args'];
-            array_unshift($params, $request, $response, $authResult['payload'] ?? NULL);
-            $response = call_user_func_array(array($resource, $route['action']), $params);
+        // Call Resource action
+        $params = $route['args'];
+        array_unshift($params, $request, $response, $authPayload);
+        $response = call_user_func_array(array($resource, $route['action']), $params);
 
-            // Dispatch response to client
-            return $response;
-        }
-        else {
-            $response->getBody()->write(json_encode($authResult));
-            return $response->withStatus(401);
-        }
+        // Dispatch response to client
+        return $response;
     }
 
     /**
      * Emit a PSR-7 Response communicating information provided by Resource actions
-     * @param Response $response
+     * @param Response $res
      */
-    private function emitResponse(Response $response) : void
+    private function emitResponse(Response $res) : void
     {
+        $response = $res->getResponse();
+
         // Throw error if headers have already been sent
         if (headers_sent())
         {
