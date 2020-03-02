@@ -1,6 +1,6 @@
 <?php
 require '../vendor/autoload.php';
-
+use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Client;
 
 /**
@@ -39,9 +39,12 @@ class ApiConnect
             $messageBody = $res->getBody()->read(2048);
             $data = json_decode($messageBody);
         }
-        catch (\GuzzleHttp\Exception\ClientException $e){
-            return "error";
-
+        catch (ClientException $e){
+            $response = json_decode($e->getResponse()->getBody()->getContents());
+            $_SESSION['status'] = $response->status;
+            $_SESSION['error'] = $response->error;
+            $_SESSION['error_message'] = $response->message;
+            return $response;
         }
         return $data;
 
@@ -59,9 +62,13 @@ class ApiConnect
             $data = json_decode($messageBody);
             return $data;
         }
-        catch (\GuzzleHttp\Exception\ClientException $e){
-            session_destroy();
-            echo '<script>location.href = "../public/loginAndSignup.php"</script>';
+        catch (ClientException $e){
+            $response = json_decode($e->getResponse()->getBody()->getContents());
+            $_SESSION['status'] = $response->status;
+            $_SESSION['error'] = $response->error;
+            $_SESSION['error_message'] = $response->message;
+            echo '<script>location.href = "../public/errorPage.php"</script>';
+            return $response;
         }
 
     }
@@ -73,17 +80,23 @@ class ApiConnect
      * @param $clientFingerprint
      */
     function refreshToken($clientFingerprint){
-        $res = $this->client->request('POST', 'api/user/refresh', ['json' => ["refresh_token" => $_SESSION["refresh_token"], "client_fingerprint" => $clientFingerprint]]);
-        $messageBody = $res->getBody()->read(2048);
-        $data= json_decode($messageBody);
-        if ($data->success){
+        try {
+            $res = $this->client->request('POST', 'api/user/refresh', ['json' => ["refresh_token" => $_SESSION["refresh_token"], "client_fingerprint" => $clientFingerprint]]);
+            $messageBody = $res->getBody()->read(2048);
+            $data = json_decode($messageBody);
             $_SESSION['access_token']= $data->access_token;
             $_SESSION['refresh_token'] = $data->refresh_token;
         }
-        else{
-            //session_destroy();
-            echo'<script>location.href = "../public/loginAndSignup.php" </script>';
+        catch (ClientException $e)
+        {
+            $response = json_decode($e->getResponse()->getBody()->getContents());
+            $_SESSION['status'] = $response->status;
+            $_SESSION['error'] = $response->error;
+            $_SESSION['error_message'] = $response->message;
+            echo'<script>location.href = "../public/errorPage.php" </script>';
         }
+
+
     }
 
     /**
@@ -92,11 +105,21 @@ class ApiConnect
      * @return mixed
      */
     function signOut($clientFingerprint){
-        $res = $this->client->request('POST', 'api/user/logout', ['headers' => ["Authorization" => 'bearer ' . $_SESSION['access_token']],'json' => ['client_fingerprint' => $clientFingerprint]]);
-        session_destroy();
-        $messageBody = $res->getBody()->read(2048);
-        $data= json_decode($messageBody);
-        return $data;
+        try{
+            $res = $this->client->request('POST', 'api/user/logout', ['headers' => ["Authorization" => 'bearer ' . $_SESSION['access_token']],'json' => ['client_fingerprint' => $clientFingerprint]]);
+            session_destroy();
+            $messageBody = $res->getBody()->read(2048);
+            $data= json_decode($messageBody);
+            return $data;
+        }
+        catch (ClientException $e){
+            $response = json_decode($e->getResponse()->getBody()->getContents());
+            $_SESSION['status'] = $response->status;
+            $_SESSION['error'] = $response->error;
+            $_SESSION['error_message'] = $response->message;
+            echo'<script>location.href = "../public/errorPage.php" </script>';
+            return $response;
+        }
 
     }
 }
