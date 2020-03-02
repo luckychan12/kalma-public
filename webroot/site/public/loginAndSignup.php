@@ -1,5 +1,4 @@
 <?php
-
 include_once "header.php";
 
 
@@ -45,6 +44,16 @@ include_once "header.php";
     <div class="col-md-1"></div>
     <div class="col-lg-5" style="padding:10px;background-color: var(--c-primary-dark);font:var(--f-normal) ;color: var(--c-text-on-primary);border-top-left-radius:20px; border-bottom-left-radius: 20px">
         <h2 id="loginHeader" style="text-align: center">Login</h2>
+        <div style="text-align: center">
+         <?php
+         if (isset($_SESSION['error_message']))
+         {
+             echo $_SESSION['error_message'];
+         }
+         ?>
+        </div>
+
+
         <form action="../controller/loginController.php" method="post" style="text-align: center">
             <input type="email" placeholder="Email" name="logEmail">
             <br>

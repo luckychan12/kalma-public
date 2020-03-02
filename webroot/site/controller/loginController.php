@@ -11,6 +11,7 @@ if(isset($_POST['login'])) {
     $api = new ApiConnect();
     $data = $api->requestLogin($_POST['logPassword'], $_POST['logEmail'], $_POST['fingerprint']);
     if (!isset($data->error)) {
+        session_unset();
         $_SESSION['access_token'] = $data->access_token;
         $_SESSION['account_link'] = $data->links->account;
         $_SESSION['refresh_token'] = $data->refresh_token;
@@ -19,7 +20,7 @@ if(isset($_POST['login'])) {
     }
     else
     {
-       echo '<script>location.href = "../public/errorPage.php?"</script>';
+       echo '<script>location.href = "../public/loginAndSignup.php?"</script>';
     }
 }
 
