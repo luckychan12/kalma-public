@@ -19,7 +19,7 @@ if(isset($_POST['login'])) {
     }
     else
     {
-        echo '<script>location.href = "../public/errorPage.php?"</script>';
+       echo '<script>location.href = "../public/errorPage.php?"</script>';
     }
 }
 

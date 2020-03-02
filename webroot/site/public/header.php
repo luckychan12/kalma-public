@@ -144,8 +144,12 @@ if(isset($_POST['logout'])){
 <?php
 
 //hides the menu buttons that ares accessible on the login page
-
-if ($_SERVER['REQUEST_URI'] == "/Kalma/webroot/site/public/loginAndSignup.php"){
+$filepath = strtok($_SERVER['REQUEST_URI'], '?');
+if ($filepath == "/Kalma/webroot/site/public/loginAndSignup.php"){
+    echo '<script>document.getElementById("signOut").classList.add("hide");
+          document.getElementById("sideButton").classList.add("hide")</script>';
+}
+else if ($filepath == "/Kalma/webroot/site/public/errorPage.php"){
     echo '<script>document.getElementById("signOut").classList.add("hide");
           document.getElementById("sideButton").classList.add("hide")</script>';
 }

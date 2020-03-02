@@ -42,6 +42,7 @@ class ApiConnect
         }
         catch (ClientException $e){
             $response = json_decode($e->getResponse()->getBody()->getContents());
+            session_unset();
             $_SESSION['status'] = $response->status;
             $_SESSION['error'] = $response->error;
             $_SESSION['error_message'] = $response->message;
@@ -65,10 +66,10 @@ class ApiConnect
         }
         catch (ClientException $e){
             $response = json_decode($e->getResponse()->getBody()->getContents());
+            session_unset();
             $_SESSION['status'] = $response->status;
             $_SESSION['error'] = $response->error;
             $_SESSION['error_message'] = $response->message;
-            echo '<script>location.href = "../public/errorPage.php"</script>';
             return $response;
         }
     }
@@ -90,10 +91,10 @@ class ApiConnect
         catch (ClientException $e)
         {
             $response = json_decode($e->getResponse()->getBody()->getContents());
+            session_unset();
             $_SESSION['status'] = $response->status;
             $_SESSION['error'] = $response->error;
             $_SESSION['error_message'] = $response->message;
-            echo'<script>location.href = "../public/errorPage.php" </script>';
         }
 
 
@@ -114,10 +115,10 @@ class ApiConnect
         }
         catch (ClientException $e){
             $response = json_decode($e->getResponse()->getBody()->getContents());
+            session_unset();
             $_SESSION['status'] = $response->status;
             $_SESSION['error'] = $response->error;
             $_SESSION['error_message'] = $response->message;
-            echo'<script>location.href = "../public/errorPage.php" </script>';
             return $response;
         }
 
