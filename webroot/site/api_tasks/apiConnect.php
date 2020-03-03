@@ -1,7 +1,9 @@
 <?php
 require '../vendor/autoload.php';
 use GuzzleHttp\Exception\ClientException;
+use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception;
 
 /**
  * Class ApiConnect
@@ -48,6 +50,16 @@ class ApiConnect
             $_SESSION['error_message'] = $response->message;
             return $response;
         }
+        catch (ConnectException $e){
+            $res = array('error' => 'Failed connect to database', 'status' => '2002', 'message' => "Couldn't connect. Try again later");
+            $res = json_encode($res);
+            $res= json_decode($res);
+            session_unset();
+            $_SESSION['status'] = $res->status;
+            $_SESSION['error'] = $res->error;
+            $_SESSION['error_message'] = $res->message;
+            return $res;
+        }
 
 
     }
@@ -72,6 +84,17 @@ class ApiConnect
             $_SESSION['error_message'] = $response->message;
             return $response;
         }
+        catch (ConnectException $e){
+            $res = array('error' => 'N/A', 'status' => 'N/A', 'message' => "Couldn't connect. Try again later");
+            $res = json_encode($res);
+            $res= json_decode($res);
+            session_unset();
+            $_SESSION['status'] = $res->status;
+            $_SESSION['error'] = $res->error;
+            $_SESSION['error_message'] = $res->message;
+            return $res;
+        }
+
     }
 
     /**
@@ -95,6 +118,16 @@ class ApiConnect
             $_SESSION['status'] = $response->status;
             $_SESSION['error'] = $response->error;
             $_SESSION['error_message'] = $response->message;
+        }
+        catch (ConnectException $e){
+            $res = array('error' => 'N/A', 'status' => 'N/A', 'message' => "Couldn't connect. Try again later");
+            $res = json_encode($res);
+            $res= json_decode($res);
+            session_unset();
+            $_SESSION['status'] = $res->status;
+            $_SESSION['error'] = $res->error;
+            $_SESSION['error_message'] = $res->message;
+            return $res;
         }
 
 
@@ -120,6 +153,16 @@ class ApiConnect
             $_SESSION['error'] = $response->error;
             $_SESSION['error_message'] = $response->message;
             return $response;
+        }
+        catch (ConnectException $e){
+            $res = array('error' => 'N/A', 'status' => 'N/A', 'message' => "Couldn't connect. Try again later");
+            $res = json_encode($res);
+            $res= json_decode($res);
+            session_unset();
+            $_SESSION['status'] = $res->status;
+            $_SESSION['error'] = $res->error;
+            $_SESSION['error_message'] = $res->message;
+            return $res;
         }
 
     }
