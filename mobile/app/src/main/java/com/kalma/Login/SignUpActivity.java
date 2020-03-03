@@ -122,7 +122,7 @@ public class SignUpActivity extends AppCompatActivity {
                     @Override
                     public void onSuccess(JSONObject response) {
                         try {
-                            //tell user that the signup was successful
+                            //tell user that the sign-up was successful
                             JSONObject responseBody = response;
                             String message = responseBody.getString("message");
                             Toast toast = Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG);
@@ -165,7 +165,7 @@ public class SignUpActivity extends AppCompatActivity {
         char[] charArray = str.toCharArray();
         for (char ch : charArray) {
             //Check if letter value is between ascii 'a' and ascii 'z'
-            if (!(ch >= 'a' && ch <= 'z')) {
+            if (!((ch >= 'a' && ch <= 'z') || (ch != 39) || (ch != 45))) {
                 return false;
             }
         }
