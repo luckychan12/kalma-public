@@ -2,6 +2,7 @@
 require '../vendor/autoload.php';
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Client;
 
 
@@ -50,24 +51,24 @@ class ApiConnect
             $_SESSION['error_message'] = $response->message;
             return $response;
         }
-        catch (RequestException $e){
+        catch (RequestException $e) {
             $response = json_decode($e->getResponse()->getBody()->getContents());
             session_unset();
             $_SESSION['status'] = $response->status;
             $_SESSION['error'] = $response->error;
             $_SESSION['error_message'] = $response->message;
             return $response;
-            //$res = array('error' => 'Failed connect to database', 'status' => '2002', 'message' => "Couldn't connect. Try again later");
-            //$res = json_encode($res);
-            //$res= json_decode($res);
-            //session_unset();
-            //$_SESSION['status'] = $res->status;
-            //$_SESSION['error'] = $res->error;
-            //$_SESSION['error_message'] = $res->message;
-           // return $res;
         }
-
-
+        catch (ConnectException $e){
+            $res = array('error' => 'Connection Timed Out', 'status' => 'N/A', 'message' => "Couldn't connect. Try again later");
+            $res = json_encode($res);
+            $res= json_decode($res);
+            session_unset();
+            $_SESSION['status'] = $res->status;
+            $_SESSION['error'] = $res->error;
+            $_SESSION['error_message'] = $res->message;
+            return $res;
+        }
     }
 
     /**
@@ -90,21 +91,23 @@ class ApiConnect
             $_SESSION['error_message'] = $response->message;
             return $response;
         }
-        catch (RequestException $e){
+        catch (RequestException $e) {
             $response = json_decode($e->getResponse()->getBody()->getContents());
             session_unset();
             $_SESSION['status'] = $response->status;
             $_SESSION['error'] = $response->error;
             $_SESSION['error_message'] = $response->message;
             return $response;
-            //$res = array('error' => 'Failed connect to database', 'status' => '2002', 'message' => "Couldn't connect. Try again later");
-            //$res = json_encode($res);
-            //$res= json_decode($res);
-            //session_unset();
-            //$_SESSION['status'] = $res->status;
-            //$_SESSION['error'] = $res->error;
-            //$_SESSION['error_message'] = $res->message;
-            // return $res;
+        }
+        catch (ConnectException $e){
+            $res = array('error' => 'Connection Timed Out', 'status' => 'N/A', 'message' => "Couldn't connect. Try again later");
+            $res = json_encode($res);
+            $res= json_decode($res);
+            session_unset();
+            $_SESSION['status'] = $res->status;
+            $_SESSION['error'] = $res->error;
+            $_SESSION['error_message'] = $res->message;
+            return $res;
         }
 
     }
@@ -139,15 +142,18 @@ class ApiConnect
             $_SESSION['error'] = $response->error;
             $_SESSION['error_message'] = $response->message;
             return $response;
-            //$res = array('error' => 'Failed connect to database', 'status' => '2002', 'message' => "Couldn't connect. Try again later");
-            //$res = json_encode($res);
-            //$res= json_decode($res);
-            //session_unset();
-            //$_SESSION['status'] = $res->status;
-            //$_SESSION['error'] = $res->error;
-            //$_SESSION['error_message'] = $res->message;
-            // return $res;
         }
+        catch (ConnectException $e){
+            $res = array('error' => 'Connection Timed Out', 'status' => 'N/A', 'message' => "Couldn't connect. Try again later");
+            $res = json_encode($res);
+            $res= json_decode($res);
+            session_unset();
+            $_SESSION['status'] = $res->status;
+            $_SESSION['error'] = $res->error;
+            $_SESSION['error_message'] = $res->message;
+            return $res;
+        }
+
 
 
     }
@@ -180,15 +186,18 @@ class ApiConnect
             $_SESSION['error'] = $response->error;
             $_SESSION['error_message'] = $response->message;
             return $response;
-            //$res = array('error' => 'Failed connect to database', 'status' => '2002', 'message' => "Couldn't connect. Try again later");
-            //$res = json_encode($res);
-            //$res= json_decode($res);
-            //session_unset();
-            //$_SESSION['status'] = $res->status;
-            //$_SESSION['error'] = $res->error;
-            //$_SESSION['error_message'] = $res->message;
-            // return $res;
         }
+        catch (ConnectException $e){
+            $res = array('error' => 'Connection Timed Out', 'status' => 'N/A', 'message' => "Couldn't connect. Try again later");
+            $res = json_encode($res);
+            $res= json_decode($res);
+            session_unset();
+            $_SESSION['status'] = $res->status;
+            $_SESSION['error'] = $res->error;
+            $_SESSION['error_message'] = $res->message;
+            return $res;
+        }
+
 
     }
 }

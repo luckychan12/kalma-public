@@ -66,15 +66,15 @@ include_once "header.php";
     <div class="col-lg-5" style="padding:10px;background-color: var(--c-primary-dark);font:var(--f-normal) ;color: var(--c-text-on-primary);border-top-right-radius:20px; border-bottom-right-radius: 20px">
         <h2 style="text-align: center; ">Sign up</h2>
         <form action="loginAndSignup.php" method="post" style="text-align: center">
-            <input type="email" placeholder="Email" id="email">
+            <input type="email" placeholder="Email" name="email">
             <br>
-            <input type="text" placeholder="First Name" id="firstName">
+            <input type="text" placeholder="First Name" name="firstName">
             <br>
-            <input type="text" placeholder="Last Name" id="lastName">
+            <input type="text" placeholder="Last Name" name="lastName">
             <br>
-            <input type="password" placeholder="Password" id="password">
+            <input type="password" placeholder="Password" name="password">
             <br>
-            <input type="date"  id="dob" min="1900-01-01">
+            <input type="date"  name="dob" min="1900-01-01">
             <br>
             <input style="width: 100px;background-color: var(--c-secondary); color:var(--c-text-on-secondary)" type="submit" name="signup" value="Submit">
         </form>
