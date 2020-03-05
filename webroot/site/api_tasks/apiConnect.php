@@ -1,9 +1,9 @@
 <?php
 require '../vendor/autoload.php';
 use GuzzleHttp\Exception\ClientException;
-use GuzzleHttp\Exception\ConnectException;
+use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Client;
-use GuzzleHttp\Exception;
+
 
 /**
  * Class ApiConnect
@@ -24,7 +24,7 @@ class ApiConnect
             // Base URI is used with relative requests
             'base_uri' => 'http://localhost/',
             // You can set any number of default request options.
-            'timeout'  => 2.0,
+            'timeout'  => 50.0,
         ]);
     }
 
@@ -50,15 +50,21 @@ class ApiConnect
             $_SESSION['error_message'] = $response->message;
             return $response;
         }
-        catch (ConnectException $e){
-            $res = array('error' => 'Failed connect to database', 'status' => '2002', 'message' => "Couldn't connect. Try again later");
-            $res = json_encode($res);
-            $res= json_decode($res);
+        catch (RequestException $e){
+            $response = json_decode($e->getResponse()->getBody()->getContents());
             session_unset();
-            $_SESSION['status'] = $res->status;
-            $_SESSION['error'] = $res->error;
-            $_SESSION['error_message'] = $res->message;
-            return $res;
+            $_SESSION['status'] = $response->status;
+            $_SESSION['error'] = $response->error;
+            $_SESSION['error_message'] = $response->message;
+            return $response;
+            //$res = array('error' => 'Failed connect to database', 'status' => '2002', 'message' => "Couldn't connect. Try again later");
+            //$res = json_encode($res);
+            //$res= json_decode($res);
+            //session_unset();
+            //$_SESSION['status'] = $res->status;
+            //$_SESSION['error'] = $res->error;
+            //$_SESSION['error_message'] = $res->message;
+           // return $res;
         }
 
 
@@ -84,15 +90,21 @@ class ApiConnect
             $_SESSION['error_message'] = $response->message;
             return $response;
         }
-        catch (ConnectException $e){
-            $res = array('error' => 'N/A', 'status' => 'N/A', 'message' => "Couldn't connect. Try again later");
-            $res = json_encode($res);
-            $res= json_decode($res);
+        catch (RequestException $e){
+            $response = json_decode($e->getResponse()->getBody()->getContents());
             session_unset();
-            $_SESSION['status'] = $res->status;
-            $_SESSION['error'] = $res->error;
-            $_SESSION['error_message'] = $res->message;
-            return $res;
+            $_SESSION['status'] = $response->status;
+            $_SESSION['error'] = $response->error;
+            $_SESSION['error_message'] = $response->message;
+            return $response;
+            //$res = array('error' => 'Failed connect to database', 'status' => '2002', 'message' => "Couldn't connect. Try again later");
+            //$res = json_encode($res);
+            //$res= json_decode($res);
+            //session_unset();
+            //$_SESSION['status'] = $res->status;
+            //$_SESSION['error'] = $res->error;
+            //$_SESSION['error_message'] = $res->message;
+            // return $res;
         }
 
     }
@@ -102,6 +114,7 @@ class ApiConnect
      *
      * Work in progress
      * @param $clientFingerprint
+     * @return mixed
      */
     function refreshToken($clientFingerprint){
         try {
@@ -119,15 +132,21 @@ class ApiConnect
             $_SESSION['error'] = $response->error;
             $_SESSION['error_message'] = $response->message;
         }
-        catch (ConnectException $e){
-            $res = array('error' => 'N/A', 'status' => 'N/A', 'message' => "Couldn't connect. Try again later");
-            $res = json_encode($res);
-            $res= json_decode($res);
+        catch (RequestException $e){
+            $response = json_decode($e->getResponse()->getBody()->getContents());
             session_unset();
-            $_SESSION['status'] = $res->status;
-            $_SESSION['error'] = $res->error;
-            $_SESSION['error_message'] = $res->message;
-            return $res;
+            $_SESSION['status'] = $response->status;
+            $_SESSION['error'] = $response->error;
+            $_SESSION['error_message'] = $response->message;
+            return $response;
+            //$res = array('error' => 'Failed connect to database', 'status' => '2002', 'message' => "Couldn't connect. Try again later");
+            //$res = json_encode($res);
+            //$res= json_decode($res);
+            //session_unset();
+            //$_SESSION['status'] = $res->status;
+            //$_SESSION['error'] = $res->error;
+            //$_SESSION['error_message'] = $res->message;
+            // return $res;
         }
 
 
@@ -154,15 +173,21 @@ class ApiConnect
             $_SESSION['error_message'] = $response->message;
             return $response;
         }
-        catch (ConnectException $e){
-            $res = array('error' => 'N/A', 'status' => 'N/A', 'message' => "Couldn't connect. Try again later");
-            $res = json_encode($res);
-            $res= json_decode($res);
+        catch (RequestException $e){
+            $response = json_decode($e->getResponse()->getBody()->getContents());
             session_unset();
-            $_SESSION['status'] = $res->status;
-            $_SESSION['error'] = $res->error;
-            $_SESSION['error_message'] = $res->message;
-            return $res;
+            $_SESSION['status'] = $response->status;
+            $_SESSION['error'] = $response->error;
+            $_SESSION['error_message'] = $response->message;
+            return $response;
+            //$res = array('error' => 'Failed connect to database', 'status' => '2002', 'message' => "Couldn't connect. Try again later");
+            //$res = json_encode($res);
+            //$res= json_decode($res);
+            //session_unset();
+            //$_SESSION['status'] = $res->status;
+            //$_SESSION['error'] = $res->error;
+            //$_SESSION['error_message'] = $res->message;
+            // return $res;
         }
 
     }
