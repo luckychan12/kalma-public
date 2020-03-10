@@ -66,8 +66,9 @@ class DatabaseConnection
         {
             Logger::log(Logger::ERROR,
                 "Failed to execute query:\n\t'%s'\n" .
-                "\tThrows Exception:\n\t%s",
-                $query, $e->getMessage());
+                "\tThrows Exception:\n\t%s\n" .
+                "\t%s",
+                $query, $e->getMessage(), implode("\n\t", $stmt->errorInfo()));
 
             throw new ResponseException(500, 3001, 'Oops! Something went wrong processing your request.', 'An SQL error has occurred.');
         }
