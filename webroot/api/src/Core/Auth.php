@@ -168,37 +168,39 @@ class Auth
     /**
      * Generate a short-lifetime, stateful JWT containing a user ID
      * @param int $user_id
-     * @return string
+     * @return array
      */
-    public static function generateAccessToken(int $user_id) : string
+    public static function generateAccessToken(int $user_id) : array
     {
+        $expiry_time = time() + 15 * 60; // Expires in 15 minutes
         $payload = array(
             'iss' => 'kalma/api',
             'aud' => 'kalma/api',
             'iat' => time(),
-            'exp' => time() + 15 * 60, // Expires in 15 minutes
-            'sub' => $user_id
+            'exp' => $expiry_time,
+            'sub' => $user_id,
         );
 
-        return static::generateJWT($payload);
+        return [static::generateJWT($payload), $expiry_time];
     }
 
     /**
      * Generate a long-lifetime, stateful JWT containing a session ID
      * @param int $session_id
-     * @return string
+     * @return array
      */
-    public static function generateRefreshToken(int $session_id) : string
+    public static function generateRefreshToken(int $session_id) : array
     {
+        $expiry_time = time() + 28 * 24 * 60 * 60; // Expires in 28 days
         $payload = array(
             'iss' => 'kalma/api',
             'aud' => 'kalma/api',
             'iat' => time(),
-            'exp' => time() + 28 * 24 * 60 * 60, // Expires in 28 days
-            'sid' => $session_id
+            'exp' => $expiry_time,
+            'sid' => $session_id,
         );
 
-        return static::generateJWT($payload);
+        return [static::generateJWT($payload), $expiry_time];
     }
 
     /**
