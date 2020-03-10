@@ -22,17 +22,17 @@ use \Exception;
 class DatabaseHandler
 {
 
-    private static DatabaseConnection $connection;
+    private static ?DatabaseConnection $connection = null;
 
     /**
      * Return a Database interface object for querying
      * @return DatabaseConnection
      * @throws ResponseException
      */
-    public static function getConnection() : DatabaseConnection
+    public static function getConnection() : ?DatabaseConnection
     {
         // If a database connection doesn't already exist, create one
-        if (!isset(self::$connection)) {
+        if (self::$connection == null) {
             // Get credentials from config
             $db_host = Config::get('db_host');
             $db_name = Config::get('db_name');
@@ -42,6 +42,9 @@ class DatabaseHandler
             // Create the connection
             try {
                 $conn = new PDO("mysql:host=$db_host;dbname=$db_name", $db_user, $db_pass);
+                // Enable explicit error reporting
+                $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+                self::$connection = new DatabaseConnection($conn);
             }
             catch (Exception $e) {
                 Logger::log(
@@ -52,10 +55,6 @@ class DatabaseHandler
 
                 throw new ResponseException(500, 3500, 'Oops! An error has occurred processing your request.', 'Failed to connect to the database.');
             }
-            // Enable explicit error reporting
-            $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-            self::$connection = new DatabaseConnection($conn);
         }
 
         return self::$connection;

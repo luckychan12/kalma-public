@@ -18,6 +18,7 @@ namespace Kalma\Api\Resource;
 use Kalma\Api\Core\Config;
 use Kalma\Api\Core\DatabaseConnection;
 use Kalma\Api\Core\DatabaseHandler;
+use Kalma\Api\Response\Exception\ResponseException;
 
 require __DIR__ . '/../../vendor/autoload.php';
 
@@ -27,9 +28,18 @@ class Resource
     protected DatabaseConnection $database;
     protected string $api_root;
 
+    /**
+     * Resource constructor.
+     * @throws ResponseException
+     */
     public function __construct()
     {
-        $this->database = DatabaseHandler::getConnection();
+        $db = DatabaseHandler::getConnection();
+        if ($db === null)
+        {
+            throw new ResponseException(500, 3500, 'Oops! An error has occurred processing your request.', 'Failed to connect to the database.');
+        }
+        $this->database = $db;
         $this->api_root = Config::get('api_root');
     }
 }
