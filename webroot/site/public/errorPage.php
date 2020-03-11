@@ -12,5 +12,9 @@ include_once "header.php";
         Error: <?php echo $_SESSION['error'] ?>
         <br>
         Message: <?php echo $_SESSION['error_message'] ?>
+        <br>
+        <?php if (isset($_SESSION['detail'])){
+            echo 'Detail: '.$_SESSION['detail'] ;
+        }  ?>
     </div>
 </body>
