@@ -107,6 +107,7 @@ class ApiConnect
             $data = json_decode($messageBody);
             $_SESSION['access_token']= $data->access_token;
             $_SESSION['refresh_token'] = $data->refresh_token;
+            return $data;
         }
         catch (ClientException $e)
         {
@@ -115,6 +116,7 @@ class ApiConnect
             $_SESSION['status'] = $response->status;
             $_SESSION['error'] = $response->error;
             $_SESSION['error_message'] = $response->message;
+            return $response;
         }
         catch (RequestException $e){
             $response = json_decode($e->getResponse()->getBody()->getContents());
@@ -172,12 +174,13 @@ class ApiConnect
         }
         catch (ClientException $e){
             $response = json_decode($e->getResponse()->getBody());
-            echo $response->error;
             session_unset();
             $_SESSION['status'] = $response->status;
             $_SESSION['error'] = $response->error;
             $_SESSION['error_message'] = $response->message;
-            $_SESSION['detail'] = $response->detail;
+            if(isset($response->detail)) {
+                $_SESSION['detail'] = $response->detail;
+            }
             return $response;
         }
         catch (RequestException $e){
@@ -186,7 +189,9 @@ class ApiConnect
             $_SESSION['status'] = $response->status;
             $_SESSION['error'] = $response->error;
             $_SESSION['error_message'] = $response->message;
-            $_SESSION['detail'] = $response->detail;
+            if(isset($response->detail)) {
+                $_SESSION['detail'] = $response->detail;
+            }
             return $response;
         }
     }
