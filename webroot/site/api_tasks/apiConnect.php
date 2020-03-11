@@ -2,7 +2,6 @@
 require '../vendor/autoload.php';
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\RequestException;
-use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Client;
 
 
@@ -59,16 +58,7 @@ class ApiConnect
             $_SESSION['error_message'] = $response->message;
             return $response;
         }
-        catch (ConnectException $e){
-            $res = array('error' => 'Connection Timed Out', 'status' => 'N/A', 'message' => "Couldn't connect. Try again later");
-            $res = json_encode($res);
-            $res= json_decode($res);
-            session_unset();
-            $_SESSION['status'] = $res->status;
-            $_SESSION['error'] = $res->error;
-            $_SESSION['error_message'] = $res->message;
-            return $res;
-        }
+
     }
 
     /**
@@ -99,16 +89,7 @@ class ApiConnect
             $_SESSION['error_message'] = $response->message;
             return $response;
         }
-        catch (ConnectException $e){
-            $res = array('error' => 'Connection Timed Out', 'status' => 'N/A', 'message' => "Couldn't connect. Try again later");
-            $res = json_encode($res);
-            $res= json_decode($res);
-            session_unset();
-            $_SESSION['status'] = $res->status;
-            $_SESSION['error'] = $res->error;
-            $_SESSION['error_message'] = $res->message;
-            return $res;
-        }
+
 
     }
 
@@ -143,16 +124,7 @@ class ApiConnect
             $_SESSION['error_message'] = $response->message;
             return $response;
         }
-        catch (ConnectException $e){
-            $res = array('error' => 'Connection Timed Out', 'status' => 'N/A', 'message' => "Couldn't connect. Try again later");
-            $res = json_encode($res);
-            $res= json_decode($res);
-            session_unset();
-            $_SESSION['status'] = $res->status;
-            $_SESSION['error'] = $res->error;
-            $_SESSION['error_message'] = $res->message;
-            return $res;
-        }
+
 
 
 
@@ -187,20 +159,42 @@ class ApiConnect
             $_SESSION['error_message'] = $response->message;
             return $response;
         }
-        catch (ConnectException $e){
-            $res = array('error' => 'Connection Timed Out', 'status' => 'N/A', 'message' => "Couldn't connect. Try again later");
-            $res = json_encode($res);
-            $res= json_decode($res);
-            session_unset();
-            $_SESSION['status'] = $res->status;
-            $_SESSION['error'] = $res->error;
-            $_SESSION['error_message'] = $res->message;
-            return $res;
+
+
+
+    }
+    function requestSignup($inFirstName,$inLastName,$inPassword, $inEmail, $inDOB){
+        try {
+            $res = $this->client->request('POST', 'api/user/signup', ['json' => ["email_address" => $inEmail, "password" => $inPassword, "first_name" => $inFirstName, "last_name" => $inLastName, "date_of_birth" =>$inDOB]]);
+            $messageBody = $res->getBody()->read(2048);
+            $data = json_decode($messageBody);
+            return $data;
         }
-
-
+        catch (ClientException $e){
+            $response = json_decode($e->getResponse()->getBody());
+            echo $response->error;
+            session_unset();
+            $_SESSION['status'] = $response->status;
+            $_SESSION['error'] = $response->error;
+            $_SESSION['error_message'] = $response->message;
+            $_SESSION['detail'] = $response->detail;
+            return $response;
+        }
+        catch (RequestException $e){
+            $response = json_decode($e->getResponse()->getBody()->getContents());
+            session_unset();
+            $_SESSION['status'] = $response->status;
+            $_SESSION['error'] = $response->error;
+            $_SESSION['error_message'] = $response->message;
+            $_SESSION['detail'] = $response->detail;
+            return $response;
+        }
     }
 }
 
 ?>
+
+
+
+
 
