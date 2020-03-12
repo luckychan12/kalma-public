@@ -45,17 +45,13 @@ class ApiConnect
         catch (ClientException $e){
             $response = json_decode($e->getResponse()->getBody()->getContents());
             session_unset();
-            $_SESSION['status'] = $response->status;
-            $_SESSION['error'] = $response->error;
-            $_SESSION['error_message'] = $response->message;
+            $_SESSION['login_message'] = $response->message;
             return $response;
         }
         catch (RequestException $e) {
             $response = json_decode($e->getResponse()->getBody()->getContents());
             session_unset();
-            $_SESSION['status'] = $response->status;
-            $_SESSION['error'] = $response->error;
-            $_SESSION['error_message'] = $response->message;
+            $_SESSION['login_message'] = $response->message;
             return $response;
         }
 
@@ -79,6 +75,9 @@ class ApiConnect
             $_SESSION['status'] = $response->status;
             $_SESSION['error'] = $response->error;
             $_SESSION['error_message'] = $response->message;
+            if(isset($response->detail)) {
+                $_SESSION['detail'] = $response->detail;
+            }
             return $response;
         }
         catch (RequestException $e) {
@@ -87,6 +86,9 @@ class ApiConnect
             $_SESSION['status'] = $response->status;
             $_SESSION['error'] = $response->error;
             $_SESSION['error_message'] = $response->message;
+            if(isset($response->detail)) {
+                $_SESSION['detail'] = $response->detail;
+            }
             return $response;
         }
 
@@ -116,6 +118,9 @@ class ApiConnect
             $_SESSION['status'] = $response->status;
             $_SESSION['error'] = $response->error;
             $_SESSION['error_message'] = $response->message;
+            if(isset($response->detail)) {
+                $_SESSION['detail'] = $response->detail;
+            }
             return $response;
         }
         catch (RequestException $e){
@@ -124,6 +129,9 @@ class ApiConnect
             $_SESSION['status'] = $response->status;
             $_SESSION['error'] = $response->error;
             $_SESSION['error_message'] = $response->message;
+            if(isset($response->detail)) {
+                $_SESSION['detail'] = $response->detail;
+            }
             return $response;
         }
 
@@ -151,6 +159,9 @@ class ApiConnect
             $_SESSION['status'] = $response->status;
             $_SESSION['error'] = $response->error;
             $_SESSION['error_message'] = $response->message;
+            if(isset($response->detail)) {
+                $_SESSION['detail'] = $response->detail;
+            }
             return $response;
         }
         catch (RequestException $e){
@@ -159,6 +170,9 @@ class ApiConnect
             $_SESSION['status'] = $response->status;
             $_SESSION['error'] = $response->error;
             $_SESSION['error_message'] = $response->message;
+            if(isset($response->detail)) {
+                $_SESSION['detail'] = $response->detail;
+            }
             return $response;
         }
 

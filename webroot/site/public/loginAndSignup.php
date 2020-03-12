@@ -1,9 +1,6 @@
 <?php
 include_once "header.php";
 
-
-//TODO add sign up functionality
-
 ?>
 
 
@@ -51,9 +48,10 @@ label {
         <h2 id="loginHeader" style="text-align: center">Login</h2>
         <div style="text-align: center">
          <?php
-         if (isset($_SESSION['error_message']))
+         //Displays a message if there was an issue logging in
+         if (isset($_SESSION['login_message']))
          {
-             echo $_SESSION['error_message'];
+             echo $_SESSION['login_message'];
          }
          ?>
         </div>
