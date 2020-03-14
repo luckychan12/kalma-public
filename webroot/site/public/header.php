@@ -143,9 +143,21 @@ if(isset($_POST['logout'])){
     </div>
 <?php
 
-//hides the menu buttons that ares accessible on the login page
-
-if ($_SERVER['REQUEST_URI'] == "/Kalma/webroot/site/public/loginAndSignup.php"){
+//hides the menu buttons that arent accessible on some of the pages
+$filepath = strtok($_SERVER['REQUEST_URI'], '?');
+if ($filepath == "/Kalma/webroot/site/public/loginAndSignup.php"){
+    echo '<script>document.getElementById("signOut").classList.add("hide");
+          document.getElementById("sideButton").classList.add("hide")</script>';
+}
+else if ($filepath == "/Kalma/webroot/site/public/errorPage.php"){
+    echo '<script>document.getElementById("signOut").classList.add("hide");
+          document.getElementById("sideButton").classList.add("hide")</script>';
+}
+else if($filepath == "/Kalma/webroot/site/public/logoutSuccess.php"){
+    echo '<script>document.getElementById("signOut").classList.add("hide");
+          document.getElementById("sideButton").classList.add("hide")</script>';
+}
+else if($filepath == "Kalma/webroot/site/public/conformationPage.php"){
     echo '<script>document.getElementById("signOut").classList.add("hide");
           document.getElementById("sideButton").classList.add("hide")</script>';
 }
@@ -153,3 +165,4 @@ else{
     echo '<script>document.getElementById("signOut").classList.remove("hide");
           document.getElementById("sideButton").classList.remove("hide")</script>';
 }
+

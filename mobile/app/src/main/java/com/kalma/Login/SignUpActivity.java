@@ -27,6 +27,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
@@ -72,13 +73,8 @@ public class SignUpActivity extends AppCompatActivity {
                 String lastName = txtLastName.getText().toString();
                 String password = txtPassword.getText().toString();
                 String email = txtEmail.getText().toString();
-                //convert date string into DateTime object and generate epoch value
-                DateTimeFormatter formatter = DateTimeFormat.forPattern("dd/MM/yyy");
-                DateTime dateTimeGMT = new DateTime(formatter.parseDateTime(txtDOB.getText().toString()), DateTimeZone.UTC);
-                long epochSecs = (dateTimeGMT.getMillis() / 1000);
-                //Attempt to sign up
-                signUp(firstName, lastName, password, email, epochSecs);
-
+                
+                attemptSignUp(firstName, lastName, password, email);
             }
         });
 
@@ -89,6 +85,30 @@ public class SignUpActivity extends AppCompatActivity {
                 datePicker.show();
             }
         });
+    }
+
+    private void attemptSignUp(String firstName, String lastName, String password, String email) {
+        if (!(firstName.isEmpty() || lastName.isEmpty() || password.isEmpty() || email.isEmpty() || txtDOB.getText().toString().isEmpty())){
+            if (validateString(firstName) && validateString(lastName)){
+                //convert date string into DateTime object and generate epoch value
+                long epochSecs = getEpochSecs();
+                signUp(firstName, lastName, password, email, epochSecs);
+            }
+            else{
+                Toast toast = Toast.makeText(getApplicationContext(), "First name and Last can only contain letters 'A' - 'Z'", Toast.LENGTH_LONG);
+                toast.show();
+            }
+        }
+        else{
+            Toast toast = Toast.makeText(getApplicationContext(), "All fields must be filled.", Toast.LENGTH_LONG);
+            toast.show();
+        }
+    }
+
+    private long getEpochSecs() {
+        DateTimeFormatter formatter = DateTimeFormat.forPattern("dd/MM/yyy");
+        DateTime dateTimeGMT = new DateTime(formatter.parseDateTime(txtDOB.getText().toString()), DateTimeZone.UTC);
+        return dateTimeGMT.getMillis() / 1000;
     }
 
     private void gotoLogin() {
@@ -102,7 +122,7 @@ public class SignUpActivity extends AppCompatActivity {
                     @Override
                     public void onSuccess(JSONObject response) {
                         try {
-                            //tell user that the signup was successful
+                            //tell user that the sign-up was successful
                             JSONObject responseBody = response;
                             String message = responseBody.getString("message");
                             Toast toast = Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG);
@@ -133,6 +153,23 @@ public class SignUpActivity extends AppCompatActivity {
                     }
                 }
         );
+    }
+
+    //validates that input string only contains letters
+    public boolean validateString(String str) {
+        if (str == null){
+            return false;
+        }
+        str = str.toLowerCase();
+        //Convert sting to char array and loop through letters individually
+        char[] charArray = str.toCharArray();
+        for (char ch : charArray) {
+            //Check if letter value is between ascii 'a' and ascii 'z'
+            if (!((ch >= 'a' && ch <= 'z') || (ch != 39) || (ch != 45))) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private JSONObject buildSignUpJsonObject(String firstName, String lastName, String password, String email, long DOB) {

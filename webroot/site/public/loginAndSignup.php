@@ -1,9 +1,5 @@
 <?php
-
 include_once "header.php";
-
-
-//TODO add sign up functionality
 
 ?>
 
@@ -12,13 +8,18 @@ include_once "header.php";
 
 <html lang='en'>
 <style>
+label {
+    margin-top: 5px;
+    margin-bottom: 0;
+    text-align: left;
+    width: 350px;
+}
     input {
         padding:5px;
-        margin:10px;
+        margin:5px;
         width:350px;
         font: var(--f-normal);
     }
-    .hide {display: none;}
 
 </style>
 
@@ -45,10 +46,23 @@ include_once "header.php";
     <div class="col-md-1"></div>
     <div class="col-lg-5" style="padding:10px;background-color: var(--c-primary-dark);font:var(--f-normal) ;color: var(--c-text-on-primary);border-top-left-radius:20px; border-bottom-left-radius: 20px">
         <h2 id="loginHeader" style="text-align: center">Login</h2>
+        <div style="text-align: center">
+         <?php
+         //Displays a message if there was an issue logging in
+         if (isset($_SESSION['login_message']))
+         {
+             echo $_SESSION['login_message'];
+         }
+         ?>
+        </div>
+
+
         <form action="../controller/loginController.php" method="post" style="text-align: center">
-            <input type="email" placeholder="Email" name="logEmail">
+            <label for="logEmail">Email Address:</label>
+            <input type="email" placeholder="Email" name="logEmail" id="logEmail" required>
             <br>
-            <input type="password" placeholder="Password" name="logPassword">
+            <label for="logPassword">Password:</label>
+            <input type="password" placeholder="Password" name="logPassword" id="logPassword" required>
             <br>
             <input type="hidden" name="fingerprint" id="hiddenFingerprint">
             <input style="width: 100px;background-color: var(--c-secondary); color:var(--c-text-on-secondary)" type="submit" name="login" value="Submit">
@@ -56,16 +70,21 @@ include_once "header.php";
     </div>
     <div class="col-lg-5" style="padding:10px;background-color: var(--c-primary-dark);font:var(--f-normal) ;color: var(--c-text-on-primary);border-top-right-radius:20px; border-bottom-right-radius: 20px">
         <h2 style="text-align: center; ">Sign up</h2>
-        <form action="loginAndSignup.php" method="post" style="text-align: center">
-            <input type="email" placeholder="Email" id="email">
+        <form action="../controller/signUpController.php" method="post" style="text-align: center">
+            <label for="email">Email Address:</label>
+            <input type="email" placeholder="Email" name="email" id="email" required>
             <br>
-            <input type="text" placeholder="First Name" id="firstName">
+            <label for="firstName">First Name:</label>
+            <input type="text" placeholder="First Name" name="firstName" id="firstName" required>
             <br>
-            <input type="text" placeholder="Last Name" id="lastName">
+            <label for="lastName">Last Name:</label>
+            <input type="text" placeholder="Last Name" name="lastName" id="lastName" required>
             <br>
-            <input type="password" placeholder="Password" id="password">
+            <label for="password">Password:</label>
+            <input type="password" placeholder="Password" name="password" id="password" required>
             <br>
-            <input type="date"  id="dob" min="1900-01-01">
+            <label for="dob">Date of Birth:</label>
+            <input type="date"  name="dob" min="1900-01-01" placeholder="Date Of Birth" id="dob" required>
             <br>
             <input style="width: 100px;background-color: var(--c-secondary); color:var(--c-text-on-secondary)" type="submit" name="signup" value="Submit">
         </form>

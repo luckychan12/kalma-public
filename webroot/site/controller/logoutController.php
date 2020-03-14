@@ -5,9 +5,11 @@
 
 session_start();
 include_once '../api_tasks/apiConnect.php';
-echo $_GET['clientFingerprint'];
 $api= new ApiConnect();
 $data = $api->signOut($_GET['clientFingerprint']);
-if($data->success){
-    echo '<script> location.href = "../public/loginAndSignup.php"</script>';
+if(!isset($data->error)){
+    echo '<script> location.href = "../public/logoutSuccess.php"</script>';
+}
+else{
+    echo'<script>location.href = "../public/errorPage.php" </script>';
 }
