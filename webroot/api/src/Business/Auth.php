@@ -23,6 +23,7 @@ use Firebase\JWT\ExpiredException;
 use Firebase\JWT\JWT;
 use Firebase\JWT\SignatureInvalidException;
 use InvalidArgumentException;
+use Kalma\Api\Core\Logger;
 use Kalma\Api\Response\Exception\ResponseException;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use UnexpectedValueException;
@@ -84,7 +85,7 @@ class Auth
         $access_token = str_ireplace('bearer ', '', $auth_header);
 
         // Validate the token
-        $payload = static::validateJWT($access_token);
+        $payload = static::validateSessionJWT($access_token);
         if ($payload != null && isset($payload['sub']))
         {
             $user_id = $payload['sub'];
@@ -103,24 +104,15 @@ class Auth
     }
 
     /**
-     * Decode a JWT and return the decoded array
+     * Decode a session JWT and return the decoded array
      * @param string $token The JWT to validate
      * @return array        The payload of the JWT, or an error message
      * @throws ResponseException
      */
-    public static function validateJWT(string $token) : ?array
+    public static function validateSessionJWT(string $token) : ?array
     {
-        $key = static::getPublicKey();
-
-        try
-        {
-            $decoded = (array) JWT::decode($token, $key, ['RS256']);
-            return $decoded ?? null;
-        }
-        catch (InvalidArgumentException $e)
-        {
-            Logger::log(Logger::ERROR, 'No public key provided for JWT validation.');
-            throw new ResponseException(401, 2101, 'Sorry, we couldn\'t authenticate your request.', 'Public key unavailable.');
+        try {
+            return static::validateGenericJWT($token);
         }
         catch (ExpiredException $e)
         {
@@ -134,6 +126,35 @@ class Auth
         {
             throw new ResponseException(401, 2104, 'Sorry, we couldn\'t authenticate your request.', 'Unexpected error: ' . $e->getMessage());
         }
+    }
+
+    /**
+     * Decode a JWT and, if valid, return the decoded array
+     * @param string $token
+     * @return array|null
+     * @throws InvalidArgumentException
+     * @throws ExpiredException
+     * @throws BeforeValidException
+     * @throws ResponseException
+     * @throws UnexpectedValueException
+     * @throws SignatureInvalidException
+     * @throws DomainException
+     * @throws ResponseException
+     */
+    public static function validateGenericJWT(string $token) : ?array
+    {
+        try {
+            $key = static::getPublicKey();
+
+            $decoded = (array) JWT::decode($token, $key, ['RS256']);
+            return $decoded ?? null;
+        }
+        catch (InvalidArgumentException $e)
+        {
+            Logger::log(Logger::ERROR, 'No public key provided for JWT validation.');
+            throw new ResponseException(401, 2101, 'Sorry, we couldn\'t process your request.', 'Public key unavailable.');
+        }
+
     }
 
     /**
