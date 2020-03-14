@@ -36,6 +36,7 @@ class Router
         $this->dispatcher = simpleDispatcher(function(RouteCollector $root)
         {
             $root->addRoute('POST', '/user/signup',          ['User', 'signup',  Auth::ACCESS_PUBLIC]);
+            $root->addRoute('POST', '/user/confirm',         ['User', 'confirm', Auth::ACCESS_PUBLIC]);
             $root->addRoute('POST', '/user/login',           ['User', 'login',   Auth::ACCESS_PUBLIC]);
             $root->addRoute('POST', '/user/refresh',         ['User', 'refresh', Auth::ACCESS_PUBLIC]);
             $root->addRoute('POST', '/user/logout',          ['User', 'logout',  Auth::ACCESS_USER]);
