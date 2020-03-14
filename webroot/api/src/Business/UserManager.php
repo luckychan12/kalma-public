@@ -14,11 +14,16 @@
 namespace Kalma\Api\Business;
 
 use DateTime;
+use DomainException;
 use Exception;
+use Firebase\JWT\BeforeValidException;
+use Firebase\JWT\ExpiredException;
+use Firebase\JWT\SignatureInvalidException;
 use Kalma\Api\Core\Config;
 use Kalma\Api\Core\DatabaseHandler;
 use Kalma\Api\Core\Logger;
 use Kalma\Api\Response\Exception\ResponseException;
+use UnexpectedValueException;
 
 class UserManager
 {
@@ -38,9 +43,10 @@ class UserManager
     /**
      * Create a user record in the database
      * @param array $user_data
+     * @return string|null
      * @throws ResponseException
      */
-    public function createUser(array $user_data) : void
+    public function createUser(array $user_data) : ?string
     {
         $this->validateUserData($user_data);
 
@@ -76,28 +82,30 @@ class UserManager
         }
         else
         {
-            if (Config::get('mail_enabled'))
-            {
-                $confirmation_payload = array
-                (
-                    'iss' => 'kalma',
-                    'aud' => '*',
-                    'iat' => time(),
-                    'nbf' => time() + 10,
+            $confirmation_payload = array
+            (
+                'iss' => 'kalma',
+                'aud' => '*',
+                'iat' => time(),
+                'nbf' => time() + 10,
 
-                    'user_id' => $data['user_id'],
-                );
+                'sub' => $data['user_id'],
+            );
+            $confirmation_jwt = Auth::generateJWT($confirmation_payload);
+            $url = Config::get('site_root') . Config::get('api_root');
+            $confirmation_link = "$url/user/confirm/?confirmation=" . $confirmation_jwt;
 
-                $confirmation_jwt = Auth::generateJWT($confirmation_payload);
-                $url = Config::get('site_root') . Config::get('api_root');
-                $confirmation_link = "$url/user/confirm/?confirmation=" . $confirmation_jwt;
-
+            if (Config::get('mail_enabled')) {
                 $to = $user_data['email_address'];
                 $subject = 'Confirm Your Account';
                 $content = file_get_contents(__DIR__ . '/../templates/confirmation_email.html');
-                $message = str_replace('{{link}}',  $confirmation_link, $content);
+                $message = str_replace('{{link}}', $confirmation_link, $content);
                 $headers = 'From: ';
                 mail($to, $subject, $message, $headers);
+                return null;
+            }
+            else {
+                return $confirmation_link;
             }
         }
     }
@@ -194,6 +202,43 @@ class UserManager
     }
 
     /**
+     * Verify a confirmation token and activate the corresponding account.
+     * @param string $confirmation_token
+     * @throws ResponseException
+     */
+    public function confirmAccount(string $confirmation_token) : void
+    {
+        try {
+            $payload = Auth::validateGenericJWT($confirmation_token);
+            if (!isset($payload['sub']))
+            {
+                throw new ResponseException(400, 2108, 'This confirmation token is invalid.', 'The confirmation token contains no user ID in the `sub` claim.');
+            }
+        }
+        catch (ExpiredException $e)
+        {
+            throw new ResponseException(401, 2109, 'The confirmation token you supplied is out of date. Please sign up again.');
+        }
+        catch (BeforeValidException $e)
+        {
+            throw new ResponseException(401, 2110, 'Your token hasn\'t become valid yet!', 'Confirmation token not-before claim hasn\'t elapsed. Is the client a robot?');
+        }
+        catch (UnexpectedValueException | SignatureInvalidException | DomainException $e)
+        {
+            throw new ResponseException(401, 2111, 'Sorry, we couldn\'t activate your account.', 'Unexpected error: ' . $e->getMessage());
+        }
+
+        $conn = DatabaseHandler::getConnection();
+        $rows_affected = $conn->execute("UPDATE `user` SET `activated` = b'1' WHERE `user_id` = :user_id",
+            array('user_id' => $payload['sub']));
+
+        if ($rows_affected == 0)
+        {
+            throw new ResponseException(400, 2112, 'The confirmation token is invalid.', 'The confirmation token contains an invalid user ID');
+        }
+    }
+
+    /**
      * Query the database to check whether a user record exists with matching email address and password
      * @param string $email
      * @param string $pass
@@ -268,7 +313,7 @@ class UserManager
     public function refreshSession(string $refresh_token, string $client_fingerprint) : array
     {
 
-        $payload = Auth::validateJWT($refresh_token);
+        $payload = Auth::validateSessionJWT($refresh_token);
 
         if (!isset($payload['sid']))
         {
