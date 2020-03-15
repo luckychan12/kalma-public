@@ -66,9 +66,14 @@ public class LoginActivity extends AppCompatActivity {
                             String accessToken = responseBody.getString("access_token");
                             int accessExp = Integer.parseInt(responseBody.getString("access_expiry"));
                             int refreshExp = Integer.parseInt(responseBody.getString("refresh_expiry"));
+                            JSONObject links = responseBody.getJSONObject("links");
+                            String accLink = links.getString("account");
+                            String logoutLink = links.getString("logout") ;
                             String refreshToken = responseBody.getString("refresh_token");
                             AuthStrings.getInstance(getApplicationContext()).setAuthToken(accessToken, accessExp);
                             AuthStrings.getInstance(getApplicationContext()).setRefreshToken(refreshToken, refreshExp);
+                            AuthStrings.getInstance(getApplicationContext()).setAccountLink(accLink);
+                            AuthStrings.getInstance(getApplicationContext()).setLogoutLink(logoutLink);
                             Log.d("Response", response.toString());
                             //open home page
                             onSuccessfulLogin();
