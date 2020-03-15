@@ -44,9 +44,25 @@ public class UserProfileActivity extends AppCompatActivity {
             }
         });
     }
+    private void fillData(JSONObject userBody){
+        txtUserID = findViewById(R.id.UserID);
+        txtEmail = findViewById(R.id.Email);
+        txtFName = findViewById(R.id.FirstName);
+        txtLName = findViewById(R.id.LastName);
+        txtDoB = findViewById(R.id.DoBlbl);
+        try {
+            txtUserID.setText(userBody.getString("user_id"));
+            txtEmail.setText(userBody.getString("email_address"));
+            txtFName.setText(userBody.getString("first_name"));
+            txtLName.setText(userBody.getString("last_name"));
+            String epochDoB = userBody.getString("date_of_birth");
+            DateTime dobTime = new DateTime(epochDoB);
+            txtDoB.setText(dobTime.toString("dd/MM/yyyy"));
+        } catch (JSONException je) {
+            Log.e("JSONException", "onErrorResponse: ", je);
+        }
 
-
-
+    }
 
     private void getData() {
         //create a json object and call API to log in
@@ -54,7 +70,13 @@ public class UserProfileActivity extends AppCompatActivity {
         apiCaller.getData(null,buildMap(),AuthStrings.getInstance(getApplicationContext()).getAccountLink(), new ServerCallback() {
                     @Override
                     public void onSuccess(JSONObject response) {
+                        try {
+                            JSONObject userBody = response.getJSONObject("user");
+                            fillData(userBody);
                             Log.d("Response", response.toString());
+                        } catch (JSONException je) {
+                            Log.e("JSONException", "onErrorResponse: ", je);
+                        }
                     }
 
                     @Override
