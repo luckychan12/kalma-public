@@ -58,10 +58,10 @@ label {
 
 
         <form action="../controller/loginController.php" method="post" style="text-align: center">
-            <label for="logEmail">Email Address:</label>
+            <label for="logEmail">Email Address:</label><br>
             <input type="email" placeholder="Email" name="logEmail" id="logEmail" required>
             <br>
-            <label for="logPassword">Password:</label>
+            <label for="logPassword">Password:</label><br>
             <input type="password" placeholder="Password" name="logPassword" id="logPassword" required>
             <br>
             <input type="hidden" name="fingerprint" id="hiddenFingerprint">
@@ -71,19 +71,19 @@ label {
     <div class="col-lg-5" style="padding:10px;background-color: var(--c-primary-dark);font:var(--f-normal) ;color: var(--c-text-on-primary);border-top-right-radius:20px; border-bottom-right-radius: 20px">
         <h2 style="text-align: center; ">Sign up</h2>
         <form action="../controller/signUpController.php" method="post" style="text-align: center">
-            <label for="email">Email Address:</label>
+            <label for="email">Email Address:</label><br>
             <input type="email" placeholder="Email" name="email" id="email" required>
             <br>
-            <label for="firstName">First Name:</label>
+            <label for="firstName">First Name:</label><br>
             <input type="text" placeholder="First Name" name="firstName" id="firstName" required>
             <br>
-            <label for="lastName">Last Name:</label>
+            <label for="lastName">Last Name:</label><br>
             <input type="text" placeholder="Last Name" name="lastName" id="lastName" required>
             <br>
-            <label for="password">Password:</label>
+            <label for="password">Password:</label><br>
             <input type="password" placeholder="Password" name="password" id="password" required>
             <br>
-            <label for="dob">Date of Birth:</label>
+            <label for="dob">Date of Birth:</label><br>
             <input type="date"  name="dob" min="1900-01-01" placeholder="Date Of Birth" id="dob" required>
             <br>
             <input style="width: 100px;background-color: var(--c-secondary); color:var(--c-text-on-secondary)" type="submit" name="signup" value="Submit">

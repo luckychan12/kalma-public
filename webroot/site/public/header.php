@@ -44,7 +44,7 @@ if(isset($_POST['logout'])){
             color: var(--c-text-on-primary);
             font: var(--f-normal);
             text-decoration: none;
-            
+
         }
         li a:hover {
             font: var(--f-normal);
@@ -91,6 +91,11 @@ if(isset($_POST['logout'])){
             border: none;
             cursor: pointer;
         }
+        body {
+            background-color: var(--c-bg);
+            color: var(--c-text-on-bg);
+            font: var(--f-normal);
+        }
 
         .show {display: block;}
         .hide {display: none;}
@@ -98,6 +103,7 @@ if(isset($_POST['logout'])){
 
     <!--Displays the side menu with all the pages-->
     <script>
+
         function openSideBar() {
             document.getElementById("sideMenu").classList.toggle("show");
         }
@@ -109,6 +115,7 @@ if(isset($_POST['logout'])){
                     var openSideMenu = sideMenu[i];
                     if (openSideMenu.classList.contains('show')) {
                         openSideMenu.classList.remove('show');
+
                     }
                 }
             }
@@ -131,11 +138,11 @@ if(isset($_POST['logout'])){
                     <a href="#sleep" >Sleep Tracker</a>
                     <a href="#weight" >Weight Tracker</a>
                     <a href="#height" >Height Tracker</a>
-                    <a href="#profile" >Profile</a>
+                    <a href="profile.php" >Profile</a>
                 </div>
             </div>
             <li style="text-align: center">
-                <a style="font: var(--f-brand); font-size: 35px;  margin:0"  href="#">kalma</a>
+                <a style="font: var(--f-brand); font-size: 35px;  padding:5px"  href="#">kalma</a>
             </li>
                 <button type="submit" name="logout" style="float:right;" id="signOut" class="btn fas fa-sign-out-alt" title="Logout" value="">
             </form>
@@ -143,7 +150,7 @@ if(isset($_POST['logout'])){
     </div>
 <?php
 
-//hides the menu buttons that arent accessible on some of the pages
+//hides the menu buttons that aren't accessible on some of the pages
 $filepath = strtok($_SERVER['REQUEST_URI'], '?');
 if ($filepath == "/Kalma/webroot/site/public/loginAndSignup.php"){
     echo '<script>document.getElementById("signOut").classList.add("hide");
@@ -157,7 +164,7 @@ else if($filepath == "/Kalma/webroot/site/public/logoutSuccess.php"){
     echo '<script>document.getElementById("signOut").classList.add("hide");
           document.getElementById("sideButton").classList.add("hide")</script>';
 }
-else if($filepath == "Kalma/webroot/site/public/conformationPage.php"){
+else if($filepath == "Kalma/webroot/site/public/signupSuccess.php"){
     echo '<script>document.getElementById("signOut").classList.add("hide");
           document.getElementById("sideButton").classList.add("hide")</script>';
 }
