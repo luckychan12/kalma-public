@@ -17,7 +17,7 @@ import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
 
-public class UserProfile extends AppCompatActivity {
+public class UserProfileActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
