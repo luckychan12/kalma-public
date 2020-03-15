@@ -1,27 +1,14 @@
 package com.kalma.API_Interaction;
 
-import android.app.Activity;
 import android.content.Context;
-import android.content.res.Resources;
-import android.provider.Settings;
-import android.util.Log;
-import android.widget.TextView;
-import android.widget.Toast;
-
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.Volley;
-import com.google.gson.JsonIOException;
-import com.kalma.Login.LoginActivity;
 import com.kalma.R;
-
-import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.UnsupportedEncodingException;
 
 public class APICaller {
     //set application context to use getResource methods
