@@ -1,6 +1,8 @@
 package com.kalma.API_Interaction;
 
 import android.content.Context;
+
+import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -8,6 +10,9 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.kalma.R;
 import org.json.JSONObject;
+
+import java.util.HashMap;
+import java.util.Map;
 
 
 public class APICaller {
@@ -38,7 +43,7 @@ public class APICaller {
         requestQueue.add(jsonObjectRequest);
     }
 
-    public void getData(JSONObject request, String location, final ServerCallback callback ){
+    public void getData(JSONObject request, final Map headers, String location, final ServerCallback callback ){
         RequestQueue requestQueue = RequestQueueSingleton.getInstance(context.getApplicationContext()).getRequestQueue();
         try {
             String url = context.getResources().getString(R.string.api_url) + location;
@@ -53,7 +58,12 @@ public class APICaller {
                 public void onErrorResponse(VolleyError error) {
                     callback.onFail(error);
                 }
-            });
+            }){
+                @Override
+                public Map<String, String> getHeaders() throws AuthFailureError {
+                    return headers;
+                }
+            };
             requestQueue.add(jsonObjectRequest);
         } catch (Exception e) {
             e.printStackTrace();
