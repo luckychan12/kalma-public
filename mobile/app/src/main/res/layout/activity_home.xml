@@ -156,32 +156,33 @@
         app:layout_constraintVertical_bias="0.996" >
 
         <Button
-            style = "?android:attr/buttonBarButtonStyle"
             android:id="@+id/btnHome"
+            style="?android:attr/buttonBarButtonStyle"
             android:layout_width="103dp"
             android:layout_height="match_parent"
-            android:text="home" />
+            android:text="@string/home"
+            android:textColor="@color/colorSecondary" />
 
         <Button
             style = "?android:attr/buttonBarButtonStyle"
             android:id="@+id/btnProfile"
             android:layout_width="98dp"
             android:layout_height="match_parent"
-            android:text="profile" />
+            android:text="@string/profile" />
 
         <Button
             style = "?android:attr/buttonBarButtonStyle"
             android:id="@+id/btnCalander"
             android:layout_width="98dp"
             android:layout_height="match_parent"
-            android:text="calander" />
+            android:text="@string/calander" />
 
         <Button
             style = "?android:attr/buttonBarButtonStyle"
             android:id="@+id/btnOther"
             android:layout_width="98dp"
             android:layout_height="match_parent"
-            android:text="settings" />
+            android:text="@string/settings" />
 
     </TableRow>
 

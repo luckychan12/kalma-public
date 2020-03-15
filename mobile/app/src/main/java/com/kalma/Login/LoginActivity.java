@@ -63,8 +63,17 @@ public class LoginActivity extends AppCompatActivity {
                         try {
                             //retrieve access token and store.
                             JSONObject responseBody = response;
-                            String token = responseBody.getString("access_token");
-                            AuthStrings.getInstance(getApplicationContext()).setAuthToken(token);
+                            String accessToken = responseBody.getString("access_token");
+                            int accessExp = Integer.parseInt(responseBody.getString("access_expiry"));
+                            int refreshExp = Integer.parseInt(responseBody.getString("refresh_expiry"));
+                            JSONObject links = responseBody.getJSONObject("links");
+                            String accLink = links.getString("account");
+                            String logoutLink = links.getString("logout") ;
+                            String refreshToken = responseBody.getString("refresh_token");
+                            AuthStrings.getInstance(getApplicationContext()).setAuthToken(accessToken, accessExp);
+                            AuthStrings.getInstance(getApplicationContext()).setRefreshToken(refreshToken, refreshExp);
+                            AuthStrings.getInstance(getApplicationContext()).setAccountLink(accLink);
+                            AuthStrings.getInstance(getApplicationContext()).setLogoutLink(logoutLink);
                             Log.d("Response", response.toString());
                             //open home page
                             onSuccessfulLogin();
@@ -80,7 +89,7 @@ public class LoginActivity extends AppCompatActivity {
                     String jsonInput = new String(error.networkResponse.data, "utf-8");
                     JSONObject responseBody = new JSONObject(jsonInput);
                     String message = responseBody.getString("message");
-                    AuthStrings.getInstance(getApplicationContext()).setAuthToken(null);
+                    AuthStrings.getInstance(getApplicationContext()).setAuthToken(null, 0);
                     Log.w("Error.Response", jsonInput);
                     Toast toast = Toast.makeText(getApplicationContext(), message , Toast.LENGTH_LONG);
                     toast.show();

@@ -8,6 +8,11 @@ public class AuthStrings {
     private static AuthStrings authStrings;
     private static String authToken;
     private static String refreshToken;
+    private static String accountLink;
+    private static String LogoutLink;
+
+    private static int authTokenExp;
+    private static int refreshTokenExp;
     private static Context context;
 
     //private Constructor
@@ -25,14 +30,31 @@ public class AuthStrings {
     }
 
 
-    public void setAuthToken(String token){
+    public void setAuthToken(String token,int exp){
         authToken = token;
+        authTokenExp = exp;
     }
 
-    public void setRefreshToken(String token){
+    public void setRefreshToken(String token, int exp){
         refreshToken = token;
+        refreshTokenExp = exp;
     }
 
+    public void setLogoutLink(String logoutLink) {
+        LogoutLink = logoutLink;
+    }
+
+    public void setAccountLink(String accountLink) {
+        AuthStrings.accountLink = accountLink;
+    }
+
+    public String getAccountLink(){
+        return accountLink;
+    }
+
+    public String getLogoutLink() {
+        return LogoutLink;
+    }
 
     public String getAuthToken() {
         return authToken;

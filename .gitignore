@@ -7,3 +7,4 @@ target
 *.iml
 .idea
 local.properies
+.vscode/settings.json
