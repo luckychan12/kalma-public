@@ -21,8 +21,9 @@ public class APICaller {
     public APICaller(Context context){
         this.context = context;
     }
-    public void post(final JSONObject content, String location, final ServerCallback callback) {
+    public void post(final JSONObject content, final Map headers, String location, final ServerCallback callback) {
         RequestQueue requestQueue = RequestQueueSingleton.getInstance(context.getApplicationContext()).getRequestQueue();
+        try {
         String url = context.getResources().getString(R.string.api_url) + location;
         //create request
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url, content,
@@ -37,10 +38,17 @@ public class APICaller {
                     public void onErrorResponse(VolleyError error ) {
                         callback.onFail(error);
                     }
-                }
-        );
+                }){
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                return headers;
+            }
+        };
         //add request to queue to be sent to API
         requestQueue.add(jsonObjectRequest);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public void getData(JSONObject request, final Map headers, String location, final ServerCallback callback ){

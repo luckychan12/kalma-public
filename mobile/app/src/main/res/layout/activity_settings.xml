@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorPrimaryDark"
+    tools:context=".MainApp.SettingsActivity">
+
+    <TableRow
+        android:id="@+id/tableRow2"
+        android:layout_width="419dp"
+        android:layout_height="75dp"
+        android:background="@color/colorPrimary"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.996">
+
+        <Button
+            android:id="@+id/btnHome"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="103dp"
+            android:layout_height="match_parent"
+            android:text="@string/home" />
+
+        <Button
+            android:id="@+id/btnProfile"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="98dp"
+            android:layout_height="match_parent"
+            android:text="@string/profile"
+            android:textColor="#fefefe" />
+
+        <Button
+            android:id="@+id/btnCalander"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="98dp"
+            android:layout_height="match_parent"
+            android:text="@string/calander" />
+
+        <Button
+            android:id="@+id/btnSettings"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="98dp"
+            android:layout_height="match_parent"
+            android:text="@string/settings"
+            android:textColor="@color/colorSecondary" />
+
+    </TableRow>
+
+    <Button
+        android:id="@+id/btnLogout"
+        android:layout_width="323dp"
+        android:layout_height="55dp"
+        android:background="#9A1B1B"
+        android:text="@string/log_out"
+        app:layout_constraintBottom_toBottomOf="@+id/tableRow2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.835" />
+</androidx.constraintlayout.widget.ConstraintLayout>
