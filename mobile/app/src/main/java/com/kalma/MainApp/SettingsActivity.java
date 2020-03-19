@@ -1,8 +1,10 @@
 package com.kalma.MainApp;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -12,7 +14,7 @@ import com.kalma.R;
 
 public class SettingsActivity extends AppCompatActivity {
     Context context = this;
-    Button buttonHome, buttonProfile;
+    Button buttonHome, buttonProfile, buttonLogout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,7 +28,7 @@ public class SettingsActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-        buttonProfile = findViewById(R.id.btnSettings);
+        buttonProfile = findViewById(R.id.btnProfile);
         buttonProfile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -34,5 +36,28 @@ public class SettingsActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+        buttonLogout = findViewById(R.id.btnLogout);
+        buttonLogout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                builder.setMessage("Are you sure you would like to logout?")
+                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                // FIRE ZE MISSILES!
+                            }
+                        })
+                        .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                // User cancelled the dialog
+                            }
+                        });
+                // Create the AlertDialog object and return it
+                final AlertDialog dialog = builder.create();
+
+                dialog.show();
+            }
+        });
+
     }
 }

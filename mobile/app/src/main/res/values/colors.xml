@@ -17,4 +17,6 @@
     <color name="textOnSecondary">#000000</color>
     <color name="textOnLight">#000000</color>
     <color name="textOnDark">#fefefe</color>
+    <color name="cancelColour">#ff0000</color>
+    <color name="okColour">#00BCD4</color>
 </resources>
