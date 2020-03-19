@@ -30,7 +30,9 @@ import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 //TODO Implement error handling and data validation
 
@@ -115,10 +117,13 @@ public class SignUpActivity extends AppCompatActivity {
         Intent intent = new Intent(this, LoginActivity.class);
         startActivity(intent);
     }
-
+    private Map buildMap() {
+        Map<String, String> params = new HashMap<String, String>();
+        return params;
+    }
     private void signUp(String firstName, String lastName, String password, String email, long DOB) {
         APICaller apiCaller = new APICaller(getApplicationContext());
-        apiCaller.post(buildSignUpJsonObject(firstName, lastName, password, email, DOB), getResources().getString(R.string.api_signup), new ServerCallback() {
+        apiCaller.post(buildSignUpJsonObject(firstName, lastName, password, email, DOB), buildMap(), getResources().getString(R.string.api_signup), new ServerCallback() {
                     @Override
                     public void onSuccess(JSONObject response) {
                         try {

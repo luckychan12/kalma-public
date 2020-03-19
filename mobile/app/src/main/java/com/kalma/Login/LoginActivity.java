@@ -22,6 +22,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
+import java.util.HashMap;
+import java.util.Map;
 
 public class LoginActivity extends AppCompatActivity {
     EditText txtEmail, txtPassword;
@@ -52,12 +54,15 @@ public class LoginActivity extends AppCompatActivity {
         Intent intent = new Intent(this, HomeActivity.class);
         startActivity(intent);
     }
-
+    private Map buildMap() {
+        Map<String, String> params = new HashMap<String, String>();
+        return params;
+    }
 
     public void login(String email, String password) {
         //create a json object and call API to log in
         APICaller apiCaller = new APICaller(getApplicationContext());
-        apiCaller.post(buildLoginJsonObject(email, password), getResources().getString(R.string.api_login), new ServerCallback() {
+        apiCaller.post(buildLoginJsonObject(email, password), buildMap(), getResources().getString(R.string.api_login), new ServerCallback() {
                     @Override
                     public void onSuccess(JSONObject response) {
                         try {
