@@ -43,4 +43,9 @@ public class StartPage extends AppCompatActivity {
         startActivity(intent);
     }
 
+    @Override
+    public void onBackPressed() {
+        //Do nothing
+        //Prevents user from returning after logout
+    }
 }
