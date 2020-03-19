@@ -54,7 +54,13 @@ public class SettingsActivity extends AppCompatActivity {
                         });
                 // Create the AlertDialog object and return it
                 final AlertDialog dialog = builder.create();
-
+                dialog.setOnShowListener(new DialogInterface.OnShowListener() {
+                    @Override
+                    public void onShow(DialogInterface arg0) {
+                        dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(getResources().getColor(R.color.cancelColour));
+                        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(getResources().getColor(R.color.okColour));
+                    }
+                });
                 dialog.show();
             }
         });
