@@ -209,6 +209,35 @@ class ApiConnect
             return $response;
         }
     }
+
+    function confirmAccount($confirmation){
+        try {
+            $res = $this->client->request('POST', 'api/user/confirm', ['json' => ["confirmation_token" => $confirmation]]);
+            $messageBody = $res->getBody()->read(2048);
+            $data = json_decode($messageBody);
+            return $data;
+        }
+        catch (ClientException $e){
+            $response = json_decode($e->getResponse()->getBody());
+            $_SESSION['status'] = $response->status;
+            $_SESSION['error'] = $response->error;
+            $_SESSION['error_message'] = $response->message;
+            if(isset($response->detail)) {
+                $_SESSION['detail'] = $response->detail;
+            }
+            return $response;
+        }
+        catch (RequestException $e){
+            $response = json_decode($e->getResponse()->getBody()->getContents());
+            $_SESSION['status'] = $response->status;
+            $_SESSION['error'] = $response->error;
+            $_SESSION['error_message'] = $response->message;
+            if(isset($response->detail)) {
+                $_SESSION['detail'] = $response->detail;
+            }
+            return $response;
+        }
+    }
 }
 
 ?>
