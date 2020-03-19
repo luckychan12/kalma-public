@@ -164,7 +164,11 @@ else if($filepath == "/Kalma/webroot/site/public/logoutSuccess.php"){
     echo '<script>document.getElementById("signOut").classList.add("hide");
           document.getElementById("sideButton").classList.add("hide")</script>';
 }
-else if($filepath == "Kalma/webroot/site/public/signupSuccess.php"){
+else if($filepath == "/Kalma/webroot/site/public/signupSuccess.php"){
+    echo '<script>document.getElementById("signOut").classList.add("hide");
+          document.getElementById("sideButton").classList.add("hide")</script>';
+}
+else if($filepath == "/Kalma/webroot/site/public/confirmationPage.php"){
     echo '<script>document.getElementById("signOut").classList.add("hide");
           document.getElementById("sideButton").classList.add("hide")</script>';
 }
