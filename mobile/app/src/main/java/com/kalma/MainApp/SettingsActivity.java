@@ -73,7 +73,7 @@ public class SettingsActivity extends AppCompatActivity {
                     @Override
                     public void onShow(DialogInterface arg0) {
                         dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(getResources().getColor(R.color.cancelColour));
-                        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(getResources().getColor(R.color.okColour));
+                        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(getResources().getColor(R.color.logoutColour));
                     }
                 });
                 dialog.show();
