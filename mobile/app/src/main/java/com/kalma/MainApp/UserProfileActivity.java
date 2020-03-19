@@ -28,18 +28,26 @@ import java.util.Map;
 
 public class UserProfileActivity extends AppCompatActivity {
     Context context = this;
-    Button buttonHome;
+    Button buttonHome, buttonSettings;
     TextView txtUserID, txtEmail, txtFName, txtLName, txtDoB;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_profile);
-        buttonHome = findViewById(R.id.btnHome);
         getData();
+        buttonHome = findViewById(R.id.btnHome);
         buttonHome.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(context, HomeActivity.class);
+                startActivity(intent);
+            }
+        });
+        buttonSettings = findViewById(R.id.btnSettings);
+        buttonSettings.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(context, SettingsActivity.class);
                 startActivity(intent);
             }
         });

@@ -42,7 +42,7 @@
             android:text="@string/calander" />
 
         <Button
-            android:id="@+id/btnOther"
+            android:id="@+id/btnSettings"
             style="?android:attr/buttonBarButtonStyle"
             android:layout_width="98dp"
             android:layout_height="match_parent"
@@ -50,4 +50,16 @@
             android:textColor="@color/colorSecondary" />
 
     </TableRow>
+
+    <Button
+        android:id="@+id/btnLogout"
+        android:layout_width="323dp"
+        android:layout_height="55dp"
+        android:background="#9A1B1B"
+        android:text="@string/log_out"
+        app:layout_constraintBottom_toBottomOf="@+id/tableRow2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.835" />
 </androidx.constraintlayout.widget.ConstraintLayout>

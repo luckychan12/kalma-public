@@ -16,7 +16,7 @@ public class HomeActivity extends AppCompatActivity {
         //Do nothing
     }
     Context context = this;
-    Button buttonProfile;
+    Button buttonProfile,buttonSettings;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,6 +27,14 @@ public class HomeActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(context, UserProfileActivity.class);
+                startActivity(intent);
+            }
+        });
+        buttonSettings = findViewById(R.id.btnSettings);
+        buttonSettings.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(context, SettingsActivity.class);
                 startActivity(intent);
             }
         });
