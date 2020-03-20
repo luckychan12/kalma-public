@@ -45,33 +45,33 @@ class Router
 
             // Sleep data CRUD operations
             $root->addRoute('GET',    '/user/{id:\d+}/sleep',          ['SleepPeriod', 'read',   Auth::ACCESS_USER]);
-            $root->addRoute('POST',   '/user/{id:\d+}/sleep/add',      ['SleepPeriod', 'create', Auth::ACCESS_USER]);
+            $root->addRoute('POST',   '/user/{id:\d+}/sleep/create',   ['SleepPeriod', 'create', Auth::ACCESS_USER]);
             $root->addRoute('PUT',    '/user/{id:\d+}/sleep/update',   ['SleepPeriod', 'update', Auth::ACCESS_USER]);
-            $root->addRoute('DELETE', '/user/{id:\d+}/sleep/remove',   ['SleepPeriod', 'delete', Auth::ACCESS_USER]);
+            $root->addRoute('DELETE', '/user/{id:\d+}/sleep/delete',   ['SleepPeriod', 'delete', Auth::ACCESS_USER]);
 
             // Calm data CRUD operations
             $root->addRoute('GET',    '/user/{id:\d+}/calmness',          ['CalmPeriod', 'read',   Auth::ACCESS_USER]);
-            $root->addRoute('POST',   '/user/{id:\d+}/calmness/add',      ['CalmPeriod', 'create', Auth::ACCESS_USER]);
+            $root->addRoute('POST',   '/user/{id:\d+}/calmness/create',   ['CalmPeriod', 'create', Auth::ACCESS_USER]);
             $root->addRoute('PUT',    '/user/{id:\d+}/calmness/update',   ['CalmPeriod', 'update', Auth::ACCESS_USER]);
-            $root->addRoute('DELETE', '/user/{id:\d+}/calmness/remove',   ['CalmPeriod', 'delete', Auth::ACCESS_USER]);
+            $root->addRoute('DELETE', '/user/{id:\d+}/calmness/delete',   ['CalmPeriod', 'delete', Auth::ACCESS_USER]);
 
             // Daily steps CRUD operations
             $root->addRoute('GET',    '/user/{id:\d+}/steps',          ['StepsDaily', 'read',   Auth::ACCESS_USER]);
-            $root->addRoute('POST',   '/user/{id:\d+}/steps/add',      ['StepsDaily', 'create', Auth::ACCESS_USER]);
+            $root->addRoute('POST',   '/user/{id:\d+}/steps/create',   ['StepsDaily', 'create', Auth::ACCESS_USER]);
             $root->addRoute('PUT',    '/user/{id:\d+}/steps/update',   ['StepsDaily', 'update', Auth::ACCESS_USER]);
-            $root->addRoute('DELETE', '/user/{id:\d+}/steps/remove',   ['StepsDaily', 'delete', Auth::ACCESS_USER]);
+            $root->addRoute('DELETE', '/user/{id:\d+}/steps/delete',   ['StepsDaily', 'delete', Auth::ACCESS_USER]);
 
             // Weight logging CRUD operations
             $root->addRoute('GET',    '/user/{id:\d+}/weight',          ['WeightLog', 'read',   Auth::ACCESS_USER]);
-            $root->addRoute('POST',   '/user/{id:\d+}/weight/add',      ['WeightLog', 'create', Auth::ACCESS_USER]);
+            $root->addRoute('POST',   '/user/{id:\d+}/weight/create',   ['WeightLog', 'create', Auth::ACCESS_USER]);
             $root->addRoute('PUT',    '/user/{id:\d+}/weight/update',   ['WeightLog', 'update', Auth::ACCESS_USER]);
-            $root->addRoute('DELETE', '/user/{id:\d+}/weight/remove',   ['WeightLog', 'delete', Auth::ACCESS_USER]);
+            $root->addRoute('DELETE', '/user/{id:\d+}/weight/delete',   ['WeightLog', 'delete', Auth::ACCESS_USER]);
 
             // Height logging CRUD operations
             $root->addRoute('GET',    '/user/{id:\d+}/height',          ['HeightLog', 'read',   Auth::ACCESS_USER]);
-            $root->addRoute('POST',   '/user/{id:\d+}/height/add',      ['HeightLog', 'create', Auth::ACCESS_USER]);
+            $root->addRoute('POST',   '/user/{id:\d+}/height/create',   ['HeightLog', 'create', Auth::ACCESS_USER]);
             $root->addRoute('PUT',    '/user/{id:\d+}/height/update',   ['HeightLog', 'update', Auth::ACCESS_USER]);
-            $root->addRoute('DELETE', '/user/{id:\d+}/height/remove',   ['HeightLog', 'delete', Auth::ACCESS_USER]);
+            $root->addRoute('DELETE', '/user/{id:\d+}/height/delete',   ['HeightLog', 'delete', Auth::ACCESS_USER]);
         });
     }
 
