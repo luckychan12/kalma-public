@@ -50,10 +50,10 @@ class Router
             $root->addRoute('DELETE', '/user/{id:\d+}/sleep/delete',   ['SleepPeriod', 'delete', Auth::ACCESS_USER]);
 
             // Calm data CRUD operations
-            $root->addRoute('GET',    '/user/{id:\d+}/calmness',          ['CalmPeriod', 'read',   Auth::ACCESS_USER]);
-            $root->addRoute('POST',   '/user/{id:\d+}/calmness/create',   ['CalmPeriod', 'create', Auth::ACCESS_USER]);
-            $root->addRoute('PUT',    '/user/{id:\d+}/calmness/update',   ['CalmPeriod', 'update', Auth::ACCESS_USER]);
-            $root->addRoute('DELETE', '/user/{id:\d+}/calmness/delete',   ['CalmPeriod', 'delete', Auth::ACCESS_USER]);
+            $root->addRoute('GET',    '/user/{id:\d+}/calm',          ['CalmPeriod', 'read',   Auth::ACCESS_USER]);
+            $root->addRoute('POST',   '/user/{id:\d+}/calm/create',   ['CalmPeriod', 'create', Auth::ACCESS_USER]);
+            $root->addRoute('PUT',    '/user/{id:\d+}/calm/update',   ['CalmPeriod', 'update', Auth::ACCESS_USER]);
+            $root->addRoute('DELETE', '/user/{id:\d+}/calm/delete',   ['CalmPeriod', 'delete', Auth::ACCESS_USER]);
 
             // Daily steps CRUD operations
             $root->addRoute('GET',    '/user/{id:\d+}/steps',          ['StepsDaily', 'read',   Auth::ACCESS_USER]);
