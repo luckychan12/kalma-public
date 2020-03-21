@@ -137,7 +137,7 @@ class PeriodicResource extends DataResource
 
         $query_attrs = implode(', ', $this->attributes);
 
-        $query = "SELECT {$this->table_name}_id, start_time, stop_time, $query_attrs FROM `sleep_period`
+        $query = "SELECT {$this->table_name}_id, start_time, stop_time, $query_attrs FROM `$this->table_name`
                       WHERE user_id = :user_id
                         AND start_time > :from_date
                         AND start_time < :to_date
