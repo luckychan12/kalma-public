@@ -89,7 +89,7 @@ abstract class DataResource extends Resource
     public function read(Request $req, Response $res, ?array $payload, array $args) : Response
     {
         $this->validate_user_id($payload, $args);
-        return $this->_read($req, $res, $payload, ...$args);
+        return $this->_read($req, $res, $payload, $args);
     }
 
     /**
@@ -104,7 +104,7 @@ abstract class DataResource extends Resource
     public function update(Request $req, Response $res, ?array $payload, array $args) : Response
     {
         $this->validate_user_id($payload, $args);
-        return $this->_update($req, $res, $payload, ...$args);
+        return $this->_update($req, $res, $payload, $args);
     }
 
     /**
