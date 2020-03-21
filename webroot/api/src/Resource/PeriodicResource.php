@@ -48,56 +48,68 @@ class PeriodicResource extends DataResource
     public function _create(Request $req, Response $res, ?array $payload, array $args): Response
     {
         $body = $req->getParsedBody();
-        $query_params = array('user_id' => $args['id']);
 
-        // Check additional attributes
-        foreach ($this->attributes as $attribute)
+        $this->database->beginTransaction();
+
+        foreach ($body['periods'] as $period)
         {
-            if (!isset($body[$attribute]))
+            $query_params = array('user_id' => $args['id']);
+
+            // Check additional attributes
+            foreach ($this->attributes as $attribute)
             {
-                throw new ResponseException(...ResponseException::INVALID_BODY_ATTRS);
+                if (!isset($period[$attribute]))
+                {
+                    $this->database->rollBack();
+                    throw new ResponseException(...ResponseException::INVALID_BODY_ATTRS);
+                }
+
+                // If valid, use the attribute in the SQL query
+                $query_params[$attribute] = $period[$attribute];
             }
 
-            // If valid, use the attribute in the SQL query
-            $query_params[$attribute] = $body[$attribute];
-        }
-
-        // Check start/stop times
-        if (!isset($body['start_time']) || !isset($body['stop_time']))
-        {
-            throw new ResponseException(...ResponseException::INVALID_BODY_ATTRS);
-        }
-        // Parse start/stop times
-        try {
-            $utc = new DateTimeZone('UTC');
-            $start_time = new DateTime($body['start_time'], $utc);
-            $stop_time = new DateTime($body['stop_time'], $utc);
-            $now = new DateTime('now', $utc);
-            if ($start_time > $now || $stop_time > $now)
+            // Check start/stop times
+            if (!isset($period['start_time']) || !isset($period['stop_time']))
             {
+                $this->database->rollBack();
                 throw new ResponseException(...ResponseException::INVALID_BODY_ATTRS);
             }
+            // Parse start/stop times
+            try {
+                $utc = new DateTimeZone('UTC');
+                $start_time = new DateTime($period['start_time'], $utc);
+                $stop_time = new DateTime($period['stop_time'], $utc);
+                $now = new DateTime('now', $utc);
+                if ($start_time > $now || $stop_time > $now)
+                {
+                    throw new ResponseException(...ResponseException::INVALID_BODY_ATTRS);
+                }
 
-            $query_params['start_time'] = $start_time->format('Y-m-d H:i:s');
-            $query_params['stop_time'] = $stop_time->format('Y-m-d H:i:s');
-        }
-        catch (ResponseException $e)
-        {
-            throw $e;
-        }
-        catch (Exception $e) {
-            Logger::log(Logger::ERROR, $e->getMessage());
-            throw new ResponseException(400, 1101, 'One or more of the form fields isn\'t valid.', 'Invalid date format.');
+                $query_params['start_time'] = $start_time->format('Y-m-d H:i:s');
+                $query_params['stop_time'] = $stop_time->format('Y-m-d H:i:s');
+            }
+            catch (ResponseException $e)
+            {
+                $this->database->rollBack();
+                throw $e;
+            }
+            catch (Exception $e) {
+                $this->database->rollBack();
+                Logger::log(Logger::ERROR, $e->getMessage());
+                throw new ResponseException(400, 1101, 'One or more of the form fields isn\'t valid.', 'Invalid date format.');
+            }
+
+            // Create new record with provided attributes
+            $query_attrs = implode(', ', array_keys($query_params));
+            $query_attr_params = implode(', ', array_map(function($x) { return ":$x"; }, array_keys($query_params)));
+            $this->database->execute(
+                "INSERT INTO `$this->table_name` ($query_attrs) 
+                                 VALUES ($query_attr_params);",
+                $query_params,
+            );
         }
 
-        // Create new record with provided attributes
-        $query_attrs = implode(', ', array_map(function($x) { return "`$x`"; }, $this->attributes));
-        $query_attr_params = implode(', ', array_map(function($x) { return ":$x"; }, $this->attributes));
-        $this->database->execute(
-            "INSERT INTO `$this->table_name` (`user_id`, `start_time`, `stop_time`, $query_attrs) 
-                                 VALUES (:user_id,  :start_time,  :stop_time,  $query_attr_params);",
-            $query_params,
-        );
+        $this->database->commit();
 
         $res->setBody(array('message' => 'Success.'));
         return $res;
@@ -238,7 +250,6 @@ class PeriodicResource extends DataResource
         }
 
         $affected = array();
-
         foreach ($body['periods'] as $period)
         {
             if (!isset($period['id']))
