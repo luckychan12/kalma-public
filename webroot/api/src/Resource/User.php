@@ -145,7 +145,7 @@ class User extends Resource
         $rows = $this->database->fetch
         (
             'SELECT * FROM `user_account` WHERE `user_id` = :user_id',
-            array('user_id' => $args[0])
+            array('user_id' => $args['id'])
         );
 
         if (count($rows) == 0)
@@ -158,7 +158,7 @@ class User extends Resource
         $sessions = $this->database->fetch
         (
             'SELECT `client_fingerprint`, `created_time`, `expiry_time` FROM `session` WHERE `user_id` = :user_id;',
-            array('user_id' => $args[0]),
+            array('user_id' => $args['id']),
         );
 
         if (count($sessions) > 0)
