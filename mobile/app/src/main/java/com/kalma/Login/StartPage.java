@@ -83,7 +83,30 @@ public class StartPage extends AppCompatActivity {
         if (token == ""){
             return;
         }
+        APICaller apiCaller = new APICaller(getApplicationContext());
+        apiCaller.post(buildRefreshObject(token), buildMap(), getResources().getString(R.string.api_refresh), new ServerCallback() {
+                    @Override
+                    public void onSuccess(JSONObject result) {
+                        onSuccessfulLogin();
+                    }
+                    @Override
+                    public void onFail(VolleyError error) {
+                        try {
+                            //retrieve error message and display
+                            String jsonInput = new String(error.networkResponse.data, "utf-8");
+                            JSONObject responseBody = new JSONObject(jsonInput);
+                            String message = responseBody.getString("message");
+                            AuthStrings.getInstance(getApplicationContext()).forgetRefreshToken();
+                            Log.w("Error.Response", jsonInput);
+                        } catch (JSONException je) {
+                            Log.e("JSONException", "onErrorResponse: ", je);
+                        } catch (UnsupportedEncodingException err) {
+                            Log.e("EncodingError", "onErrorResponse: ", err);
+                        }
+                    }
 
+                }
+        );
     }
 
     private JSONObject buildRefreshObject(String token) {
