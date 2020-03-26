@@ -1,7 +1,24 @@
 package com.kalma.API_Interaction;
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.provider.Settings;
+import android.security.keystore.KeyGenParameterSpec;
+import android.security.keystore.KeyProperties;
+
+import androidx.security.crypto.EncryptedFile;
+import androidx.security.crypto.MasterKeys;
+
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.security.GeneralSecurityException;
+import java.util.prefs.PreferenceChangeEvent;
+
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
 
 //Auth strings singleton
 public class AuthStrings {
@@ -10,7 +27,7 @@ public class AuthStrings {
     private static String refreshToken;
     private static String accountLink;
     private static String LogoutLink;
-
+    final SharedPreferences settings = context.getSharedPreferences("TOKENS",  0);
     private static int authTokenExp;
     private static int refreshTokenExp;
     private static Context context;
@@ -66,6 +83,12 @@ public class AuthStrings {
 
     public void forgetAuthToken() {
         authToken = null;
+    }
+
+    private void storeRefreshToken(){
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putString("RefreshToken", refreshToken);
+        editor.commit();
     }
 
     public void forgetRefreshToken() {
