@@ -91,18 +91,13 @@ public class LoginActivity extends AppCompatActivity {
                         authStrings.setAuthToken(accessToken, accessExp);
                         authStrings.setAccountLink(accLink);
                         authStrings.setLogoutLink(logoutLink);
-                        if (((CheckBox) findViewById(R.id.rememberCreds)).isChecked()) {
-                            authStrings.setRefreshToken(refreshToken, refreshExp);
-                        } else {
-                            authStrings.forgetRefreshToken();
-                        }
                     }
 
                     @Override
                     public void onFail(VolleyError error) {
                         try {
                             //retrieve error message and display
-                            String jsonInput = new String(error.networkResponse.data, StandardCharsets.UTF_8);
+                            String jsonInput = new String(error.networkResponse.data, "utf-8");
                             JSONObject responseBody = new JSONObject(jsonInput);
                             String message = responseBody.getString("message");
                             AuthStrings.getInstance(getApplicationContext()).setAuthToken(null, 0);
@@ -111,6 +106,8 @@ public class LoginActivity extends AppCompatActivity {
                             toast.show();
                         } catch (JSONException je) {
                             Log.e("JSONException", "onErrorResponse: ", je);
+                        } catch (UnsupportedEncodingException err) {
+                            Log.e("EncodingError", "onErrorResponse: ", err);
                         }
                     }
                 }
