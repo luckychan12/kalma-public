@@ -32,7 +32,7 @@ public class AuthStrings {
 
     //private Constructor
     private AuthStrings(Context ctx){
-        context = ctx;
+        context = ctx.getApplicationContext();
         authToken = getAuthToken();
     }
 
@@ -52,7 +52,6 @@ public class AuthStrings {
 
     public void setRefreshToken(String token, int exp){
         refreshToken = token;
-        storeRefreshToken();
         refreshTokenExp = exp;
     }
 
@@ -72,6 +71,10 @@ public class AuthStrings {
         return LogoutLink;
     }
 
+    public int getAuthExp(){
+        return authTokenExp;
+    }
+
     public String getAuthToken() {
         return authToken;
     }
@@ -84,7 +87,7 @@ public class AuthStrings {
         authToken = "";
     }
 
-    private void storeRefreshToken(){
+    public void storeRefreshToken(){
         settings = context.getSharedPreferences("TOKENS",  0);
         SharedPreferences.Editor editor = settings.edit();
         editor.putString("RefreshToken", refreshToken);
@@ -93,6 +96,11 @@ public class AuthStrings {
 
     public void forgetRefreshToken() {
         refreshToken = "";
+        SharedPreferences settings = context.getSharedPreferences("TOKENS", 0);
+        settings.edit().putString("RefreshToken", "").commit();
+    }
+
+    public void unstoreRefreshToken(){
         SharedPreferences settings = context.getSharedPreferences("TOKENS", 0);
         settings.edit().putString("RefreshToken", "").commit();
     }

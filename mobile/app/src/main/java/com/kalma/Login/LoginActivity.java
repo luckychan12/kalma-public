@@ -64,7 +64,7 @@ public class LoginActivity extends AppCompatActivity {
     public void login(String email, String password) {
         //create a json object and call API to log in
         APICaller apiCaller = new APICaller(getApplicationContext());
-        apiCaller.post(buildLoginJsonObject(email, password), buildMap(), getResources().getString(R.string.api_login), new ServerCallback() {
+        apiCaller.post(false, buildLoginJsonObject(email, password), buildMap(), getResources().getString(R.string.api_login), new ServerCallback() {
                     @Override
                     public void onSuccess(JSONObject response) {
                         try {
@@ -91,11 +91,12 @@ public class LoginActivity extends AppCompatActivity {
                         authStrings.setAuthToken(accessToken, accessExp);
                         authStrings.setAccountLink(accLink);
                         authStrings.setLogoutLink(logoutLink);
+                        authStrings.setRefreshToken(refreshToken, refreshExp);
                         if (((CheckBox)findViewById(R.id.rememberCreds)).isChecked()){
-                            authStrings.setRefreshToken(refreshToken, refreshExp);
+                            authStrings.storeRefreshToken();
                         }
                         else{
-                            authStrings.forgetRefreshToken();
+                            authStrings.unstoreRefreshToken();
                         }
                     }
 
