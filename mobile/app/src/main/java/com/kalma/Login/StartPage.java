@@ -87,11 +87,24 @@ public class StartPage extends AppCompatActivity {
         apiCaller.post(buildRefreshObject(token), buildMap(), getResources().getString(R.string.api_refresh), new ServerCallback() {
                     @Override
                     public void onSuccess(JSONObject result) {
-                        onSuccessfulLogin();
+                        try {
+                            JSONObject responseBody = result;
+                            String accessToken = responseBody.getString("access_token");
+                            int accessExp = Integer.parseInt(responseBody.getString("access_expiry"));
+                            AuthStrings.getInstance(getApplicationContext()).setAuthToken(accessToken, accessExp);
+                            String refreshToken = responseBody.getString("refresh_token");
+                            int refreshExp = Integer.parseInt(responseBody.getString("refresh_expiry"));
+                            AuthStrings.getInstance(getApplicationContext()).setRefreshToken(refreshToken, refreshExp);
+                            onSuccessfulLogin();
+                        }
+                        catch (JSONException je) {
+                            Log.e("JSONException", "onErrorResponse: ", je);
+                        }
                     }
                     @Override
                     public void onFail(VolleyError error) {
                         try {
+
                             //retrieve error message and display
                             String jsonInput = new String(error.networkResponse.data, "utf-8");
                             JSONObject responseBody = new JSONObject(jsonInput);
@@ -114,7 +127,7 @@ public class StartPage extends AppCompatActivity {
         JSONObject object = new JSONObject();
         try {
             object.put("refresh_token", token);
-            object.put("client_fingerprint", AuthStrings.getInstance(this).getDeviceToken());
+            object.put("client_fingerprint", AuthStrings.getInstance(getApplicationContext()).getDeviceToken());
         } catch (JSONException e) {
             e.printStackTrace();
         }
