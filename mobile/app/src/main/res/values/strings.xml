@@ -9,7 +9,7 @@
     <string name="profile">profile</string>
     <string name="calender">calender</string>
     <string name="settings">settings</string>
-    
+
     <string name="app_name">Kalma</string>
     <string name="StartPageButtonText">LOG IN</string>
     <string name="sign_up">SIGN UP</string>
@@ -41,6 +41,7 @@
     <string name="placeholder">------/------</string>
 
     <string name="log_out">Log out</string>
+    <string name="remember_me">Remember me?</string>
 
 
 </resources>
