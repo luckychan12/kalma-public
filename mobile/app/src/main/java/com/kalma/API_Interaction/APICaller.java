@@ -95,6 +95,11 @@ public class APICaller {
                                 String refreshToken = responseBody.getString("refresh_token");
                                 int refreshExp = Integer.parseInt(responseBody.getString("refresh_expiry"));
                                 authStrings.setRefreshToken(refreshToken, refreshExp);
+                                JSONObject links = responseBody.getJSONObject("links");
+                                String accLink = links.getString("account");
+                                String logoutLink = links.getString("logout");
+                                authStrings.setAccountLink(accLink);
+                                authStrings.setLogoutLink(logoutLink);
                                 callback.onSuccess(result);
                             }
                             catch (JSONException je) {
