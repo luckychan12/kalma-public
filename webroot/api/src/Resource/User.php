@@ -27,11 +27,11 @@ class User extends Resource
      * @param Request $req
      * @param Response $res
      * @param array|null $payload
-     * @param mixed ...$args
+     * @param array $args
      * @return Response
      * @throws ResponseException
      */
-    public function signup(Request $req, Response $res, ?array $payload, ...$args) : Response
+    public function signup(Request $req, Response $res, ?array $payload, array $args) : Response
     {
         $am = UserManager::getInstance();
         $body = $req->getParsedBody();
@@ -48,11 +48,11 @@ class User extends Resource
      * @param Request $req
      * @param Response $res
      * @param array|null $payload
-     * @param mixed ...$args
+     * @param array $args
      * @return Response
      * @throws ResponseException
      */
-    public function confirm(Request $req, Response $res, ?array $payload, ...$args) : Response
+    public function confirm(Request $req, Response $res, ?array $payload, array $args) : Response
     {
         $body = $req->getParsedBody();
         if (!isset($body['confirmation_token']))
@@ -73,11 +73,11 @@ class User extends Resource
      * @param Request $req
      * @param Response $res
      * @param array|null $payload Public endpoint, no JWT payload required
-     * @param mixed ...$args Takes no URI params
+     * @param array $args Takes no URI params
      * @return Response
      * @throws ResponseException
      */
-    public function login(Request $req, Response $res, ?array $payload, ...$args) : Response
+    public function login(Request $req, Response $res, ?array $payload, array $args) : Response
     {
         $body = $req->getParsedBody();
         if (!isset($body['email_address']) || !isset($body['password']) || !isset($body['client_fingerprint']))
@@ -106,11 +106,11 @@ class User extends Resource
      * @param Request $req
      * @param Response $res
      * @param array|null $payload
-     * @param mixed ...$args
+     * @param array $args
      * @return Response
      * @throws ResponseException
      */
-    public function refresh(Request $req, Response $res, ?array $payload, ...$args) : Response
+    public function refresh(Request $req, Response $res, ?array $payload, array $args) : Response
     {
         $body = $req->getParsedBody();
 
@@ -131,14 +131,13 @@ class User extends Resource
      * @param Request $req
      * @param Response $res
      * @param array $payload
-     * @param mixed ...$args Expects exactly one argument, the id of the user to be read
+     * @param array $args Expects exactly one argument, the id of the user to be read
      * @return Response
      * @throws ResponseException
      */
-    public function read(Request $req, Response $res, ?array $payload, ...$args) : Response
+    public function read(Request $req, Response $res, ?array $payload, array $args) : Response
     {
-
-        if (!isset($payload['sub']) || $args[0] != $payload['sub']) {
+        if (!isset($payload['sub']) || intval($args['id']) !== $payload['sub']) {
             throw new ResponseException(403, 2002, 'You do not have permission to access this resource.',
                     'The subject of the access token may not access the requested user\'s data.');
         }
@@ -146,7 +145,7 @@ class User extends Resource
         $rows = $this->database->fetch
         (
             'SELECT * FROM `user_account` WHERE `user_id` = :user_id',
-            array('user_id' => $args[0])
+            array('user_id' => $args['id'])
         );
 
         if (count($rows) == 0)
@@ -159,7 +158,7 @@ class User extends Resource
         $sessions = $this->database->fetch
         (
             'SELECT `client_fingerprint`, `created_time`, `expiry_time` FROM `session` WHERE `user_id` = :user_id;',
-            array('user_id' => $args[0]),
+            array('user_id' => $args['id']),
         );
 
         if (count($sessions) > 0)
@@ -184,11 +183,11 @@ class User extends Resource
      * @param Request $req
      * @param Response $res
      * @param array $payload
-     * @param mixed ...$args Expects exactly one argument, the id of the user to be read
+     * @param array $args Expects exactly one argument, the id of the user to be read
      * @return Response
      * @throws ResponseException
      */
-    public function logout(Request $req, Response $res, ?array $payload, ...$args) : Response
+    public function logout(Request $req, Response $res, ?array $payload, array $args) : Response
     {
         $body = $req->getParsedBody();
         if (!isset($body['client_fingerprint']))

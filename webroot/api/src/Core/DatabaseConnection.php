@@ -95,14 +95,45 @@ class DatabaseConnection
         }
         else
         {
+            if ($this->conn->inTransaction())
+            {
+                $this->rollBack();
+            }
+
             Logger::log(Logger::ERROR, "Failed to execute query: \n\t'%s'" .
                                        "Error Info: \n\t %s",
                                         $query, $this->conn->errorInfo());
 
-
             throw new ResponseException(500, 3001, 'Oops! Something went wrong processing your request.', 'An SQL error has occurred.');
         }
 
+    }
+
+    /**
+     * Expose PDO::beginTransaction method
+     * @return bool
+     */
+    public function beginTransaction() : bool
+    {
+        return $this->conn->beginTransaction();
+    }
+
+    /**
+     * Expose PDO::commit method
+     * @return bool
+     */
+    public function commit() : bool
+    {
+        return $this->conn->commit();
+    }
+
+    /**
+     * Expose PDO::rollBack method
+     * @return bool
+     */
+    public function rollBack() : bool
+    {
+        return $this->conn->rollBack();
     }
 
 }
