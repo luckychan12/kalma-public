@@ -4,7 +4,7 @@
     <string name="api_url">https://kalma.club</string>
     <string name="api_login">/api/user/login</string>
     <string name="api_signup">/api/user/signup</string>
-
+    <string name="api_refresh">/api/user/refresh</string>
     <string name="home">home</string>
     <string name="profile">profile</string>
     <string name="calender">calender</string>
