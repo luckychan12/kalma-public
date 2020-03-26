@@ -29,12 +29,10 @@ import java.util.Map;
 public class LoginActivity extends AppCompatActivity {
     EditText txtEmail, txtPassword;
     Button buttonLogin;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-
         //get view element resources
         txtEmail = findViewById(R.id.txtEmail);
         txtPassword = findViewById(R.id.txtPassword);
@@ -49,6 +47,8 @@ public class LoginActivity extends AppCompatActivity {
                 login(email, password);
             }
         });
+
+
     }
 
     private void onSuccessfulLogin() {
@@ -91,6 +91,12 @@ public class LoginActivity extends AppCompatActivity {
                         authStrings.setAuthToken(accessToken, accessExp);
                         authStrings.setAccountLink(accLink);
                         authStrings.setLogoutLink(logoutLink);
+                        if (((CheckBox)findViewById(R.id.rememberCreds)).isChecked()){
+                            authStrings.setRefreshToken(refreshToken, refreshExp);
+                        }
+                        else{
+                            authStrings.forgetRefreshToken();
+                        }
                     }
 
                     @Override
