@@ -7,8 +7,6 @@ import android.provider.Settings;
 import android.security.keystore.KeyGenParameterSpec;
 import android.security.keystore.KeyProperties;
 
-import androidx.security.crypto.EncryptedFile;
-import androidx.security.crypto.MasterKeys;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -27,7 +25,7 @@ public class AuthStrings {
     private static String refreshToken;
     private static String accountLink;
     private static String LogoutLink;
-    final SharedPreferences settings = context.getSharedPreferences("TOKENS",  0);
+    private SharedPreferences settings;
     private static int authTokenExp;
     private static int refreshTokenExp;
     private static Context context;
@@ -54,6 +52,7 @@ public class AuthStrings {
 
     public void setRefreshToken(String token, int exp){
         refreshToken = token;
+        storeRefreshToken();
         refreshTokenExp = exp;
     }
 
@@ -86,6 +85,7 @@ public class AuthStrings {
     }
 
     private void storeRefreshToken(){
+        settings = context.getSharedPreferences("TOKENS",  0);
         SharedPreferences.Editor editor = settings.edit();
         editor.putString("RefreshToken", refreshToken);
         editor.commit();
