@@ -81,7 +81,7 @@ public class AuthStrings {
     }
 
     public void forgetAuthToken() {
-        authToken = null;
+        authToken = "";
     }
 
     private void storeRefreshToken(){
@@ -92,7 +92,9 @@ public class AuthStrings {
     }
 
     public void forgetRefreshToken() {
-        refreshToken = null;
+        refreshToken = "";
+        SharedPreferences settings = context.getSharedPreferences("TOKENS", 0);
+        settings.edit().putString("RefreshToken", "");
     }
 
     public Long getDeviceToken(){
