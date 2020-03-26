@@ -120,8 +120,13 @@ class User extends Resource
         }
 
         $um = UserManager::getInstance();
-        $result = $um->refreshSession($body['refresh_token'], $body['client_fingerprint']);
-        $res->setBody($result);
+        [$session, $user_id] = $um->refreshSession($body['refresh_token'], $body['client_fingerprint']);
+        $resBody = $session;
+        $resBody['links'] = array(
+            'account' => $this->api_root . "/user/$user_id/account",
+            'logout'  => $this->api_root . "/user/logout",
+        );
+        $res->setBody($resBody);
         return $res;
     }
 
