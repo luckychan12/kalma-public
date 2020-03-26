@@ -104,7 +104,7 @@ public class SettingsActivity extends AppCompatActivity {
     public void logout() {
         //create a json object and call API to log in
         APICaller apiCaller = new APICaller(getApplicationContext());
-        apiCaller.post(logoutObject(), buildMap(), AuthStrings.getInstance(getApplicationContext()).getLogoutLink(),new ServerCallback() {
+        apiCaller.post(true, logoutObject(), buildMap(), AuthStrings.getInstance(getApplicationContext()).getLogoutLink(),new ServerCallback() {
                     @Override
                     public void onSuccess(JSONObject response) {
                         try {
@@ -123,6 +123,7 @@ public class SettingsActivity extends AppCompatActivity {
                     public void onFail(VolleyError error) {
                         try{
                             forgetTokens();
+                            Log.e("RESPONSE",Integer.toString(error.networkResponse.statusCode));
                             //retrieve error message and display
                             String jsonInput = new String(error.networkResponse.data, "utf-8");
                             JSONObject responseBody = new JSONObject(jsonInput);
