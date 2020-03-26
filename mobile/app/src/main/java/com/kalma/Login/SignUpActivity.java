@@ -123,7 +123,7 @@ public class SignUpActivity extends AppCompatActivity {
     }
     private void signUp(String firstName, String lastName, String password, String email, long DOB) {
         APICaller apiCaller = new APICaller(getApplicationContext());
-        apiCaller.post(buildSignUpJsonObject(firstName, lastName, password, email, DOB), buildMap(), getResources().getString(R.string.api_signup), new ServerCallback() {
+        apiCaller.post(false, buildSignUpJsonObject(firstName, lastName, password, email, DOB), buildMap(), getResources().getString(R.string.api_signup), new ServerCallback() {
                     @Override
                     public void onSuccess(JSONObject response) {
                         try {

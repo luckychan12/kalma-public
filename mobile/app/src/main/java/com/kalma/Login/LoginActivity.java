@@ -2,10 +2,10 @@ package com.kalma.Login;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.provider.Settings.Secure;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -22,18 +22,17 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
 public class LoginActivity extends AppCompatActivity {
     EditText txtEmail, txtPassword;
     Button buttonLogin;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-
         //get view element resources
         txtEmail = findViewById(R.id.txtEmail);
         txtPassword = findViewById(R.id.txtPassword);
@@ -48,12 +47,15 @@ public class LoginActivity extends AppCompatActivity {
                 login(email, password);
             }
         });
+
+
     }
 
-    private void onSuccessfulLogin(){
+    private void onSuccessfulLogin() {
         Intent intent = new Intent(this, HomeActivity.class);
         startActivity(intent);
     }
+
     private Map buildMap() {
         Map<String, String> params = new HashMap<String, String>();
         return params;
@@ -62,7 +64,7 @@ public class LoginActivity extends AppCompatActivity {
     public void login(String email, String password) {
         //create a json object and call API to log in
         APICaller apiCaller = new APICaller(getApplicationContext());
-        apiCaller.post(buildLoginJsonObject(email, password), buildMap(), getResources().getString(R.string.api_login), new ServerCallback() {
+        apiCaller.post(false, buildLoginJsonObject(email, password), buildMap(), getResources().getString(R.string.api_login), new ServerCallback() {
                     @Override
                     public void onSuccess(JSONObject response) {
                         try {
@@ -73,12 +75,9 @@ public class LoginActivity extends AppCompatActivity {
                             int refreshExp = Integer.parseInt(responseBody.getString("refresh_expiry"));
                             JSONObject links = responseBody.getJSONObject("links");
                             String accLink = links.getString("account");
-                            String logoutLink = links.getString("logout") ;
+                            String logoutLink = links.getString("logout");
                             String refreshToken = responseBody.getString("refresh_token");
-                            AuthStrings.getInstance(getApplicationContext()).setAuthToken(accessToken, accessExp);
-                            AuthStrings.getInstance(getApplicationContext()).setRefreshToken(refreshToken, refreshExp);
-                            AuthStrings.getInstance(getApplicationContext()).setAccountLink(accLink);
-                            AuthStrings.getInstance(getApplicationContext()).setLogoutLink(logoutLink);
+                            StoreTokens(accessToken, accessExp, refreshExp, accLink, logoutLink, refreshToken);
                             Log.d("Response", response.toString());
                             //open home page
                             onSuccessfulLogin();
@@ -87,25 +86,37 @@ public class LoginActivity extends AppCompatActivity {
                         }
                     }
 
-            @Override
-            public void onFail(VolleyError error) {
-                try{
-                    //retrieve error message and display
-                    String jsonInput = new String(error.networkResponse.data, "utf-8");
-                    JSONObject responseBody = new JSONObject(jsonInput);
-                    String message = responseBody.getString("message");
-                    AuthStrings.getInstance(getApplicationContext()).setAuthToken(null, 0);
-                    Log.w("Error.Response", jsonInput);
-                    Toast toast = Toast.makeText(getApplicationContext(), message , Toast.LENGTH_LONG);
-                    toast.show();
-                }
-                catch (JSONException je){
-                    Log.e("JSONException", "onErrorResponse: ", je);
-                }
-                catch (UnsupportedEncodingException err) {
-                    Log.e("EncodingError", "onErrorResponse: ", err);
-                }
-            }
+                    private void StoreTokens(String accessToken, int accessExp, int refreshExp, String accLink, String logoutLink, String refreshToken) {
+                        AuthStrings authStrings = AuthStrings.getInstance(getApplicationContext());
+                        authStrings.setAuthToken(accessToken, accessExp);
+                        authStrings.setAccountLink(accLink);
+                        authStrings.setLogoutLink(logoutLink);
+                        authStrings.setRefreshToken(refreshToken, refreshExp);
+                        if (((CheckBox)findViewById(R.id.rememberCreds)).isChecked()){
+                            authStrings.storeRefreshToken();
+                        }
+                        else{
+                            authStrings.unstoreRefreshToken();
+                        }
+                    }
+
+                    @Override
+                    public void onFail(VolleyError error) {
+                        try {
+                            //retrieve error message and display
+                            String jsonInput = new String(error.networkResponse.data, "utf-8");
+                            JSONObject responseBody = new JSONObject(jsonInput);
+                            String message = responseBody.getString("message");
+                            AuthStrings.getInstance(getApplicationContext()).setAuthToken(null, 0);
+                            Log.w("Error.Response", jsonInput);
+                            Toast toast = Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG);
+                            toast.show();
+                        } catch (JSONException je) {
+                            Log.e("JSONException", "onErrorResponse: ", je);
+                        } catch (UnsupportedEncodingException err) {
+                            Log.e("EncodingError", "onErrorResponse: ", err);
+                        }
+                    }
                 }
         );
 

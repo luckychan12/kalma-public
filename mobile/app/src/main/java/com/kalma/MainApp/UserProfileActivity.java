@@ -75,7 +75,7 @@ public class UserProfileActivity extends AppCompatActivity {
     private void getData() {
         //create a json object and call API to log in
         APICaller apiCaller = new APICaller(getApplicationContext());
-        apiCaller.getData(null,buildMap(),AuthStrings.getInstance(getApplicationContext()).getAccountLink(), new ServerCallback() {
+        apiCaller.getData( true,null,buildMap(),AuthStrings.getInstance(getApplicationContext()).getAccountLink(), new ServerCallback() {
                     @Override
                     public void onSuccess(JSONObject response) {
                         try {

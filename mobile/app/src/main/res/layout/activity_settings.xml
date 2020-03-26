@@ -39,7 +39,7 @@
             style="?android:attr/buttonBarButtonStyle"
             android:layout_width="98dp"
             android:layout_height="match_parent"
-            android:text="@string/calander" />
+            android:text="@string/calender" />
 
         <Button
             android:id="@+id/btnSettings"
