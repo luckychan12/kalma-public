@@ -9,7 +9,7 @@
     <string name="login_image_desc">PLACEHOLDER IMAGE</string>
 
 
-    <string name="api_url">http://192.168.0.20</string>
+    <string name="api_url">https://kalma.club</string>
     <string name="api_login">/api/user/login</string>
     <string name="api_signup">/api/user/signup</string>
 
@@ -38,7 +38,7 @@
     <string name="placeholder">------/------</string>
     <string name="home">home</string>
     <string name="profile">profile</string>
-    <string name="calander">calander</string>
+    <string name="calender">calender</string>
     <string name="settings">settings</string>
     <string name="log_out">Log out</string>
 
