@@ -91,6 +91,11 @@ public class LoginActivity extends AppCompatActivity {
                         authStrings.setAuthToken(accessToken, accessExp);
                         authStrings.setAccountLink(accLink);
                         authStrings.setLogoutLink(logoutLink);
+                        if (((CheckBox) findViewById(R.id.rememberCreds)).isChecked()) {
+                            authStrings.setRefreshToken(refreshToken, refreshExp);
+                        } else {
+                            authStrings.forgetRefreshToken();
+                        }
                     }
 
                     @Override
