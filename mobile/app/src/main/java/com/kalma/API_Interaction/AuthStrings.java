@@ -94,7 +94,7 @@ public class AuthStrings {
     public void forgetRefreshToken() {
         refreshToken = "";
         SharedPreferences settings = context.getSharedPreferences("TOKENS", 0);
-        settings.edit().putString("RefreshToken", "");
+        settings.edit().putString("RefreshToken", "").commit();
     }
 
     public Long getDeviceToken(){
