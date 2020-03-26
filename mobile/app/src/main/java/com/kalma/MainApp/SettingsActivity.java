@@ -109,9 +109,7 @@ public class SettingsActivity extends AppCompatActivity {
                     public void onSuccess(JSONObject response) {
                         try {
                             String message = response.getString("message");
-                            AuthStrings authStrings = AuthStrings.getInstance(getApplicationContext());
-                            authStrings.forgetAuthToken();
-                            authStrings.forgetRefreshToken();
+                            forgetTokens();
                             Toast toast = Toast.makeText(getApplicationContext(), message , Toast.LENGTH_LONG);
                             Log.d("Response", response.toString());
                             Intent intent = new Intent(context, StartPage.class);
@@ -124,11 +122,11 @@ public class SettingsActivity extends AppCompatActivity {
                     @Override
                     public void onFail(VolleyError error) {
                         try{
+                            forgetTokens();
                             //retrieve error message and display
                             String jsonInput = new String(error.networkResponse.data, "utf-8");
                             JSONObject responseBody = new JSONObject(jsonInput);
                             String message = responseBody.getString("message");
-                            AuthStrings.getInstance(getApplicationContext()).setAuthToken(null, 0);
                             Log.w("Error.Response", jsonInput);
                             Toast toast = Toast.makeText(getApplicationContext(), message , Toast.LENGTH_LONG);
                             toast.show();
@@ -143,6 +141,12 @@ public class SettingsActivity extends AppCompatActivity {
                 }
         );
 
+    }
+
+    private void forgetTokens() {
+        AuthStrings authStrings = AuthStrings.getInstance(getApplicationContext());
+        authStrings.forgetAuthToken();
+        authStrings.forgetRefreshToken();
     }
 
 
