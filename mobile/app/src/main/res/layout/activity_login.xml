@@ -20,9 +20,10 @@
         android:textColor="@color/textOnDark"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.503"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.57"
+        app:layout_constraintVertical_bias="0.563"
         tools:targetApi="o" />
 
     <EditText
@@ -58,25 +59,7 @@
         app:layout_constraintHorizontal_bias="0.496"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.704" />
-
-    <TextView
-        android:id="@+id/lblError"
-        android:layout_width="381dp"
-        android:layout_height="59dp"
-        android:foregroundGravity="center_vertical|center_horizontal"
-        android:gravity="center|clip_vertical|center_vertical"
-        android:lineSpacingExtra="8sp"
-        android:text="@string/error_message"
-        android:textColor="@android:color/holo_red_light"
-        android:textSize="16sp"
-        android:visibility="invisible"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.47"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.825" />
+        app:layout_constraintVertical_bias="0.681" />
 
     <TextView
         android:id="@+id/txtLogin"
@@ -91,4 +74,19 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.19" />
+
+    <CheckBox
+        android:id="@+id/rememberCreds"
+        android:layout_width="148dp"
+        android:layout_height="39dp"
+        android:background="#FFFFFF"
+        android:checked="true"
+        android:text="@string/remember_me"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.304"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.778" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
