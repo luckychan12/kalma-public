@@ -17,6 +17,10 @@ use \Exception;
 
 class ResponseException extends Exception
 {
+    const INVALID_BODY_ATTRS = array(400, 1002, 'Oops! Something went wrong accessing this resource.', 'Invalid request body attributes.');
+    const INVALID_URI_PARAMS = array(400, 1003, 'Oops! Something went wrong accessing this resource.', 'Invalid URI parameters.');
+    const INVALID_DATE_FORMAT = array(400, 1101, 'One or more of the form fields isn\'t valid.', 'Invalid date format.');
+
 
     private int $status;
     private string $detail;
