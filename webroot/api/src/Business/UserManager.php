@@ -345,7 +345,7 @@ class UserManager
 
         // If the refresh token is valid, issue new access and refresh tokens
         $session = static::createSession($data['user_id'], $client_fingerprint);
-        return $session;
+        return [$session, $data['user_id']];
     }
 
 }

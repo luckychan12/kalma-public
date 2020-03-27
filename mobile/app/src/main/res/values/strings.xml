@@ -1,18 +1,23 @@
 <resources>
+    <string name="default_email">dummy@example2.com</string>
+    <string name="default_password">Asdfghjkl!23</string>
+    <string name="api_url">https://kalma.club</string>
+    <string name="api_login">/api/user/login</string>
+    <string name="api_signup">/api/user/signup</string>
+    <string name="api_refresh">/api/user/refresh</string>
+    <string name="home">home</string>
+    <string name="profile">profile</string>
+    <string name="calender">calender</string>
+    <string name="settings">settings</string>
+
     <string name="app_name">Kalma</string>
     <string name="StartPageButtonText">LOG IN</string>
     <string name="sign_up">SIGN UP</string>
     <string name="emailMarker">Email</string>
     <string name="passwordMarker">Password</string>
     <string name="log_in">LOG IN</string>
-    <string name="error_message">There was an error logging in. Please check your email and password</string>
     <string name="login_image_desc">PLACEHOLDER IMAGE</string>
-
-
-    <string name="api_url">http://192.168.0.20</string>
-    <string name="api_login">/api/user/login</string>
-    <string name="api_signup">/api/user/signup</string>
-
+    <string name="error_message">There was an error logging in. Please check your email and password</string>
     <string name="lastname_marker">LastName</string>
     <string name="dateofbirth_marker">DateOfBirth</string>
     <string name="firstname_marker">FirstName</string>
@@ -28,19 +33,15 @@
     <string name="mindful_minutes">Mindful Minutes</string>
     <string name="daily_step_count">Daily Step count</string>
     <string name="homelayout">HomeLayout</string>
-    <string name="default_email">dummy@example2.com</string>
-    <string name="default_password">Asdfghjkl!23</string>
     <string name="user_id">User ID:</string>
     <string name="email_address">Email Address:</string>
     <string name="first_name">First Name:</string>
     <string name="last_name">Last Name:</string>
     <string name="date_of_birth">Date of Birth:</string>
     <string name="placeholder">------/------</string>
-    <string name="home">home</string>
-    <string name="profile">profile</string>
-    <string name="calander">calander</string>
-    <string name="settings">settings</string>
+
     <string name="log_out">Log out</string>
+    <string name="remember_me">Remember me?</string>
 
 
 </resources>
