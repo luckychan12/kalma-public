@@ -145,43 +145,44 @@
     </RelativeLayout>
 
     <TableRow
-        android:layout_width="409dp"
-        android:layout_height="69dp"
+        android:layout_width="413dp"
+        android:layout_height="71dp"
         android:background="@color/colorPrimary"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.996" >
+        app:layout_constraintVertical_bias="1.0">
 
         <Button
-            style = "?android:attr/buttonBarButtonStyle"
             android:id="@+id/btnHome"
+            style="?android:attr/buttonBarButtonStyle"
             android:layout_width="103dp"
             android:layout_height="match_parent"
-            android:text="home" />
+            android:text="@string/home"
+            android:textColor="@color/colorSecondary" />
 
         <Button
-            style = "?android:attr/buttonBarButtonStyle"
             android:id="@+id/btnProfile"
+            style="?android:attr/buttonBarButtonStyle"
             android:layout_width="98dp"
             android:layout_height="match_parent"
-            android:text="profile" />
+            android:text="@string/profile" />
 
         <Button
-            style = "?android:attr/buttonBarButtonStyle"
             android:id="@+id/btnCalander"
+            style="?android:attr/buttonBarButtonStyle"
             android:layout_width="98dp"
             android:layout_height="match_parent"
-            android:text="calander" />
+            android:text="@string/calender" />
 
         <Button
-            style = "?android:attr/buttonBarButtonStyle"
-            android:id="@+id/btnOther"
+            android:id="@+id/btnSettings"
+            style="?android:attr/buttonBarButtonStyle"
             android:layout_width="98dp"
             android:layout_height="match_parent"
-            android:text="settings" />
+            android:text="@string/settings" />
 
     </TableRow>
 

@@ -88,8 +88,8 @@ class FrontController
         $resource = new $resourceClass();
 
         // Call Resource action
-        $params = $route['args'];
-        array_unshift($params, $request, $response, $authPayload);
+        $params = array();
+        array_unshift($params, $request, $response, $authPayload, $route['args']);
         $response = call_user_func_array(array($resource, $route['action']), $params);
 
         // Dispatch response to client

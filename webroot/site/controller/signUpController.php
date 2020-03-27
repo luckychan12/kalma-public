@@ -12,7 +12,9 @@ if(isset($_POST['signup'])){
     $api = new ApiConnect();
     $result = $api->requestSignup($_POST['firstName'],$_POST['lastName'],$_POST['password'],$_POST['email'],$dob);
     if (!isset($result->error)){
-        echo '<script>location.href = "../public/conformationPage.php"</script>';
+
+        $_SESSION['confirmationLink'] = $result->confirmation_url;
+        echo '<script>location.href = "../public/signupSuccess.php"</script>';
     }
     else {
         echo '<script>location.href = "../public/errorPage.php" </script>';
