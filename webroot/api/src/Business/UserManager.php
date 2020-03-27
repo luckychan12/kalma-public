@@ -193,7 +193,7 @@ class UserManager
     {
         $min_age = 16;
         try {
-            $dob = new DateTime($dob_timestamp, new DateTimeZone('UTC'));
+            $dob = DateTime::createFromFormat(DATE_ISO8601, $dob_timestamp);
             $now = new DateTime();
             $age = $now->diff($dob);
             return $age->y >= $min_age;
