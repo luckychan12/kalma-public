@@ -67,7 +67,7 @@ class UserManager
             'password_hash' => password_hash($user_data['password'], PASSWORD_BCRYPT),
             'first_name' => $user_data['first_name'],
             'last_name' => $user_data['last_name'],
-            'date_of_birth' => date('y-m-d', $user_data['date_of_birth']),
+            'date_of_birth' => $user_data['date_of_birth'],
         );
 
         $rows = $db->fetch
@@ -185,15 +185,15 @@ class UserManager
 
     /**
      * Return true if the user meets the age requirement, else false;
-     * @param int $dob_timestamp The user's date of birth in seconds since the Unix epoch
+     * @param string $dob_timestamp The user's date of birth in seconds since the Unix epoch
      * @return bool
      * @throws ResponseException
      */
-    private function validateAge(int $dob_timestamp) : bool
+    private function validateAge(string $dob_timestamp) : bool
     {
         $min_age = 16;
         try {
-            $dob = DateTime::createFromFormat(DATE_ISO8601, $dob_timestamp);
+            $dob = new DateTime($dob_timestamp, new DateTimeZone('UTC'));
             $now = new DateTime();
             $age = $now->diff($dob);
             return $age->y >= $min_age;
