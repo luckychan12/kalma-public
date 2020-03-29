@@ -41,6 +41,7 @@
             </div>
 
             <div class="col-lg-5">
+                <hr class="d-lg-none">
                 <h2>Sign up</h2>
                 <form class="form-signup"action="../controller/signUpController.php" method="post">
                     <div class="form-group">
