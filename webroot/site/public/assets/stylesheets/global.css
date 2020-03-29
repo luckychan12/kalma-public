@@ -20,7 +20,7 @@ body {
     border-color: var(--c-secondary-dark);
 }
 
-.navbar-top {
+.navbar.navbar-top {
     background-color: var(--c-primary);
     color: var(--c-text-on-primary);
 
@@ -31,11 +31,24 @@ body {
     margin-bottom: 20px;
 }
 
-.navbar-top > .navbar-brand {
+.navbar.navbar-top > .navbar-brand {
     font-family: var(--f-brand);
     color: var(--c-text-on-primary);
 }
 
-.navbar-top > .navbar-brand:hover {
+.navbar.navbar-top > .navbar-brand:hover {
+    color: var(--c-secondary);
+}
+
+.navbar.navbar-top .nav-link {
     color: var(--c-text-on-primary);
 }
+
+.navbar.navbar-top .nav-link:hover {
+    color: var(--c-secondary);
+}
+
+.navbar.navbar-top .nav-link > i + span {
+    margin-left: 5px;
+}
+
