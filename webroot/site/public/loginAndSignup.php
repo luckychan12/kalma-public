@@ -1,100 +1,76 @@
 <?php
-include_once "header.php";
-
+    session_start();
 ?>
 
-
 <!doctype html>
-
 <html lang='en'>
-<style>
-label {
-    margin-top: 5px;
-    margin-bottom: 0;
-    text-align: left;
-    width: 350px;
-}
-    input {
-        padding:5px;
-        margin:5px;
-        width:350px;
-        font: var(--f-normal);
-    }
+<head>
+    <?php include_once "./components/global_head_inner.php"; ?>
+    <link rel="stylesheet" href="assets/stylesheets/loginAndSignup.css">
+</head>
 
-</style>
+<body>
 
-<script>
+    <?php include_once "./components/navbar_top.php"; ?>
 
-    window.onload = function() {
-        var today = new Date();
-        var day = today.getDate();
-        var month = today.getMonth() + 1;
-        var year = today.getFullYear();
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-1"></div>
 
-        if (day < 10)
-            day = '0' + day;
-        if (month < 10)
-            month = '0' + month;
-        var now = year+ '-' + month + '-' + day;
-        document.getElementById('dob').setAttribute("max", now);
-    }
-</script>
-<body >
+            <div class="col-lg-5">
+                <h2> Login </h2>
+                <div class="alert alert-danger alert-dismissible fade text-center <?= isset($_SESSION['login_message']) ? "show" : "hide"?>" role="alert">
+                    <?= $_SESSION['login_message'] ?? ""; ?>
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
 
-<div class="container-fluid" >
-<div class="row" style="margin-top: 20px">
-    <div class="col-md-1"></div>
-    <div class="col-lg-5" style="padding:10px;background-color: var(--c-primary-dark);font:var(--f-normal) ;color: var(--c-text-on-primary);border-top-left-radius:20px; border-bottom-left-radius: 20px">
-        <h2 id="loginHeader" style="text-align: center">Login</h2>
-        <div style="text-align: center">
-         <?php
-         //Displays a message if there was an issue logging in
-         if (isset($_SESSION['login_message']))
-         {
-             echo $_SESSION['login_message'];
-         }
-         ?>
+                <form class="form-login" action="../controller/loginController.php" method="post">
+                    <div class="form-group">
+                        <label for="logEmail">Email Address:</label><br>
+                        <input class="form-control" type="email" placeholder="Email" name="logEmail" id="logEmail" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="logPassword">Password:</label><br>
+                        <input class="form-control" type="password" placeholder="Password" name="logPassword" id="logPassword" required>
+                    </div>
+                    <input type="hidden" name="fingerprint" id="hiddenFingerprint">
+                    <input class="btn btn-primary" type="submit" name="login" value="Submit">
+                </form>
+            </div>
+
+            <div class="col-lg-5">
+                <hr class="d-lg-none">
+                <h2>Sign up</h2>
+                <form class="form-signup"action="../controller/signUpController.php" method="post">
+                    <div class="form-group">
+                        <label for="email">Email Address:</label><br>
+                        <input class="form-control" type="email" placeholder="Email" name="email" id="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="firstName">First Name:</label><br>
+                        <input class="form-control" type="text" placeholder="First Name" name="firstName" id="firstName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="lastName">Last Name:</label><br>
+                        <input class="form-control" type="text" placeholder="Last Name" name="lastName" id="lastName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password:</label><br>
+                        <input class="form-control" type="password" placeholder="Password" name="password" id="password" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="dob">Date of Birth:</label><br>
+                        <input class="form-control" type="date" name="dob" min="1900-01-01" placeholder="Date Of Birth" id="dob" required>
+                    </div>
+                    <input class="btn btn-primary" type="submit" name="signup" value="Submit">
+                </form>
+            </div>
+
+            <div class="col-md-1"></div>
         </div>
-
-
-        <form action="../controller/loginController.php" method="post" style="text-align: center">
-            <label for="logEmail">Email Address:</label><br>
-            <input type="email" placeholder="Email" name="logEmail" id="logEmail" required>
-            <br>
-            <label for="logPassword">Password:</label><br>
-            <input type="password" placeholder="Password" name="logPassword" id="logPassword" required>
-            <br>
-            <input type="hidden" name="fingerprint" id="hiddenFingerprint">
-            <input style="width: 100px;background-color: var(--c-secondary); color:var(--c-text-on-secondary)" type="submit" name="login" value="Submit">
-        </form>
     </div>
-    <div class="col-lg-5" style="padding:10px;background-color: var(--c-primary-dark);font:var(--f-normal) ;color: var(--c-text-on-primary);border-top-right-radius:20px; border-bottom-right-radius: 20px">
-        <h2 style="text-align: center; ">Sign up</h2>
-        <form action="../controller/signUpController.php" method="post" style="text-align: center">
-            <label for="email">Email Address:</label><br>
-            <input type="email" placeholder="Email" name="email" id="email" required>
-            <br>
-            <label for="firstName">First Name:</label><br>
-            <input type="text" placeholder="First Name" name="firstName" id="firstName" required>
-            <br>
-            <label for="lastName">Last Name:</label><br>
-            <input type="text" placeholder="Last Name" name="lastName" id="lastName" required>
-            <br>
-            <label for="password">Password:</label><br>
-            <input type="password" placeholder="Password" name="password" id="password" required>
-            <br>
-            <label for="dob">Date of Birth:</label><br>
-            <input type="date"  name="dob" min="1900-01-01" placeholder="Date Of Birth" id="dob" required>
-            <br>
-            <input style="width: 100px;background-color: var(--c-secondary); color:var(--c-text-on-secondary)" type="submit" name="signup" value="Submit">
-        </form>
-    </div>
-</div>
-</div>
 </body>
 
-<script>
-    let client = new ClientJS();
-    let fingerprint = client.getFingerprint();
-    document.getElementById("hiddenFingerprint").value = fingerprint;
-</script>
+</html>
