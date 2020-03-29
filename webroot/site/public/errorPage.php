@@ -1,20 +1,30 @@
 <?php
-include_once "header.php";
-
+session_start();
 ?>
+
 <!doctype html>
 <html lang='en'>
-<body style="">
-<button onclick="window.location.href = 'loginAndSignup.php'" style="background-color: var(--c-secondary);margin: 20px; padding-right: 10px;padding-left: 10px">Back to login</button>
-    <div style="padding-top: 20px;text-align: center; font-size: xx-large; font:var(--f-normal)">
-        Status: <?php echo $_SESSION['status'];?>
+
+<head>
+    <?php include_once './components/global_head_inner.php' ?>
+</head>
+
+<body>
+    <?php include_once './components/navbar_top.php' ?>
+
+    <div class="text-center">
+        <b>Status:</b> <?= $_SESSION['status'] ?? "Unknown" ?>
         <br>
-        Error: <?php echo $_SESSION['error'] ?>
+        <b>Error:</b> <?= $_SESSION['error'] ?? "Unknown" ?>
         <br>
-        Message: <?php echo $_SESSION['error_message'] ?>
+        <b>Message:</b> <?= $_SESSION['error_message'] ?? "Unknown" ?>
         <br>
-        <?php if (isset($_SESSION['detail'])){
-            echo 'Detail: '.$_SESSION['detail'] ;
-        }  ?>
+        <b>Detail:</b> <?= $_SESSION['detail'] ?? "Unknown" ?>
+        <br>
+        <br>
+        <a class="btn btn-primary" href="./loginAndSignup.php">Back to login</a>
     </div>
+
 </body>
+
+</html>

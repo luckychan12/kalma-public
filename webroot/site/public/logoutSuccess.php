@@ -1,12 +1,12 @@
-<?php
-include_once "header.php";
-
-?>
 <!doctype html>
 <html lang='en'>
+<head>
+    <?php include_once './components/global_head_inner.php' ?>
+</head>
 <body>
-<div>
-    <button onclick="window.location.href = 'loginAndSignup.php'" style="background-color: var(--c-secondary);margin: 20px; padding-right: 10px;padding-left: 10px">Back to login</button>
-</div>
-<h1 style="padding-top: 20px;text-align: center">You have been successfully logged out.</h1>
+    <?php include_once './components/navbar_top.php' ?>
+    <div class="text-center">
+        <h1>You have been successfully logged out.</h1>
+        <a class="btn btn-primary" href="./loginAndSignup.php"> Back to login </a>
+    </div>
 </body>
