@@ -16,11 +16,14 @@ if(isset($_POST['login'])) {
         $_SESSION['account_link'] = $data->links->account;
         $_SESSION['refresh_token'] = $data->refresh_token;
         $_SESSION['logout_link'] = $data->links->logout;
-       echo '<script> location.href = "../public/dashboard.php"</script>';
+
+        header('Location: ../public/dashboard.php');
     }
     else
     {
-       echo '<script>location.href = "../public/loginAndSignup.php?"</script>';
+        $_SESSION['login_message'] = "{$data->message} ({$data->error})";
+
+        header('Location: ../public/loginAndSignup.php');
     }
 }
 

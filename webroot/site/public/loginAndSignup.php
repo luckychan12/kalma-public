@@ -1,3 +1,7 @@
+<?php
+    session_start();
+?>
+
 <!doctype html>
 <html lang='en'>
 <head>
@@ -15,7 +19,12 @@
 
             <div class="col-lg-5">
                 <h2> Login </h2>
-                <div> <?= $_SESSION['login_message'] ?? ""; ?> </div>
+                <div class="alert alert-danger alert-dismissible fade text-center <?= isset($_SESSION['login_message']) ? "show" : "hide"?>" role="alert">
+                    <?= $_SESSION['login_message'] ?? ""; ?>
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
 
                 <form class="form-login" action="../controller/loginController.php" method="post">
                     <div class="form-group">
