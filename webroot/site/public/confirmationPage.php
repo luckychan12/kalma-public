@@ -1,28 +1,36 @@
 <?php
-include_once 'header.php';
 include_once "../api_tasks/apiConnect.php";
+$api = new ApiConnect();
 
-if (isset($_GET['confirmation'])){
-    $api = new ApiConnect();
-    $data = $api->confirmAccount($_GET['confirmation']);
-
-}
+$token = $_GET['confirmation'] ?? "";
+$data = $api->confirmAccount($token);
 ?>
 
 <!doctype html>
 <html lang='en'>
+
+<head>
+    <?php include_once "./components/global_head_inner.php"; ?>
+</head>
+
 <body>
-<div>
-    <button onclick="window.location.href = 'loginAndSignup.php'" style="background-color: var(--c-secondary);margin: 20px; padding-right: 10px;padding-left: 10px">Login</button>
-</div>
-<div style="text-align: center">
-    <?php
-    if(!isset($data->error)){
-        echo $data->message;
-    }
-    else {
-        echo '<script>location.href = "../public/errorPage.php" </script>';
-    }
-    ?>
-</div>
+    <?php include_once "./components/navbar_top.php" ?>
+
+    <div>
+        <a class="btn btn-primary" href="./loginAndSignup.php">Login</a>
+    </div>
+
+    <div>
+        <?php
+        if(!isset($data->error)) {
+            echo "{$data->message} ({$data->error})";
+        }
+        else {
+            header('Location: ./errorPage.php');
+            exit();
+        }
+        ?>
+    </div>
 </body>
+
+</html>
