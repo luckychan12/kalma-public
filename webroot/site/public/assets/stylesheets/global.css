@@ -1,3 +1,7 @@
+/*
+ * General styles
+ */
+
 .hide {
     display: none;
 }
@@ -6,6 +10,28 @@ body {
     background-color: var(--c-bg);
     color: var(--c-text-on-bg);
     font-family: var(--f-normal);
+}
+
+hr {
+    border-top: 1px solid var(--c-secondary);
+}
+
+/*
+ * Forms & Controls
+ */
+
+form .form-control:focus {
+    box-shadow: 0 0 0 1px var(--c-secondary);
+    border: 1px solid var(--c-secondary);
+}
+
+@media (prefers-color-scheme: dark) {
+    form .form-control,
+    form .form-control:focus {
+        background-color: var(--c-bg-shade);
+        color: var(--c-text-on-bg);
+        border: 1px solid #46454b;
+    }
 }
 
 .btn-primary {
@@ -20,7 +46,11 @@ body {
     border-color: var(--c-secondary-dark);
 }
 
-.navbar-top {
+/*
+ * Navbar styles
+ */
+
+.navbar.navbar-top {
     background-color: var(--c-primary);
     color: var(--c-text-on-primary);
 
@@ -31,11 +61,44 @@ body {
     margin-bottom: 20px;
 }
 
-.navbar-top > .navbar-brand {
+.navbar.navbar-top > .navbar-brand {
     font-family: var(--f-brand);
     color: var(--c-text-on-primary);
 }
 
-.navbar-top > .navbar-brand:hover {
+.navbar.navbar-top > .navbar-brand:hover {
+    color: var(--c-secondary);
+}
+
+.navbar.navbar-top .nav-link {
     color: var(--c-text-on-primary);
 }
+
+.navbar.navbar-top .nav-link:hover {
+    color: var(--c-secondary);
+}
+
+.navbar.navbar-top .nav-link > i + span {
+    margin-left: 5px;
+}
+
+@media (prefers-color-scheme: dark) {
+    .navbar.navbar-top .dropdown-menu {
+        background-color: var(--c-primary-dark);
+    }
+
+    .navbar.navbar-top .dropdown-item {
+        color: var(--c-text-on-primary);
+    }
+
+    .navbar.navbar-top .dropdown-item:hover {
+        background-color: var(--c-primary);
+    }
+}
+
+@media (prefers-color-scheme: light) {
+    .navbar.navbar-top .dropdown-menu {
+        background-color: var(--c-bg-light);
+    }
+}
+

@@ -1,8 +1,8 @@
 <?php require_once __DIR__ . '/fingerprinter.php'; ?>
 
-<nav class="navbar navbar-expand-lg navbar-dark navbar-top">
+<nav class="navbar navbar-dark navbar-expand-lg navbar-top">
     <a class="navbar-brand" href="#">Kalma</a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarTop" aria-expanded="false" aria-label="Toggle navigation">
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTop" aria-controls="navbarTop" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarTop">
@@ -24,9 +24,9 @@
             </li>
         </ul>
         <ul class="navbar-nav ml-auto">
-            <a class="nav-link <?= isset($_SESSION['account_link']) ? "show" : "hide" ?>" href="./profile.php"><i class="fa fa-fw fa-user"></i></a>
-            <a class="nav-link <?= isset($_SESSION['logout_link']) ? "show" : "hide" ?>" href="?logout"><i class="fas fa-sign-out-alt"></i></a>
-            <a class="nav-link <?= !isset($_SESSION['account_link']) ? "show" : "hide" ?>" href="./loginAndSignup.php"><i class="fas fa-sign-in-alt"></i></a>
+            <a class="nav-link <?= isset($_SESSION['account_link']) ? "show" : "hide" ?>" href="./profile.php"><i class="fa fa-fw fa-user"></i><span>Profile</span></a>
+            <a class="nav-link <?= isset($_SESSION['logout_link']) ? "show" : "hide" ?>" href="?logout"><i class="fas fa-sign-out-alt"></i><span>Logout</span></a>
+            <a class="nav-link <?= !isset($_SESSION['account_link']) ? "show" : "hide" ?>" href="./loginAndSignup.php"><i class="fas fa-sign-in-alt"></i><span>Login/Signup</span></a>
         </ul>
     </div>
 </nav>
