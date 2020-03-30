@@ -17,7 +17,9 @@ namespace Kalma\Api\Business;
 
 require __DIR__ . '/../../vendor/autoload.php';
 
+use DateTime;
 use DomainException;
+use Exception;
 use Firebase\JWT\BeforeValidException;
 use Firebase\JWT\ExpiredException;
 use Firebase\JWT\JWT;
@@ -172,6 +174,7 @@ class Auth
      * Generate a short-lifetime, stateful JWT containing a user ID
      * @param int $user_id
      * @return array
+     * @throws ResponseException
      */
     public static function generateAccessToken(int $user_id) : array
     {
@@ -184,13 +187,21 @@ class Auth
             'sub' => $user_id
         );
 
-        return [static::generateJWT($payload), $expiry];
+        try {
+            $expiry_timestamp = (new DateTime("@$expiry"))->format(DATE_ISO8601);
+        }
+        catch (Exception $e) {
+            throw new ResponseException(...ResponseException::INVALID_DATE_FORMAT);
+        }
+
+        return [static::generateJWT($payload), $expiry_timestamp];
     }
 
     /**
      * Generate a long-lifetime, stateful JWT containing a session ID
      * @param int $session_id
      * @return array
+     * @throws ResponseException
      */
     public static function generateRefreshToken(int $session_id) : array
     {
@@ -203,7 +214,14 @@ class Auth
             'sid' => $session_id
         );
 
-        return [static::generateJWT($payload), $expiry];
+        try {
+            $expiry_timestamp = (new DateTime("@$expiry"))->format(DATE_ISO8601);
+        }
+        catch (Exception $e) {
+            throw new ResponseException(...ResponseException::INVALID_DATE_FORMAT);
+        }
+
+        return [static::generateJWT($payload), $expiry_timestamp];
     }
 
     /**

@@ -14,6 +14,7 @@
 namespace Kalma\Api\Business;
 
 use DateTime;
+use DateTimeZone;
 use DomainException;
 use Exception;
 use Firebase\JWT\BeforeValidException;
@@ -66,7 +67,7 @@ class UserManager
             'password_hash' => password_hash($user_data['password'], PASSWORD_BCRYPT),
             'first_name' => $user_data['first_name'],
             'last_name' => $user_data['last_name'],
-            'date_of_birth' => date('y-m-d', $user_data['date_of_birth']),
+            'date_of_birth' => $user_data['date_of_birth'],
         );
 
         $rows = $db->fetch
@@ -184,20 +185,21 @@ class UserManager
 
     /**
      * Return true if the user meets the age requirement, else false;
-     * @param  int  $dob_timestamp The user's date of birth in seconds since the Unix epoch
+     * @param string $dob_timestamp The user's date of birth in seconds since the Unix epoch
      * @return bool
+     * @throws ResponseException
      */
-    private function validateAge(int $dob_timestamp) : bool
+    private function validateAge(string $dob_timestamp) : bool
     {
         $min_age = 16;
         try {
-            $dob = new DateTime("@$dob_timestamp");
+            $dob = new DateTime($dob_timestamp, new DateTimeZone('UTC'));
             $now = new DateTime();
             $age = $now->diff($dob);
             return $age->y >= $min_age;
         } catch (Exception $e) {
             Logger::log(Logger::ERROR, "Failed to parse date timestamp '$dob_timestamp' in AccountManager::validateAge()");
-            return false;
+            throw new ResponseException(400, 1101, 'One or more of the form fields isn\'t valid.', 'Invalid date format.');
         }
     }
 

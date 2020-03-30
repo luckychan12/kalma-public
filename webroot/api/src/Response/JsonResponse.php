@@ -50,7 +50,7 @@ class JsonResponse extends Response
      */
     public function getResponse(): HttpResponse
     {
-        $this->body['timestamp'] = date(DATE_ATOM);
+        $this->body['timestamp'] = date(DATE_ISO8601);
         $this->body['status'] = $this->status;
         $this->body['uri'] = $this->getRequestURI();
         return parent::getResponse();
