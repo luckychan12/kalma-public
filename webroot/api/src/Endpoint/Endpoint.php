@@ -13,7 +13,7 @@
  * @since      File available since Pre-Alpha
  */
 
-namespace Kalma\Api\Resource;
+namespace Kalma\Api\Endpoint;
 
 use Kalma\Api\Core\Config;
 use Kalma\Api\Core\DatabaseConnection;
@@ -22,7 +22,7 @@ use Kalma\Api\Response\Exception\ResponseException;
 
 require __DIR__ . '/../../vendor/autoload.php';
 
-class Resource
+class Endpoint
 {
 
     protected DatabaseConnection $database;

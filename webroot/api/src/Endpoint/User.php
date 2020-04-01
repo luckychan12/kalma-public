@@ -11,7 +11,7 @@
  * @license    http://creativecommons.org/licenses/by-nc-nd/4.0/  CC BY-NC-ND 4.0
  */
 
-namespace Kalma\Api\Resource;
+namespace Kalma\Api\Endpoint;
 
 use Kalma\Api\Business\UserManager;
 use Kalma\Api\Response\Exception\ResponseException;
@@ -20,7 +20,7 @@ use Kalma\Api\Response\Response;
 
 require __DIR__ . '/../../vendor/autoload.php';
 
-class User extends Resource
+class User extends Endpoint
 {
     /**
      * Attempt to create a user account. Return a success/failure bool with a message.
