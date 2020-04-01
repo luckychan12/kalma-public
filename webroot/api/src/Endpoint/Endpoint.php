@@ -16,7 +16,7 @@
 namespace Kalma\Api\Endpoint;
 
 use Kalma\Api\Core\Config;
-use Kalma\Api\Core\DatabaseConnection;
+use Kalma\Api\Core\DatabaseConnector;
 use Kalma\Api\Core\DatabaseHandler;
 use Kalma\Api\Response\Exception\ResponseException;
 
@@ -25,7 +25,7 @@ require __DIR__ . '/../../vendor/autoload.php';
 class Endpoint
 {
 
-    protected DatabaseConnection $database;
+    protected DatabaseHandler $database;
     protected string $api_root;
 
     /**
@@ -34,7 +34,7 @@ class Endpoint
      */
     public function __construct()
     {
-        $db = DatabaseHandler::getConnection();
+        $db = DatabaseConnector::getConnection();
         if ($db === null)
         {
             throw new ResponseException(500, 3500, 'Oops! An error has occurred processing your request.', 'Failed to connect to the database.');
