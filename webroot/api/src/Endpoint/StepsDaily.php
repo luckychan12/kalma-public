@@ -11,10 +11,10 @@
  * @license    http://creativecommons.org/licenses/by-nc-nd/4.0/  CC BY-NC-ND 4.0
  */
 
-namespace Kalma\Api\Resource;
+namespace Kalma\Api\Endpoint;
 
 
-class StepsDaily extends LoggedResource
+class StepsDaily extends LoggedEndpoint
 {
 
     public function __construct()

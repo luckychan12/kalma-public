@@ -1,6 +1,6 @@
 <?php
 /**
- * Handles server requests and calls the appropriate resource
+ * Handles server requests and calls the appropriate Endpoint
  *
  * LICENSE: This code is licensed under a Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License
  *
@@ -72,7 +72,7 @@ class FrontController
     }
 
     /**
-     * Instantiate the Resource class for a given route and call the specified action method, if it exists
+     * Instantiate the Endpoint class for a given route and call the specified action method, if it exists
      * @param Request $request
      * @param Response $response
      * @param array $route
@@ -83,21 +83,21 @@ class FrontController
     {
         $authPayload = Auth::authorize($request, $route['access_level']);
 
-        // Instantiate Resource
-        $resourceClass = '\\Kalma\\Api\\Resource\\' . $route['resource'];
-        $resource = new $resourceClass();
+        // Instantiate Endpoint
+        $endpointClass = '\\Kalma\\Api\\Endpoint\\' . $route['endpoint'];
+        $endpoint = new $endpointClass();
 
-        // Call Resource action
+        // Call Endpoint action
         $params = array();
         array_unshift($params, $request, $response, $authPayload, $route['args']);
-        $response = call_user_func_array(array($resource, $route['action']), $params);
+        $response = call_user_func_array(array($endpoint, $route['action']), $params);
 
         // Dispatch response to client
         return $response;
     }
 
     /**
-     * Emit a PSR-7 Response communicating information provided by Resource actions
+     * Emit a PSR-7 Response communicating information provided by Endpoint actions
      * @param Response $res
      */
     private function emitResponse(Response $res) : void

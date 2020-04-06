@@ -1,6 +1,6 @@
 <?php
 /**
- * A CRUD Resource to track data that can be recorded for any unique date
+ * A CRUD Resource to track data that is recorded primarily as a period of time
  *
  * LICENSE: This code is licensed under a Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License
  *
@@ -11,7 +11,7 @@
  * @license    http://creativecommons.org/licenses/by-nc-nd/4.0/  CC BY-NC-ND 4.0
  */
 
-namespace Kalma\Api\Resource;
+namespace Kalma\Api\Endpoint;
 
 use DateTime;
 use DateTimeZone;
@@ -21,7 +21,7 @@ use Kalma\Api\Response\Exception\ResponseException;
 use Kalma\Api\Response\Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 
-class LoggedResource extends DataResource
+class PeriodicEndpoint extends DataEndpoint
 {
 
     private string $name;
@@ -49,35 +49,64 @@ class LoggedResource extends DataResource
     {
         $body = $req->getParsedBody();
 
-        if (!isset($body['entries']) || !is_array($body['entries']))
-        {
-            throw new ResponseException(...ResponseException::INVALID_BODY_ATTRS);
-        }
-
         $this->database->beginTransaction();
 
-        foreach ($body['entries'] as $entry)
+        foreach ($body['periods'] as $period)
         {
-            $query_params = array('user_id' => $args['id'], 'date_logged' => date('Y-m-d'));
+            $query_params = array('user_id' => $args['id']);
 
+            // Check additional attributes
             foreach ($this->attributes as $attribute)
             {
-                if (!isset($entry[$attribute]))
+                if (!isset($period[$attribute]))
                 {
                     $this->database->rollBack();
                     throw new ResponseException(...ResponseException::INVALID_BODY_ATTRS);
                 }
 
-                $query_params[$attribute] = $entry[$attribute];
+                // If valid, use the attribute in the SQL query
+                $query_params[$attribute] = $period[$attribute];
             }
 
-            $query_attrs = implode(", ", array_keys($query_params));
-            $query_attr_params = implode(", ", array_map(function($v) { return ":".$v; }, array_keys($query_params)));
+            // Check start/stop times
+            if (!isset($period['start_time']) || !isset($period['stop_time']))
+            {
+                $this->database->rollBack();
+                throw new ResponseException(...ResponseException::INVALID_BODY_ATTRS);
+            }
+            // Parse start/stop times
+            try {
+                $utc = new DateTimeZone('UTC');
+                $start_time = new DateTime($period['start_time'], $utc);
+                $stop_time = new DateTime($period['stop_time'], $utc);
+                $now = new DateTime('now', $utc);
+                if ($start_time > $now || $stop_time > $now)
+                {
+                    throw new ResponseException(...ResponseException::INVALID_BODY_ATTRS);
+                }
 
-            $query = "INSERT INTO `$this->table_name` ($query_attrs) VALUES ($query_attr_params);";
+                $query_params['start_time'] = $start_time->format('Y-m-d H:i:s');
+                $query_params['stop_time'] = $stop_time->format('Y-m-d H:i:s');
+            }
+            catch (ResponseException $e)
+            {
+                $this->database->rollBack();
+                throw $e;
+            }
+            catch (Exception $e) {
+                $this->database->rollBack();
+                Logger::log(Logger::ERROR, $e->getMessage());
+                throw new ResponseException(400, 1101, 'One or more of the form fields isn\'t valid.', 'Invalid date format.');
+            }
 
-            $this->database->execute($query, $query_params);
-
+            // Create new record with provided attributes
+            $query_attrs = implode(', ', array_keys($query_params));
+            $query_attr_params = implode(', ', array_map(function($x) { return ":$x"; }, array_keys($query_params)));
+            $this->database->execute(
+                "INSERT INTO `$this->table_name` ($query_attrs) 
+                                 VALUES ($query_attr_params);",
+                $query_params,
+            );
         }
 
         $this->database->commit();
@@ -99,10 +128,10 @@ class LoggedResource extends DataResource
     {
         $params = $_GET;
 
-        $order_by = 'date_logged';
+        $order_by = 'start_time';
         if (isset($params['order']))
         {
-            if (in_array($params['order'], ['date_logged', ...$this->attributes]))
+            if (in_array($params['order'], ['start_time', 'stop_time', ...$this->attributes]))
             {
                 $order_by = $params['order'];
             }
@@ -114,8 +143,19 @@ class LoggedResource extends DataResource
 
         $order_dir = isset($params['desc']) ? 'DESC' : 'ASC';
 
+
         $lim_offset = $params['offset'] ?? 0;
         $lim_count = $params['count'] ?? 2147483647;
+
+        $query_attrs = implode(', ', $this->attributes);
+
+        $query = "SELECT {$this->table_name}_id, start_time, stop_time, $query_attrs FROM `$this->table_name`
+                      WHERE user_id = :user_id
+                        AND start_time > :from_date
+                        AND start_time < :to_date
+                        ORDER BY $order_by $order_dir
+                        LIMIT $lim_offset,$lim_count;";
+
 
         try {
             $from_date = isset($params['from']) ? (new DateTime($params['from'], new DateTimeZone('UTC')))->format('Y-m-d') : '0000-00-00';
@@ -132,51 +172,57 @@ class LoggedResource extends DataResource
             'to_date' => $to_date,
         );
 
-        $query_attrs = implode(', ', $this->attributes);
-
-        $query = "SELECT {$this->table_name}_id, date_logged, $query_attrs FROM `$this->table_name`
-                      WHERE user_id = :user_id
-                        AND date_logged > :from_date
-                        AND date_logged < :to_date
-                        ORDER BY $order_by $order_dir
-                        LIMIT $lim_offset,$lim_count;";
-
         $rows = $this->database->fetch($query, $query_params);
 
         $link_stem = "/api/user/{$args['id']}/$this->name/";
 
-        $entries = array();
+        $periods = array();
         foreach ($rows as $row)
         {
             $id = $row["{$this->table_name}_id"];
 
             try {
-                $date_logged = new DateTime($row['date_logged'], new DateTimeZone('UTC'));
+                $start_time = new DateTime($row['start_time'], new DateTimeZone('UTC'));
+                $stop_time = new DateTime($row['stop_time'], new DateTimeZone('UTC'));
             } catch (Exception $e) {
                 throw new ResponseException(500, 3200, 'Sorry, we couldn\'t fetch the data you requested.', 'An error has occurred parsing query results.');
             }
 
-            $entry = array(
+            $duration = abs($start_time->getTimestamp() - $stop_time->getTimestamp()) / 60;
+            $duration_text = $duration . 'm';
+            if ($duration > 60)
+            {
+                $duration_text = floor($duration / 60).'h';
+                if ($duration % 60 > 0)
+                {
+                    $duration_text .= ' '.($duration % 60).'m';
+                }
+            }
+
+            $period = array(
                 'id' => $id,
-                'date_logged' => $date_logged->format(DATE_ISO8601),
+                'start_time' => $start_time->format(DATE_ISO8601),
+                'stop_time' => $stop_time->format(DATE_ISO8601),
+                'duration' => $duration,
+                'duration_text' => $duration_text,
             );
 
             foreach ($this->attributes as $attribute)
             {
-                $entry[$attribute] = $row[$attribute];
+                $period[$attribute] = $row[$attribute];
             }
 
-            $entry['links'] = array(
+            $period['links'] = array(
                 'read' => $link_stem . "$id",
                 'update' => $link_stem . "$id/update",
                 'delete' => $link_stem . "$id/delete",
             );
 
-            $entries[] = $entry;
+            $periods[] = $period;
         }
 
         $res->setBody(array(
-            'entries' => $entries,
+            'periods' => $periods,
             'links' => array(
                 'create' => $link_stem . 'create',
                 'update' => $link_stem . 'update',
@@ -198,56 +244,56 @@ class LoggedResource extends DataResource
     public function _update(Request $req, Response $res, ?array $payload, array $args): Response
     {
         $body = $req->getParsedBody();
-        if (!isset($body['entries']) || !is_array($body['entries']))
+        if (!isset($body['periods']) || !is_array($body['periods']))
         {
             throw new ResponseException(...ResponseException::INVALID_BODY_ATTRS);
         }
 
         $affected = array();
-        foreach ($body['entries'] as $entry)
+        foreach ($body['periods'] as $period)
         {
-            if (!isset($entry['id']))
+            if (!isset($period['id']))
             {
                 throw new ResponseException(...ResponseException::INVALID_BODY_ATTRS);
             }
 
-            $allowed_fields = [...$this->attributes];
+            $allowed_fields = ['start_time', 'stop_time', ...$this->attributes];
             $sets = array();
-            $query_params = array('user_id' => $args['id'], "entry_id" => $entry['id']);
+            $query_params = array('user_id' => $args['id'], "period_id" => $period['id']);
             foreach ($allowed_fields as $field)
             {
-                if (isset($entry[$field]))
+                if (isset($period[$field]))
                 {
                     $sets[] = "$field = :$field";
-                    $query_params[$field] = $entry[$field];
+                    $query_params[$field] = $period[$field];
                 }
             }
-
+            
             $set_queries = implode(', ', $sets);
 
             $query = "UPDATE `$this->table_name`
                       SET $set_queries
-                      WHERE {$this->table_name}_id = :entry_id
+                      WHERE {$this->table_name}_id = :period_id
                         AND user_id = :user_id;";
 
             $rows_affected = $this->database->execute($query, $query_params);
 
             if ($rows_affected > 0)
             {
-                $affected[] = $entry['id'];
+                $affected[] = $period['id'];
             }
         }
 
         $res->setBody(array(
             'resources_affected' => $affected,
-            'message' => count($affected) < count($body['entries']) ? 'One or more resources could not be updated.' : 'Success.',
+            'message' => count($affected) < count($body['periods']) ? 'One or more resources could not be updated.' : 'Success.',
         ));
 
         return $res;
     }
 
     /**
-     * DELETE one or more log entries
+     * DELETE a column
      * @param Request $req
      * @param Response $res
      * @param array|null $payload
@@ -258,25 +304,25 @@ class LoggedResource extends DataResource
     public function _delete(Request $req, Response $res, ?array $payload, array $args): Response
     {
         $body = $req->getParsedBody();
-        if (!isset($body['entries']) || !is_array($body['entries']))
+        if (!isset($body['periods']) || !is_array($body['periods']))
         {
             throw new ResponseException(...ResponseException::INVALID_BODY_ATTRS);
         }
 
         $resources_affected = array();
 
-        foreach ($body['entries'] as $entry_id)
+        foreach ($body['periods'] as $period_id)
         {
-            if (!is_integer($entry_id))
+            if (!is_integer($period_id))
             {
                 throw new ResponseException(...ResponseException::INVALID_BODY_ATTRS);
             }
 
             $query = "DELETE FROM `$this->table_name` 
-                          WHERE {$this->table_name}_id = :entry_id
+                          WHERE {$this->table_name}_id = :period_id
                             AND user_id = :user_id;";
             $query_params = array(
-                'entry_id' => $entry_id,
+                'period_id' => $period_id,
                 'user_id' => $args['id'],
             );
 
@@ -284,13 +330,13 @@ class LoggedResource extends DataResource
 
             if ($rows_affected > 0)
             {
-                $resources_affected[] = $entry_id;
+                $resources_affected[] = $period_id;
             }
         }
 
         $res->setBody(array(
             'resources_affected' => $resources_affected,
-            'message' => count($resources_affected) < count($body['entries']) ? 'One or more resources could not be updated.' : 'Success.',
+            'message' => count($resources_affected) < count($body['periods']) ? 'One or more resources could not be updated.' : 'Success.',
         ));
 
         return $res;
