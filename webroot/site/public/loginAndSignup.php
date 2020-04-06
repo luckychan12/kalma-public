@@ -60,7 +60,7 @@
                         <label for="password">Password:</label>
                         <a data-toggle="collapse" href="#passwordHints" role="button" aria-expanded="false" aria-controls="collapseExample">
                             <i class="fas fa-question"></i>
-                        </a>
+                        </a><br>
                         <div class="collapse" id="passwordHints">
                                 A strong password contains:
                                 <ul>
