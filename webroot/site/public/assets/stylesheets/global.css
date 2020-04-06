@@ -35,17 +35,28 @@ form .form-control:focus {
 }
 
 form input.error {
-    border: 1px solid red;
+    border: 1px solid var(--c-error);
+    box-shadow: 0 0 0 1px var(--c-error);
 }
 
 form label.error {
-    color: red;
-    position: relative;
-    top: -2rem;
-    float: right;
-    height: 0;
-    margin: 0;
-    padding: 0;
+    color:  var(--c-error);
+    font-size: 14px;
+}
+
+@media (min-width: 576px) {
+    form label.error {
+        position: relative;
+        top: -2rem;
+        float: right;
+        height: 0;
+        margin: 0;
+        padding: 0;
+        max-width: 60%;
+        text-align: right;
+
+        white-space: nowrap;
+    }
 }
 
 .btn-primary {

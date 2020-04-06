@@ -19,7 +19,9 @@
     --c-text-on-primary: #ffffff;
     --c-text-on-secondary: #000000;
     --c-text-on-light: #000000;
-    --c-text-on-dark: #fefefe;  
+    --c-text-on-dark: #fefefe;
+
+    --c-error: red;
 
     /* Default to dark theme */
     --c-bg: var(--c-bg-dark);
@@ -48,6 +50,8 @@
         --c-bg: var(--c-bg-light);
         --c-bg-shade: var(--c-bg-light-shade);
         --c-text-on-bg: var(--c-text-on-light);
+
+        --c-error: #dd0200;
     }
 }
 
