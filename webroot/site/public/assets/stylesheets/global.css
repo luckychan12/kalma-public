@@ -71,6 +71,14 @@ form label.error {
     border-color: var(--c-secondary-dark);
 }
 
+a {
+    color: var(--c-secondary);
+}
+
+a:hover {
+    color: var(--c-secondary-dark);
+}
+
 /*
  * Navbar styles
  */
