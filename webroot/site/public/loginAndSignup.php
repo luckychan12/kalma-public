@@ -43,7 +43,7 @@
             <div class="col-lg-5">
                 <hr class="d-lg-none">
                 <h2>Sign up</h2>
-                <form class="form-signup"action="../controller/signUpController.php" method="post">
+                <form id="signupForm" class="form-signup"action="../controller/signUpController.php" method="post">
                     <div class="form-group">
                         <label for="email">Email Address:</label><br>
                         <input class="form-control" type="email" placeholder="Email" name="email" id="email" required>
@@ -58,7 +58,11 @@
                     </div>
                     <div class="form-group">
                         <label for="password">Password:</label><br>
-                        <input class="form-control" type="password" placeholder="Password" name="password" id="password" required>
+                        <input class="form-control" type="password" placeholder="Password" name="password" id="password" required minlength="8">
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Confirm Password:</label><br>
+                        <input class="form-control" type="password" placeholder="Password" name="retypePassword" id="retypePassword" required equalto="#password">
                     </div>
                     <div class="form-group">
                         <label for="dob">Date of Birth:</label><br>
@@ -71,6 +75,8 @@
             <div class="col-md-1"></div>
         </div>
     </div>
+
+    <script src="assets/scripts/signup_validation.js" type="text/javascript"></script>
 </body>
 
 </html>
