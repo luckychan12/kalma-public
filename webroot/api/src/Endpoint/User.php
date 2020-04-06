@@ -11,8 +11,9 @@
  * @license    http://creativecommons.org/licenses/by-nc-nd/4.0/  CC BY-NC-ND 4.0
  */
 
-namespace Kalma\Api\Resource;
+namespace Kalma\Api\Endpoint;
 
+use DateTime;
 use Kalma\Api\Business\UserManager;
 use Kalma\Api\Response\Exception\ResponseException;
 use Psr\Http\Message\ServerRequestInterface as Request;
@@ -20,7 +21,7 @@ use Kalma\Api\Response\Response;
 
 require __DIR__ . '/../../vendor/autoload.php';
 
-class User extends Resource
+class User extends Endpoint
 {
     /**
      * Attempt to create a user account. Return a success/failure bool with a message.
@@ -165,6 +166,15 @@ class User extends Resource
             'SELECT `client_fingerprint`, `created_time`, `expiry_time` FROM `session` WHERE `user_id` = :user_id;',
             array('user_id' => $args['id']),
         );
+
+        $sessions = array_map(function($session) {
+            $sql_date_format = 'Y-m-d H:i:s';
+            $created_time = DateTime::createFromFormat($sql_date_format, $session['created_time']);
+            $expiry_time = DateTime::createFromFormat($sql_date_format, $session['expiry_time']);
+            $session['created_time'] = $created_time->format(DATE_ISO8601);
+            $session['expiry_time'] = $expiry_time->format(DATE_ISO8601);
+            return $session;
+        }, $sessions);
 
         if (count($sessions) > 0)
         {

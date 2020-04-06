@@ -21,7 +21,7 @@ use Firebase\JWT\BeforeValidException;
 use Firebase\JWT\ExpiredException;
 use Firebase\JWT\SignatureInvalidException;
 use Kalma\Api\Core\Config;
-use Kalma\Api\Core\DatabaseHandler;
+use Kalma\Api\Core\DatabaseConnector;
 use Kalma\Api\Core\Logger;
 use Kalma\Api\Response\Exception\ResponseException;
 use UnexpectedValueException;
@@ -51,7 +51,7 @@ class UserManager
     {
         $this->validateUserData($user_data);
 
-        $db = DatabaseHandler::getConnection();
+        $db = DatabaseConnector::getConnection();
 
         $rows = $db->fetch('SELECT user_id FROM `user` WHERE `email_address` = :email_address',
                 array('email_address' => $user_data['email_address']));
@@ -230,7 +230,7 @@ class UserManager
             throw new ResponseException(401, 2111, 'Sorry, we couldn\'t activate your account.', 'Unexpected error: ' . $e->getMessage());
         }
 
-        $conn = DatabaseHandler::getConnection();
+        $conn = DatabaseConnector::getConnection();
         $rows_affected = $conn->execute("UPDATE `user` SET `activated` = b'1' WHERE `user_id` = :user_id",
             array('user_id' => $payload['sub']));
 
@@ -249,7 +249,7 @@ class UserManager
      */
     public function verifyCredentials(string $email, string $pass) : int
     {
-        $db = DatabaseHandler::getConnection();
+        $db = DatabaseConnector::getConnection();
         $rows = $db->fetch
         (
             'SELECT user_id, password_hash, activated FROM `user` WHERE email_address = (:email_address)',
@@ -284,7 +284,7 @@ class UserManager
      */
     public function createSession(int $user_id, string $client_fingerprint) : array
     {
-        $db = DatabaseHandler::getConnection();
+        $db = DatabaseConnector::getConnection();
         $rows = $db->fetch
         (
             'CALL `create_session` (:user_id, :client_fingerprint)',
@@ -324,7 +324,7 @@ class UserManager
         }
 
         $session_id = $payload['sid'];
-        $db = DatabaseHandler::getConnection();
+        $db = DatabaseConnector::getConnection();
         $rows = $db->fetch(
             'SELECT `user_id`, `client_fingerprint` FROM `session` WHERE `session`.`session_id` = :session_id;',
             array('session_id' => $session_id),

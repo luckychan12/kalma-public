@@ -1,6 +1,6 @@
 <?php
 /**
- * A CRUD Resource to track the user's height
+ * A CRUD Resource to track periods of sleep
  *
  * LICENSE: This code is licensed under a Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License
  *
@@ -11,16 +11,16 @@
  * @license    http://creativecommons.org/licenses/by-nc-nd/4.0/  CC BY-NC-ND 4.0
  */
 
-namespace Kalma\Api\Resource;
+namespace Kalma\Api\Endpoint;
 
 
-class HeightLog extends LoggedResource
+class SleepPeriod extends PeriodicEndpoint
 {
 
     public function __construct()
     {
-        parent::__construct('height', 'height_log', array(
-            'height',
+        parent::__construct('sleep', 'sleep_period', array(
+            'sleep_quality',
         ));
     }
 

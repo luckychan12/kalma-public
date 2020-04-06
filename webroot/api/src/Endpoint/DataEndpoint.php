@@ -11,7 +11,7 @@
  * @license    http://creativecommons.org/licenses/by-nc-nd/4.0/  CC BY-NC-ND 4.0
  */
 
-namespace Kalma\Api\Resource;
+namespace Kalma\Api\Endpoint;
 
 use Kalma\Api\Business\Auth;
 use Kalma\Api\Response\Exception\ResponseException;
@@ -20,7 +20,7 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 
 require __DIR__ . '/../../vendor/autoload.php';
 
-abstract class DataResource extends Resource
+abstract class DataEndpoint extends Endpoint
 {
     /**
      * CREATE a new database entry from request parameters
