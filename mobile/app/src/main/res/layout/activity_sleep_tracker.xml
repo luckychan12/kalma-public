@@ -6,4 +6,55 @@
     android:layout_height="match_parent"
     tools:context=".MainApp.SleepTrackerActivity">
 
+    <com.anychart.AnyChartView
+        android:id="@+id/any_chart_view"
+        android:layout_width="397dp"
+        android:layout_height="282dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.035" />
+
+    <TableRow
+        android:layout_width="413dp"
+        android:layout_height="71dp"
+        android:background="@color/colorPrimary"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0">
+
+        <Button
+            android:id="@+id/btnHome"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="103dp"
+            android:layout_height="match_parent"
+            android:text="@string/home"
+            android:textColor="@color/colorSecondary" />
+
+        <Button
+            android:id="@+id/btnProfile"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="98dp"
+            android:layout_height="match_parent"
+            android:text="@string/profile" />
+
+        <Button
+            android:id="@+id/btnCalander"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="98dp"
+            android:layout_height="match_parent"
+            android:text="@string/calender" />
+
+        <Button
+            android:id="@+id/btnSettings"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="98dp"
+            android:layout_height="match_parent"
+            android:text="@string/settings" />
+
+    </TableRow>
 </androidx.constraintlayout.widget.ConstraintLayout>
