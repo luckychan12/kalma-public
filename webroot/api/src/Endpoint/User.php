@@ -13,6 +13,7 @@
 
 namespace Kalma\Api\Endpoint;
 
+use DateTime;
 use Kalma\Api\Business\UserManager;
 use Kalma\Api\Response\Exception\ResponseException;
 use Psr\Http\Message\ServerRequestInterface as Request;
@@ -165,6 +166,15 @@ class User extends Endpoint
             'SELECT `client_fingerprint`, `created_time`, `expiry_time` FROM `session` WHERE `user_id` = :user_id;',
             array('user_id' => $args['id']),
         );
+
+        $sessions = array_map(function($session) {
+            $sql_date_format = 'Y-m-d H:i:s';
+            $created_time = DateTime::createFromFormat($sql_date_format, $session['created_time']);
+            $expiry_time = DateTime::createFromFormat($sql_date_format, $session['expiry_time']);
+            $session['created_time'] = $created_time->format(DATE_ISO8601);
+            $session['expiry_time'] = $expiry_time->format(DATE_ISO8601);
+            return $session;
+        }, $sessions);
 
         if (count($sessions) > 0)
         {
