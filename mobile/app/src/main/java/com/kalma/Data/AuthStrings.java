@@ -1,22 +1,11 @@
-package com.kalma.API_Interaction;
+package com.kalma.Data;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
 import android.provider.Settings;
-import android.security.keystore.KeyGenParameterSpec;
-import android.security.keystore.KeyProperties;
 
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.security.GeneralSecurityException;
-import java.util.prefs.PreferenceChangeEvent;
-
-import javax.crypto.KeyGenerator;
-import javax.crypto.SecretKey;
+import org.joda.time.DateTime;
 
 //Auth strings singleton
 public class AuthStrings {
@@ -26,8 +15,8 @@ public class AuthStrings {
     private static String accountLink;
     private static String LogoutLink;
     private SharedPreferences settings;
-    private static int authTokenExp;
-    private static int refreshTokenExp;
+    private static DateTime authTokenExp;
+    private static DateTime refreshTokenExp;
     private static Context context;
 
     //private Constructor
@@ -45,12 +34,12 @@ public class AuthStrings {
     }
 
 
-    public void setAuthToken(String token,int exp){
+    public void setAuthToken(String token,DateTime exp){
         authToken = token;
         authTokenExp = exp;
     }
 
-    public void setRefreshToken(String token, int exp){
+    public void setRefreshToken(String token, DateTime exp){
         refreshToken = token;
         refreshTokenExp = exp;
     }
@@ -71,7 +60,7 @@ public class AuthStrings {
         return LogoutLink;
     }
 
-    public int getAuthExp(){
+    public DateTime getAuthExp(){
         return authTokenExp;
     }
 
