@@ -42,6 +42,10 @@
 
     <string name="log_out">Log out</string>
     <string name="remember_me">Remember me?</string>
+    <string name="_3_month">3 Month</string>
+    <string name="all_time">All Time</string>
+    <string name="_7_days">7 Days</string>
+    <string name="_6_month">6 Month</string>
 
 
 </resources>
