@@ -143,6 +143,9 @@ class LoggedEndpoint extends DataEndpoint
 
         $rows = $this->database->fetch($query, $query_params);
 
+        $target = $this->database->fetch("SELECT `{$this->name}_target` AS `target` FROM `user` WHERE `user_id` = :user_id;",
+                                          array('user_id' => $args['id']))[0]['target'];
+
         $entries = array();
         foreach ($rows as $row)
         {
@@ -158,6 +161,14 @@ class LoggedEndpoint extends DataEndpoint
                 'id' => $id,
                 'date_logged' => $date_logged->format(DATE_ISO8601),
             );
+
+            $logged = $row[$this->attributes[0]];
+            if (isset($target)) {
+                $progress = floor(($logged / $target) * 100);
+                $message = "$progress% of your daily goal.";
+                $entry['progress_percentage'] = $progress;
+                $entry['progress_message'] = $message;
+            }
 
             foreach ($this->attributes as $attribute)
             {

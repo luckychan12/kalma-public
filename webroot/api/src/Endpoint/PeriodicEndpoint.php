@@ -174,6 +174,9 @@ class PeriodicEndpoint extends DataEndpoint
 
         $rows = $this->database->fetch($query, $query_params);
 
+        $target = $this->database->fetch("SELECT `{$this->name}_target` AS `target` FROM `user` WHERE `user_id` = :user_id;",
+            array('user_id' => $args['id']))[0]['target'];
+
         $periods = array();
         foreach ($rows as $row)
         {
@@ -208,6 +211,19 @@ class PeriodicEndpoint extends DataEndpoint
             foreach ($this->attributes as $attribute)
             {
                 $period[$attribute] = $row[$attribute];
+            }
+
+            if (isset($target)) {
+                $progress = floor(($duration / $target) * 100);
+                if ($progress <= 100) {
+                    $message = "$progress% of your daily goal.";
+                }
+                else if ($progress > 100) {
+                    $excess = $progress - 100;
+                    $message = "$excess% over your daily goal.";
+                }
+                $period['progress_percentage'] = $progress;
+                $period['progress_message'] = $message;
             }
 
             $periods[] = $period;
