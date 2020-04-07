@@ -182,7 +182,6 @@ public class APICaller {
                     callback.onFail(error);
                 }
             }){
-                @org.jetbrains.annotations.Contract(pure = true)
                 @Override
                 public Map getHeaders() throws AuthFailureError {
                     return headers;

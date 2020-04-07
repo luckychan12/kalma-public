@@ -8,13 +8,12 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.VolleyError;
 import com.kalma.API_Interaction.APICaller;
-import com.kalma.API_Interaction.AuthStrings;
+import com.kalma.Data.AuthStrings;
 import com.kalma.API_Interaction.ServerCallback;
 import com.kalma.R;
 
@@ -107,9 +106,6 @@ public class UserProfileActivity extends AppCompatActivity {
         );
 
     }
-
-
-
     private Map buildMap() {
         Map<String, String> params = new HashMap<String, String>();
         params.put("Authorization", "Bearer " + AuthStrings.getInstance(getApplicationContext()).getAuthToken());
