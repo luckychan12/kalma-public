@@ -16,6 +16,10 @@ hr {
     border-top: 1px solid var(--c-secondary);
 }
 
+h1, h2, h3 {
+    font-family: var(--f-brand);
+}
+
 /*
  * Forms & Controls
  */

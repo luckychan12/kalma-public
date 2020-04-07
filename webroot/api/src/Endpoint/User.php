@@ -176,9 +176,28 @@ class User extends Endpoint
             return $session;
         }, $sessions);
 
-        if (count($sessions) > 0)
-        {
+        if (count($sessions) > 0) {
             $account_data['sessions'] = $sessions;
+        }
+
+        foreach(['sleep', 'calm', 'steps'] as $key) {
+            $val = $account_data["{$key}_target"];
+            unset($account_data["{$key}_target"]);
+            $account_data['targets'][$key] = $val;
+            if ($val !== null) {
+                if (in_array($key, ['sleep', 'calm'])) {
+                    $mins = $val % 60;
+                    $hrs = floor($val / 60);
+                    $val_string = ($hrs > 0 ? $hrs.'h ' : '') . $mins.'m';
+                }
+                else {
+                    $val_string = $val . '';
+                }
+            }
+            else {
+                $val_string = 'No target set';
+            }
+            $account_data['target_strings'][$key] = $val_string;
         }
 
         $res->setBody(array(
@@ -224,6 +243,54 @@ class User extends Endpoint
         $res->setBody(array(
             'message' => 'Successfully logged you out.',
         ));
+        return $res;
+    }
+
+    /**
+     * Update the user's goals
+     *
+     * @param Request $req
+     * @param Response $res
+     * @param array|null $payload
+     * @param array $args
+     * @return Response
+     * @throws ResponseException
+     */
+    public function setTargets(Request $req, Response $res, ?array $payload, array $args) : Response
+    {
+        if (!isset($payload['sub']) || intval($args['id']) !== $payload['sub']) {
+            throw new ResponseException(403, 2002, 'You do not have permission to access this resource.',
+                'The subject of the access token may not access the requested user\'s data.');
+        }
+
+        $body = $req->getParsedBody();
+
+        if (!isset($body['targets'])) {
+            throw new ResponseException(...ResponseException::INVALID_BODY_ATTRS);
+        }
+
+        $targets = $body['targets'];
+        $valid_targets = ['sleep', 'calm', 'steps'];
+
+        foreach($targets as $key => $value) {
+            if (!in_array($key, $valid_targets)) {
+                throw new ResponseException(...ResponseException::INVALID_BODY_ATTRS);
+            }
+        }
+
+        $query_sets = implode(",\n", array_map(function($k){
+            return "{$k}_target = :$k";
+        }, array_keys($targets)));
+
+        $query_params = $targets;
+        $query_params['user_id'] = $args['id'];
+
+        $this->database->execute("UPDATE `user` SET $query_sets WHERE `user_id` = :user_id", $query_params);
+
+        $res->setBody(array(
+            'message' => 'Updated your target' . (count($targets) > 1 ? 's!' : '!'),
+        ));
+
         return $res;
     }
 
