@@ -1,5 +1,7 @@
 $(function() {
 
+    let base_uri = 'https://kalma.club';
+
     /* Log a device out when the corresponding row in the sessions table is clicked */
     $('.logout-session-link').each(function() {
         $(this).click(function() {
@@ -8,7 +10,7 @@ $(function() {
 
             $.ajax({
                 method: 'POST',
-                url: 'http://localhost' + logoutLink,
+                url: base_uri + logoutLink,
                 headers : {
                     'Authorization' : `Bearer ${accessToken}`
                 },
@@ -74,7 +76,7 @@ $(function() {
 
             $.ajax({
                 method: 'PUT',
-                url: 'http://localhost' + targetsLink,
+                url: base_uri + targetsLink,
                 headers: {
                     'Authorization': `Bearer ${accessToken}`
                 },
