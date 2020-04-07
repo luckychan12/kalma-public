@@ -68,7 +68,7 @@ include_once '../controller/sleepController.php';
             <button onclick="off()" style="float: right">X</button>
             <h1>Add Sleep Data</h1>
             <br>
-            <form>
+            <form method="post" action="sleep.php">
                 <label>Start Time:</label>
                 <br>
                 <input type="date" name="startDate" required>
@@ -83,7 +83,7 @@ include_once '../controller/sleepController.php';
                 <br>
                 <input type="number" max="5" min="1"  name="sleepQuality" required>
                 <br>
-                <input type="submit" value="Submit" style="background-color: var(--c-secondary); margin-top: 20px;border-color: var(--c-secondary-dark)">
+                <input type="submit" value="Submit" name="addSleep" style="background-color: var(--c-secondary); margin-top: 20px;border-color: var(--c-secondary-dark)">
             </form>
         </div>
     </div>

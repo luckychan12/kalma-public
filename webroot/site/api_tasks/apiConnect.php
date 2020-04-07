@@ -239,6 +239,38 @@ class ApiConnect
             return $response;
         }
     }
+
+    function addSleepData($startTime, $stopTime, $sleepQuality ){
+        try{
+            $res = $this->client->request('POST',"api/user/".$_SESSION['user_id']."/sleep", ['headers' => ["Authorization" => 'bearer ' . $_SESSION['access_token']],'json' => ['start_time' => $startTime, 'stop_time' => $stopTime, 'sleep_quality' => $sleepQuality]]);
+            $messageBody = $res->getBody()->read(2048);
+            $data= json_decode($messageBody);
+            return $data;
+        }
+        catch (ClientException $e){
+            $response = json_decode($e->getResponse()->getBody()->getContents());
+            session_unset();
+            $_SESSION['status'] = $response->status;
+            $_SESSION['error'] = $response->error;
+            $_SESSION['error_message'] = $response->message;
+            if(isset($response->detail)) {
+                $_SESSION['detail'] = $response->detail;
+            }
+            return $response;
+        }
+        catch (RequestException $e){
+            $response = json_decode($e->getResponse()->getBody()->getContents());
+            session_unset();
+            $_SESSION['status'] = $response->status;
+            $_SESSION['error'] = $response->error;
+            $_SESSION['error_message'] = $response->message;
+            if(isset($response->detail)) {
+                $_SESSION['detail'] = $response->detail;
+            }
+            return $response;
+        }
+
+    }
 }
 
 ?>

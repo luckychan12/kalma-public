@@ -1,11 +1,28 @@
 <?php
 include_once "../api_tasks/apiConnect.php";
-
 $api = new ApiConnect();
+
+
+
+
+if(isset($_POST['startDate'])){
+    $newStartTime = new DateTime($_POST['startDate'] .' '. $_POST['startTime']);
+    $newStartTime = $newStartTime->format(DateTime::ISO8601);
+    $newEndTime = new DateTime($_POST['endDate'] .' '. $_POST['endTime']);
+    $newEndTime = $newEndTime->format(DateTime::ISO8601);
+    $message = $api->addSleepData($newStartTime,$newEndTime,$_POST['sleepQuality']);
+    if (isset($message->error)) {
+        $_SESSION['login_message'] = "{$data->message} ({$data->error})";
+       echo'<script>location.href = "../public/errorPage.php" </script>';
+    }
+}
+
 $dataPoints = $api->getData("api/user/".$_SESSION['user_id']."/sleep");
 if (isset($dataPoints->error)){
-   echo'<script>location.href = "../public/errorPage.php" </script>';
+    echo'<script>location.href = "../public/errorPage.php" </script>';
 }
+echo json_encode($dataPoints);
+
 
 
 
@@ -70,8 +87,9 @@ $i = 0;
     }
 
 
-$average =( $average/$i) /60;
-
+        if ($average > 0) {
+            $average = ($average / $i) / 60;
+        }
 
 
 //For month display
