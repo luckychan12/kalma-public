@@ -174,6 +174,8 @@ class PeriodicEndpoint extends DataEndpoint
 
         $rows = $this->database->fetch($query, $query_params);
 
+        $link_stem = "/api/user/{$args['id']}/$this->name/";
+
         $periods = array();
         foreach ($rows as $row)
         {
@@ -210,11 +212,22 @@ class PeriodicEndpoint extends DataEndpoint
                 $period[$attribute] = $row[$attribute];
             }
 
+            $period['links'] = array(
+                'read' => $link_stem . "$id",
+                'update' => $link_stem . "$id/update",
+                'delete' => $link_stem . "$id/delete",
+            );
+
             $periods[] = $period;
         }
 
         $res->setBody(array(
             'periods' => $periods,
+            'links' => array(
+                'create' => $link_stem . 'create',
+                'update' => $link_stem . 'update',
+                'delete' => $link_stem . 'delete',
+            ),
         ));
         return $res;
     }

@@ -143,6 +143,8 @@ class LoggedEndpoint extends DataEndpoint
 
         $rows = $this->database->fetch($query, $query_params);
 
+        $link_stem = "/api/user/{$args['id']}/$this->name/";
+
         $entries = array();
         foreach ($rows as $row)
         {
@@ -164,11 +166,22 @@ class LoggedEndpoint extends DataEndpoint
                 $entry[$attribute] = $row[$attribute];
             }
 
+            $entry['links'] = array(
+                'read' => $link_stem . "$id",
+                'update' => $link_stem . "$id/update",
+                'delete' => $link_stem . "$id/delete",
+            );
+
             $entries[] = $entry;
         }
 
         $res->setBody(array(
             'entries' => $entries,
+            'links' => array(
+                'create' => $link_stem . 'create',
+                'update' => $link_stem . 'update',
+                'delete' => $link_stem . 'delete',
+            ),
         ));
         return $res;
     }
