@@ -180,18 +180,24 @@ class User extends Endpoint
             $account_data['sessions'] = $sessions;
         }
 
-        $account_data['targets'] = array();
-        $account_data['targets_strings'] = array();
         foreach(['sleep', 'calm', 'steps'] as $key) {
             $val = $account_data["{$key}_target"];
             unset($account_data["{$key}_target"]);
+            $account_data['targets'][$key] = $val;
             if ($val !== null) {
-                $account_data['targets'][$key] = $val;
-                $mins = $val % 60;
-                $hrs = floor($val / 60);
-                $val_string = ($hrs > 0 ? $hrs.'h ' : '') . $mins.'m';
-                $account_data['target_strings'][$key] = $val_string;
+                if (in_array($key, ['sleep', 'calm'])) {
+                    $mins = $val % 60;
+                    $hrs = floor($val / 60);
+                    $val_string = ($hrs > 0 ? $hrs.'h ' : '') . $mins.'m';
+                }
+                else {
+                    $val_string = $val . '';
+                }
             }
+            else {
+                $val_string = 'No target set';
+            }
+            $account_data['target_strings'][$key] = $val_string;
         }
 
         $res->setBody(array(
