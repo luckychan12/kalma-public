@@ -176,9 +176,17 @@ class User extends Endpoint
             return $session;
         }, $sessions);
 
-        if (count($sessions) > 0)
-        {
+        if (count($sessions) > 0) {
             $account_data['sessions'] = $sessions;
+        }
+
+        $account_data['targets'] = array();
+        foreach(['sleep', 'calm', 'steps'] as $key) {
+            $val = $account_data["{$key}_target"];
+            unset($account_data["{$key}_target"]);
+            if ($val !== null) {
+                $account_data['targets'][$key] = $val;
+            }
         }
 
         $res->setBody(array(
