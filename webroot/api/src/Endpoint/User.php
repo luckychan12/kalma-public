@@ -181,11 +181,16 @@ class User extends Endpoint
         }
 
         $account_data['targets'] = array();
+        $account_data['targets_strings'] = array();
         foreach(['sleep', 'calm', 'steps'] as $key) {
             $val = $account_data["{$key}_target"];
             unset($account_data["{$key}_target"]);
             if ($val !== null) {
                 $account_data['targets'][$key] = $val;
+                $mins = $val % 60;
+                $hrs = floor($val / 60);
+                $val_string = ($hrs > 0 ? $hrs.'h ' : '') . $mins.'m';
+                $account_data['target_strings'][$key] = $val_string;
             }
         }
 
