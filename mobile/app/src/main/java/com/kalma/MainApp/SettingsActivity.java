@@ -14,7 +14,7 @@ import android.widget.Toast;
 
 import com.android.volley.VolleyError;
 import com.kalma.API_Interaction.APICaller;
-import com.kalma.API_Interaction.AuthStrings;
+import com.kalma.Data.AuthStrings;
 import com.kalma.API_Interaction.ServerCallback;
 import com.kalma.Login.StartPage;
 import com.kalma.R;
