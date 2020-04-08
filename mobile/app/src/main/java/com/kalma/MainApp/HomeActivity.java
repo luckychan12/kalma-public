@@ -22,6 +22,7 @@ public class HomeActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
+        setTitle("kalma Home");
         buttonProfile = findViewById(R.id.btnProfile);
         buttonProfile.setOnClickListener(new View.OnClickListener() {
             @Override
