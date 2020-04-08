@@ -39,7 +39,7 @@
                         <div class="list-item row">
                             <div class="target-name col-4 col-sm-6">$target_name</div>
                             <div class="target-value col-6 col-sm-4">$value</div>
-                            <div class="list-item-controls col"><a href="#" class="edit-target-link" data-target="$target"><i class="fas fa-pencil-alt"></i></a></div>
+                            <div class="list-item-controls col-sm"><a href="#" class="edit-target-link" data-target="$target"><i class="fas fa-pencil-alt"></i><span class="d-inline d-sm-none">Edit</span></a></div>
                         </div>
 HTML;
                             }
@@ -63,7 +63,7 @@ HTML;
                         <div class="list-item row">
                             <div class="col-4 col-sm-6">$session->client_fingerprint</div>
                             <div class="col-6 col-sm-4">$created_time</div>
-                            <div class="list-item-controls col"><a href="#" class="logout-session-link" data-target="$session->client_fingerprint"><i class="fas fa-trash"></i></a></div>
+                            <div class="list-item-controls col-sm"><a href="#" class="logout-session-link" data-target="$session->client_fingerprint"><i class="fas fa-trash"></i><span class="d-inline d-sm-none">Log out of this device</span></a></div>
                         </div>
 HTML;
                             }
