@@ -42,7 +42,7 @@ public class SleepTrackerActivity extends AppCompatActivity {
         picker.setIs24HourView(true);
         Spinner spinner = (Spinner) findViewById(R.id.option_spinner);
         List<String> categories = new ArrayList<String>();
-        for (int i = 1; i <= 5; i++) {
+        for (int i = 5; i >= 1; i--) {
             categories.add(Integer.toString(i));
         }
         ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this, R.layout.spinner_item, categories);
