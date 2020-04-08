@@ -2,6 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/SleepTracker"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainApp.SleepTrackerActivity">
@@ -80,7 +81,7 @@
         android:textSize="12sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.075"
+        app:layout_constraintHorizontal_bias="0.081"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.359" />
@@ -113,33 +114,79 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.359" />
 
+    <Button
+        android:id="@+id/btnAddData"
+        android:layout_width="160dp"
+        android:layout_height="59dp"
+        android:text="@string/add_data"
+        android:textColor="#000000"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.845"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.829" />
+
+    <Spinner
+        android:id="@+id/option_spinner"
+        android:layout_width="150dp"
+        android:layout_height="55dp"
+        android:backgroundTint="#ffffff"
+        android:textColor="#000000"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.111"
+        app:layout_constraintStart_toStartOf="parent"
+
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.831" />
+
+    <TextView
+        android:id="@+id/SleepRating"
+        android:layout_width="152dp"
+        android:layout_height="24dp"
+        android:text="@string/sleep_quality_rating"
+        android:textSize="16sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.111"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.734" />
+
     <TimePicker
-        android:id="@+id/timePicker1"
-        android:layout_width="172dp"
-        android:layout_height="77dp"
+        android:id="@+id/stopTimePicker"
+        android:layout_width="163dp"
+        android:layout_height="76dp"
         android:background="#ffffff"
         android:ems="10"
         android:inputType="time"
         android:timePickerMode="spinner"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.945"
+        app:layout_constraintHorizontal_bias="0.866"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.711" />
+        app:layout_constraintVertical_bias="0.642" />
 
-    <Button
-        android:id="@+id/btnAddData"
-        android:layout_width="175dp"
-        android:layout_height="57dp"
-        android:text="@string/add_data"
-        android:textColor="#000000"
+    <EditText
+        android:id="@+id/txtStopdate"
+        android:layout_width="127dp"
+        android:layout_height="50dp"
+        android:autofillHints=""
+        android:background="@color/colorBGLightShade"
+        android:clickable="true"
+        android:ems="10"
+        android:focusable="false"
+        android:hint="@string/stop_date"
+        android:inputType="date"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.944"
+        app:layout_constraintHorizontal_bias="0.102"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.864" />
+        app:layout_constraintVertical_bias="0.641"
+        tools:targetApi="o" />
 
     <EditText
         android:id="@+id/txtStartdate"
@@ -154,36 +201,25 @@
         android:inputType="date"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.08"
+        app:layout_constraintHorizontal_bias="0.102"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.682"
+        app:layout_constraintVertical_bias="0.488"
         tools:targetApi="o" />
 
-    <Spinner
-        android:id="@+id/option_spinner"
-        android:layout_width="176dp"
-        android:layout_height="55dp"
-        android:backgroundTint="#ffffff"
-        android:textColor="#000000"
+    <TimePicker
+        android:id="@+id/startTimePicker"
+        android:layout_width="165dp"
+        android:layout_height="76dp"
+        android:background="#ffffff"
+        android:ems="10"
+        android:inputType="time"
+        android:timePickerMode="spinner"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.097"
-        app:layout_constraintStart_toStartOf="parent"
-
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.862" />
-
-    <TextView
-        android:id="@+id/SleepRating"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/sleep_quality_rating"
-        android:textSize="16sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.086"
+        app:layout_constraintHorizontal_bias="0.865"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.764" />
+        app:layout_constraintVertical_bias="0.485" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

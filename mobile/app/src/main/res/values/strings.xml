@@ -48,6 +48,7 @@
     <string name="_6_month">6 Month</string>
     <string name="start_date">Start Date</string>
     <string name="sleep_quality_rating">Sleep Quality Rating</string>
+    <string name="stop_date">Stop Date</string>
 
 
 </resources>
