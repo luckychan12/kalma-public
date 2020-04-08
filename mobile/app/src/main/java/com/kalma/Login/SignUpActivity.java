@@ -82,6 +82,7 @@ public class SignUpActivity extends AppCompatActivity {
             }
         });
         final DatePickerDialog datePicker = new DatePickerDialog(SignUpActivity.this);
+        datePicker.setOnDateSetListener(date);
         txtDOB.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -179,7 +180,7 @@ public class SignUpActivity extends AppCompatActivity {
         char[] charArray = str.toCharArray();
         for (char ch : charArray) {
             //Check if letter value is between ascii 'a' and ascii 'z'
-            if (!((ch >= 'a' && ch <= 'z') || (ch != 39) || (ch != 45))) {
+            if (!((ch >= 'a' && ch <= 'z') || (ch == 39) || (ch == 45))) {
                 return false;
             }
         }
