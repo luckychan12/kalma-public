@@ -1,6 +1,7 @@
 package com.kalma.Login;
 
 import android.app.DatePickerDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -10,6 +11,7 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.android.volley.VolleyError;
@@ -79,12 +81,18 @@ public class SignUpActivity extends AppCompatActivity {
                 attemptSignUp(firstName, lastName, password, email);
             }
         });
-
+        final DatePickerDialog datePicker = new DatePickerDialog(SignUpActivity.this);
         txtDOB.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                DatePickerDialog datePicker = new DatePickerDialog(SignUpActivity.this, android.R.style.Theme_Holo_Dialog, date, 1990, 0, 0);
                 datePicker.show();
+            }
+        });
+        datePicker.setOnShowListener(new DialogInterface.OnShowListener() {
+            @Override
+            public void onShow(DialogInterface arg0) {
+                datePicker.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(getResources().getColor(R.color.NoColour, null));
+                datePicker.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(getResources().getColor(R.color.YesColour, null));
             }
         });
     }
