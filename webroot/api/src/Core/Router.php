@@ -51,13 +51,14 @@ class Router
                 $user->addGroup('/{id:\d+}', function(RouteCollector $account) {
 
                     // User account endpoint
-                    $account->addRoute('GET', '/account', ['User', 'read',    Auth::ACCESS_USER]);
+                    $account->addRoute('GET', '/account',         ['User', 'read',     Auth::ACCESS_USER]);
+                    $account->addRoute('PUT', '/account/targets', ['User', 'setTargets', Auth::ACCESS_USER]);
 
                     // Sleep data CRUD operations
-                    $account->addRoute('GET',    '/sleep',   ['SleepPeriod', 'read',   Auth::ACCESS_USER]);
-                    $account->addRoute('POST',   '/sleep',   ['SleepPeriod', 'create', Auth::ACCESS_USER]);
-                    $account->addRoute('PUT',    '/sleep',   ['SleepPeriod', 'update', Auth::ACCESS_USER]);
-                    $account->addRoute('DELETE', '/sleep',   ['SleepPeriod', 'delete', Auth::ACCESS_USER]);
+                    $account->addRoute('GET',    '/sleep',  ['SleepPeriod', 'read',   Auth::ACCESS_USER]);
+                    $account->addRoute('POST',   '/sleep',  ['SleepPeriod', 'create', Auth::ACCESS_USER]);
+                    $account->addRoute('PUT',    '/sleep',  ['SleepPeriod', 'update', Auth::ACCESS_USER]);
+                    $account->addRoute('DELETE', '/sleep',  ['SleepPeriod', 'delete', Auth::ACCESS_USER]);
 
                     // Calm data CRUD operations
                     $account->addRoute('GET',    '/calm',   ['CalmPeriod', 'read',   Auth::ACCESS_USER]);

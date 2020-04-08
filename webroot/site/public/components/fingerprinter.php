@@ -9,6 +9,8 @@
         else if ( job === "logout"){
             window.location.href = "../controller/logoutController.php?clientFingerprint=" + fingerprint;
         }
+
+        return fingerprint;
     }
 
     $(function(){
