@@ -10,6 +10,8 @@ public class SleepDataEntry {
     int duration;
     String durationText;
     int sleepQuality;
+    String message;
+    int percentage;
 
     public SleepDataEntry() {
     }
@@ -20,6 +22,22 @@ public class SleepDataEntry {
         this.stopTime = stopTime;
         this.duration = duration;
         this.sleepQuality = sleepQuality;
+    }
+
+    public int getPercentage() {
+        return percentage;
+    }
+
+    public void setPercentage(int percentage) {
+        this.percentage = percentage;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
     }
 
     public int getId() {
