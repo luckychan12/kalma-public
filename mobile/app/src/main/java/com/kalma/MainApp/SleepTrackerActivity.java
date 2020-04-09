@@ -2,11 +2,13 @@ package com.kalma.MainApp;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
 import android.app.DatePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -20,11 +22,14 @@ import android.widget.Toast;
 
 import com.android.volley.VolleyError;
 import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.components.AxisBase;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.formatter.IAxisValueFormatter;
+import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
 import com.kalma.API_Interaction.APICaller;
 import com.kalma.API_Interaction.ServerCallback;
 import com.kalma.Data.AuthStrings;
@@ -116,8 +121,8 @@ public class SleepTrackerActivity extends AppCompatActivity {
         datePicker.setOnShowListener(new DialogInterface.OnShowListener() {
             @Override
             public void onShow(DialogInterface arg0) {
-                datePicker.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(getResources().getColor(R.color.NoColour, null));
-                datePicker.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(getResources().getColor(R.color.YesColour, null));
+                datePicker.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(ContextCompat.getColor(context, R.color.NoColour));
+                datePicker.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(ContextCompat.getColor(context, R.color.YesColour));
             }
         });
 
@@ -193,10 +198,16 @@ public class SleepTrackerActivity extends AppCompatActivity {
                 }
             }
         }
+
+
         graphData(graphEntries);
     }
 
     private void graphData(List<LineGraphEntry> graphEntries){
+        final ArrayList<String> xLabel = new ArrayList<>();
+        for (LineGraphEntry entry :graphEntries) {
+            xLabel.add(Integer.toString(entry.getDate().getDayOfMonth()) + "/" + Integer.toString(entry.getDate().getMonthOfYear()));
+        }
         List<Entry> entries = new ArrayList<Entry>();
         for (int i = 0; i < graphEntries.size(); i++) {
             entries.add(new Entry(i, graphEntries.get(i).getValue()));
@@ -204,11 +215,21 @@ public class SleepTrackerActivity extends AppCompatActivity {
         LineDataSet dataSet = new LineDataSet(entries, "Time slept");
         //todo styling here
         //dataSet.setColor(...);
-
+        dataSet.setLineWidth(1);
+        dataSet.setColor(ContextCompat.getColor(context, R.color.colorPrimary));
+        int[] colors = {ContextCompat.getColor(context, R.color.textOnDark),
+                ContextCompat.getColor(context, R.color.colorSecondary) };
+        dataSet.setDrawFilled(true);
+        GradientDrawable gradientDrawable = new GradientDrawable();
+        gradientDrawable.setColors(colors);
+        //gradientDrawable.set
+        dataSet.setFillDrawable(gradientDrawable);
         LineData lineData = new LineData(dataSet);
         LineChart chart = (LineChart) findViewById(R.id.chart);
         YAxis yAxis = chart.getAxisLeft();
         yAxis.setAxisMinimum(0f);
+        XAxis xAxis = chart.getXAxis();
+
         chart.getAxisRight().setEnabled(false);
         chart.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
         chart.getDescription().setEnabled(false);
