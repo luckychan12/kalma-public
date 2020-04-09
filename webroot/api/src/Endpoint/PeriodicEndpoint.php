@@ -111,7 +111,10 @@ class PeriodicEndpoint extends DataEndpoint
 
         $this->database->commit();
 
-        $res->setBody(array('message' => 'Success.'));
+        $res->setBody(array(
+            'message' => 'Success.',
+            'links' => User::getLinks($args['id'], $this->name),
+        ));
         return $res;
     }
 
@@ -231,6 +234,7 @@ class PeriodicEndpoint extends DataEndpoint
 
         $res->setBody(array(
             'periods' => $periods,
+            'links' => User::getLinks($args['id'], $this->name),
         ));
         return $res;
     }
@@ -290,6 +294,7 @@ class PeriodicEndpoint extends DataEndpoint
         $res->setBody(array(
             'resources_affected' => $affected,
             'message' => count($affected) < count($body['periods']) ? 'One or more resources could not be updated.' : 'Success.',
+            'links' => User::getLinks($args['id'], $this->name),
         ));
 
         return $res;
@@ -340,6 +345,7 @@ class PeriodicEndpoint extends DataEndpoint
         $res->setBody(array(
             'resources_affected' => $resources_affected,
             'message' => count($resources_affected) < count($body['periods']) ? 'One or more resources could not be updated.' : 'Success.',
+            'links' => User::getLinks($args['id'], $this->name),
         ));
 
         return $res;
