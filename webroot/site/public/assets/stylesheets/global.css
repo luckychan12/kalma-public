@@ -81,6 +81,7 @@ a {
 
 a:hover {
     color: var(--c-secondary-dark);
+    text-decoration: none;
 }
 
 /*

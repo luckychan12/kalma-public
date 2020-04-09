@@ -7,6 +7,7 @@
 
 #main {
     padding: 10px;
+    margin-bottom: 15px
 }
 
 .profile-section {
@@ -31,15 +32,28 @@
     background: var(--c-bg);
     border-radius: 5px;
     padding: 10px;
+    position: relative;
 }
 
 .email-address, .date-of-birth {
     font-weight: 200;
     opacity: 0.7;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    position: relative;
+    width: 100%;
+}
+
+.email-address, .date-of-birth {
+    content: '';
+    display: inline-block;
 }
 
 .list-item {
     margin-bottom: 5px;
+    padding: 5px;
+    border-bottom: 1px solid var(--c-bg-shade);
 }
 
 .list-item:hover {
@@ -59,7 +73,21 @@
 
 .list-item-controls {
     text-align: center;
-    padding-right: 30px;
+}
+
+.list-item-controls span {
+    margin-left: 10px;
+}
+
+@media (min-width: 576px) {
+    .list-item {
+        border: none;
+    }
+
+    .list-item-controls {
+        text-align: right;
+        padding-right: 30px;
+    }
 }
 
 .target-name {
