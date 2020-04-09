@@ -1,101 +1,54 @@
 <?php
-include_once 'header.php';
 include_once '../controller/sleepController.php';
 ?>
 
 <!doctype html>
-<html lang='en'>
-<head>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js"></script>
-<style>
-    button {
-        background-color: var(--c-secondary);
-        color: var(--c-text-on-secondary);
-        border: solid;
-        border-color: var(--c-secondary-dark);
-    }
-    input {
-        background-color: white;
-        color: black;
-        border-style: ridge;
-        border-width: 1px ;
-        border-color: lightgrey;
-    }
-    .average {
-        color: var(--c-text-on-primary);
-        background-color: var(--c-primary-dark);
-        border-color: var(--c-primary-dark);
-        border-radius: 20px;
-        margin: 20px;
-        padding: 10px;
-        text-decoration: none;
-    }
-    .average:{
-        border: 0;
-    }
-    #overlay {
-        position: fixed;
-        display: none;
-        width: 100%;
-        height: 100%;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background-color: rgba(0,0,0,0.5);
-        z-index: 99;
-        cursor: pointer;
-    }
-
-    #addDisplay{
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%,-50%);
-        -ms-transform: translate(-50%,-50%);
-    }
-    label {
-        font-size: large;
-        margin-top: 10px;
-    }
-
-</style>
+<link lang='en'>
+<?php include_once './components/global_head_inner.php' ?>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js"></script>
+<link rel="stylesheet" href="assets/stylesheets/sleep.css">
 </head>
 <body>
+<?php include_once './components/navbar_top.php'; ?>
+<!--Add sleep period overlay-->
 <div id="overlay">
-    <div id="addDisplay">
-        <div class="average" style="text-align: center; padding: 40px">
-            <button onclick="off()" style="float: right">X</button>
-            <h1>Add Sleep Data</h1>
-            <br>
-            <form method="post" action="sleep.php">
-                <label>Start Time:</label>
-                <br>
-                <input type="date" name="startDate" required>
-                <input type="time" name="startTime" required>
-                <br>
-                <label>End Time:</label>
-                <br>
-                <input type="date" name="endDate" required>
-                <input type="time" name="endTime" required>
-                <br>
-                <label>Sleep Quality:</label>
-                <br>
-                <input type="number" max="5" min="1"  name="sleepQuality" required>
-                <br>
-                <input type="submit" value="Submit" name="addSleep" style="background-color: var(--c-secondary); margin-top: 20px;border-color: var(--c-secondary-dark)">
-            </form>
+    <div id="addDisplay" class="col-md-6 offset-md-3">
+        <div class="outer" id="popup">
+            <button id="close" onclick="off()">x</button>
+            <div class="inner-content">
+                <h1>Add Sleep Data</h1>
+                <hr>
+                <form method="post" action="sleep.php">
+                    <label>Start Time:</label>
+                    <br>
+                    <input class="form-control" type="date" name="startDate" required>
+                    <input class="form-control" type="time" name="startTime" required>
+
+                    <label>End Time:</label>
+                    <br>
+                    <input class="form-control" type="date" name="endDate" required>
+                    <input class="form-control" type="time" name="endTime" required>
+
+                    <label>Sleep Quality:</label>
+                    <br>
+                    <input class="form-control" type="number" max="5" min="1"  name="sleepQuality" required>
+                    <hr>
+                    <input type="submit" class="btn btn-primary" value="Submit" name="addSleep">
+                </form>
+            </div>
         </div>
     </div>
 </div>
+<!--Main Body-->
 <div class="container-fluid">
     <div class="row">
-        <div class="col-md-7 offset-md-1">
+        <div class="col-lg-7 offset-lg-1">
             <h1 style="margin-top: 20px">Sleep Period</h1>
-            <button onclick=showWeekChart(); style="margin-left: 5px">W</button>
-            <button onclick=showMonthChart();>M</button>
+            <button class="btn btn-primary date-selector" onclick=showWeekChart(); style="margin-left: 5px">W</button>
+            <button class="btn btn-primary date-selector" onclick=showMonthChart();>M</button>
             <br>
             <div style="margin-top: 10px; margin-left: 5px">
+                <!--Date choosers-->
                 <form id="weekForm" method="get" action="sleep.php"style="display: none">
                     <input onchange=document.getElementById('weekSubmit').click(); style="text-align: center" type="week" id="weekDate" value="<?php echo $setWeekDate ?>" name="weekDate">
                     <input type="submit" id="weekSubmit" hidden>
@@ -106,26 +59,66 @@ include_once '../controller/sleepController.php';
                 </form>
             </div>
             <br>
+            <!--Graphs-->
             <canvas id="myWeekChart" width="400" height="250" style="display: none"></canvas>
             <canvas id="myMonthChart" width="400" height="250" style="display: none"></canvas>
         </div>
-        <div class="col-md-3">
-            <div class="average">
-                <span style="font-size: x-large">Average sleep:</span>
-                <br><br>
-
-
-                <div style="text-align: right;font-size: large"><?php echo $average?> Hours a day</div>
+        <!--Average Display-->
+        <div class="col-lg-3">
+            <div class="outer">
+                <div class="module">
+                    <h2 style="font-size: x-large">Average sleep:</h2>
+                    <hr>
+                    <?php echo $average?> Hours a day
+                </div>
+                <div class="module">
+                    <h2 style="font-size: x-large">Progress:</h2>
+                    <hr>
+                    <?php echo $progress_message?>
+                </div>
             </div>
+            <!--Add data button-->
             <div style="text-align: center">
-                <button class="average" onclick="on()" style="text-align: center">
+                <button id="add-button" class="btn btn-primary" onclick="on()">
                     Add Data
                 </button>
             </div>
-
         </div>
-
     </div>
+    <br>
+    <hr>
+    <br>
+    <!--Data table-->
+    <div class="row" style="margin-bottom: 200px">
+        <div class="col-lg-10 offset-sm-1">
+            <table class="table">
+                <tr>
+                    <th>ID</th>
+                    <th>Start Time</th>
+                    <th>End Time</th>
+                    <th>Duration</th>
+                    <th>Quality</th>
+                    <th>Progress Percentage</th>
+                </tr>
+                <?php
+                foreach ($dataPoints->periods as $data) {
+                    if (isset($data->id)) {
+                        echo
+                            "<tr>
+                            <td>$data->id</td>    
+                            <td>". date('d-m-Y H:i', strtotime($data->start_time))."</td>
+                            <td>".date('d-m-Y H:i', strtotime($data->stop_time))."</td>
+                            <td>$data->duration_text</td>
+                            <td>$data->sleep_quality</td>
+                            <td>$data->progress_percentage %</td>
+                        </tr>";
+                    }
+                }
+                ?>
+            </table>
+        </div>
+    </div>
+
 </div>
 
 <script>
@@ -136,9 +129,6 @@ include_once '../controller/sleepController.php';
     function off() {
         document.getElementById("overlay").style.display = "none";
     }
-function AddingData() {
-    
-}
 
 
     function showWeekChart() {
@@ -163,7 +153,7 @@ function AddingData() {
             data: {
                 labels: ["Mon", "Tue", "Wed", "Thus", "Fri", "Sat","Sun"],
                 datasets: [{
-                    label: 'Hours of the day',
+                    label: 'Hours slept',
                     data: <?php
                     echo "[";
                     foreach ($weekPoints as $point)
@@ -206,57 +196,56 @@ function AddingData() {
         });
     }
 
-function renderMonthChart(){
-    var ctx2 = document.getElementById("myMonthChart").getContext('2d');
-    var myChart2 = new Chart(ctx2, {
-        type: 'horizontalBar',
-        data: {
-            labels: [<?php echo $monthLabels ?>],
-            datasets: [{
-                label: 'Hours of the day',
-                data: <?php
-                echo "[";
-                foreach ($monthPoints as $point)
-                {
-                    echo $point. ",";
-                }
-                echo"]";
-                ?>,
-                backgroundColor: "#ffc400",
-                borderColor:"#c79400",
-                borderWidth: 1
-            }]
-        },
-        options: {
-            scales: {
-                xAxes: [{
-                    scaleLabel: {
-                        display: true,
-                        labelString: "Number of hours slept",
-                        fontColor:'#000000',
-                    },
-                    ticks: {
-                        fontColor:'#000000',
+    function renderMonthChart(){
+        var ctx2 = document.getElementById("myMonthChart").getContext('2d');
+        var myChart2 = new Chart(ctx2, {
+            type: 'horizontalBar',
+            data: {
+                labels: [<?php echo $monthLabels ?>],
+                datasets: [{
+                    label: 'Hours slept',
+                    data: <?php
+                    echo "[";
+                    foreach ($monthPoints as $point)
+                    {
+                        echo $point. ",";
                     }
-                }],
-                yAxes: [{
-                    scaleLabel: {
-                        display: true,
-                        labelString: "Days of the month",
-                        fontColor:'#000000',
-                    },
-
-                    ticks: {
-                        fontColor:'#000000',
-                        beginAtZero:true
-                    }
+                    echo"]";
+                    ?>,
+                    backgroundColor: "#ffc400",
+                    borderColor:"#c79400",
+                    borderWidth: 1
                 }]
-            }
-        }
-    });
-}
-</script>
+            },
+            options: {
+                scales: {
+                    xAxes: [{
+                        scaleLabel: {
+                            display: true,
+                            labelString: "Number of hours slept",
+                            fontColor:'#000000',
+                        },
+                        ticks: {
+                            fontColor:'#000000',
+                        }
+                    }],
+                    yAxes: [{
+                        scaleLabel: {
+                            display: true,
+                            labelString: "Days of the month",
+                            fontColor:'#000000',
+                        },
 
+                        ticks: {
+                            fontColor:'#000000',
+                            beginAtZero:true
+                        }
+                    }]
+                }
+            }
+        });
+    }
+</script>
 <?php
 //displays the correct chart based on what was already selected
 if (isset($_GET['weekDate'])){
