@@ -1,8 +1,7 @@
 <?php
+session_start();
 include_once "../api_tasks/apiConnect.php";
 $api = new ApiConnect();
-
-
 
 
 if(isset($_POST['startDate'])){
@@ -12,17 +11,15 @@ if(isset($_POST['startDate'])){
     $newEndTime = $newEndTime->format(DateTime::ISO8601);
     $message = $api->addSleepData($newStartTime,$newEndTime,$_POST['sleepQuality']);
     if (isset($message->error)) {
-        $_SESSION['login_message'] = "{$data->message} ({$data->error})";
-       echo'<script>location.href = "../public/errorPage.php" </script>';
+        header('Location: ./errorPage.php');
     }
 }
 
+
 $dataPoints = $api->getData("api/user/".$_SESSION['user_id']."/sleep");
 if (isset($dataPoints->error)){
-    echo'<script>location.href = "../public/errorPage.php" </script>';
+    header('Location: ./errorPage.php');
 }
-echo json_encode($dataPoints);
-
 
 
 
@@ -41,6 +38,7 @@ else {
 }
 $date = $selectedDate->format(DateTime::ISO8601);
 $date = strtotime($date);
+
 
 //sets the strings for the value of the dates
 $setWeekDate = date('o', $date) . "-W" . date('W', $date);
@@ -66,30 +64,30 @@ $weekPoints = array(0,0,0,0,0,0,0);
 $average = 0;
 $i = 0;
 
-        foreach ($dataPoints->periods as $data) {
-            if (isset($data->id)) {
+foreach ($dataPoints->periods as $data) {
+    if (isset($data->id)) {
 
-                $i++;
+        $i++;
 
-                $average = $average + $data->duration;
-                $startTime = date('Y-m-d H:i', strtotime($data->start_time));
-                if (($startTime >= $start) && ($startTime <= $end)) {
+        $average = $average + $data->duration;
+        $startTime = date('Y-m-d H:i', strtotime($data->start_time));
+        if (($startTime >= $start) && ($startTime <= $end)) {
 
-                    $n = -1;
-                    if (date("G", strtotime($data->start_time)) <= 16) {
-                        $n--;
-                    }
-                    $weekPoints[date("N", strtotime($data->start_time)) + $n] = $data->duration / 60;
-                }
+            $n = -1;
+            if (date("G", strtotime($data->start_time)) <= 16) {
+                $n--;
             }
-
-
+            $weekPoints[date("N", strtotime($data->start_time)) + $n] = $data->duration / 60;
+        }
     }
 
 
-        if ($average > 0) {
-            $average = ($average / $i) / 60;
-        }
+}
+
+
+if ($average > 0) {
+    $average =number_format((($average / $i) / 60), 2, '.', '') ;
+}
 
 
 //For month display
@@ -113,18 +111,29 @@ for ($i = 1; $i <= date("t", strtotime($date)); $i++)
 
 //fills the data array with the correct data to use
 $monthPoints = array_fill(0, date("t", strtotime($date)), 0);;
+//sets the start and end of the current sleep to get the message on progress
+$progress_message="0% of your daily goal";
+$last_night = new DateTime('4pm');
+$last_night_start = $last_night->format(DateTime::ISO8601);
+$last_night_end = $last_night->modify("+1day");
+$last_night_end =$last_night_end->format(DateTime::ISO8601);
 
-    foreach ($dataPoints->periods as $data)
-    {
-        if (isset($data->id)) {
-            $startTime = date('Y-m-d H:i', strtotime($data->start_time));
-            if (($startTime >= $start) && ($startTime <= $end)) {
-                $n = -1;
-                if (date("G", strtotime($data->start_time)) <= 16) {
-                    $n--;
-                }
-                $monthPoints[date("j", strtotime($data->start_time)) + $n] = $data->duration / 60;
+foreach ($dataPoints->periods as $data)
+{
+    if (isset($data->id)) {
+        $startTime = date('Y-m-d H:i', strtotime($data->start_time));
+        if (($startTime >= $start) && ($startTime <= $end)) {
+            $n = -1;
+            if (date("G", strtotime($data->start_time)) <= 16) {
+                $n--;
             }
+            $monthPoints[date("j", strtotime($data->start_time)) + $n] = $data->duration / 60;
         }
+        //finds the progress message for the current sleep period
+        if (($startTime >= $last_night_start) && ($startTime < $last_night_end)){
+            $progress_message = $data->progress_message;
+        }
+
     }
 
+}
