@@ -242,8 +242,8 @@ class ApiConnect
 
     function addSleepData($startTime, $stopTime, $sleepQuality ){
         try{
-            $res = $this->client->request('POST',"api/user/".$_SESSION['user_id']."/sleep", ['headers' => ["Authorization" => 'bearer ' . $_SESSION['access_token']],'json' => ['start_time' => $startTime, 'stop_time' => $stopTime, 'sleep_quality' => $sleepQuality]]);
-            $messageBody = $res->getBody()->read(2048);
+            $res = $this->client->request('POST',"api/user/".$_SESSION['user_id']."/sleep", ['headers' => ["Authorization" => 'bearer ' . $_SESSION['access_token']],'json' => ['periods' => [['start_time' => $startTime, 'stop_time' => $stopTime, 'sleep_quality' => $sleepQuality]]]]);
+            $messageBody = $res->getBody()->getContents();
             $data= json_decode($messageBody);
             return $data;
         }
@@ -274,7 +274,6 @@ class ApiConnect
 }
 
 ?>
-
 
 
 
