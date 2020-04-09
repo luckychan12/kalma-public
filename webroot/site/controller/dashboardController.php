@@ -18,3 +18,6 @@ else {
 if (isset($data->error)) {
     header('Location: ./errorPage.php');
 }
+else{
+    $_SESSION['user_id'] = $data->user->user_id;
+}
