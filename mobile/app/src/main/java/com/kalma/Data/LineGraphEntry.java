@@ -3,10 +3,10 @@ package com.kalma.Data;
 import org.joda.time.DateTime;
 
 public class LineGraphEntry {
-    DateTime date;
-    double value;
+    private DateTime date;
+    private float value;
 
-    public LineGraphEntry(DateTime date, double value) {
+    public LineGraphEntry(DateTime date, float value) {
         this.date = date;
         this.value = value;
     }
@@ -19,11 +19,11 @@ public class LineGraphEntry {
         this.date = date;
     }
 
-    public double getValue() {
+    public float getValue() {
         return value;
     }
 
-    public void setValue(double value) {
+    public void setValue(float value) {
         this.value = value;
     }
 }
