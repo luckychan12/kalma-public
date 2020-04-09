@@ -38,7 +38,7 @@ class ApiConnect
     function requestLogin($inPassword, $inEmail, $inClientFingerprint){
         try {
             $res = $this->client->request('POST', 'api/user/login', ['json' => ["email_address" => $inEmail, "password" => $inPassword, "client_fingerprint" => $inClientFingerprint]]);
-            $messageBody = $res->getBody()->read(2048);
+            $messageBody = $res->getBody()->getContents();
             $data = json_decode($messageBody);
             return $data;
         }
@@ -65,7 +65,7 @@ class ApiConnect
     function getData($link){
         try {
             $res = $this->client->request('GET', $link, ['headers' => ["Authorization" => 'bearer ' . $_SESSION['access_token']]]);
-            $messageBody = $res->getBody()->read(2048);
+            $messageBody = $res->getBody()->getContents();
             $data = json_decode($messageBody);
             return $data;
         }
@@ -105,7 +105,7 @@ class ApiConnect
     function refreshToken($clientFingerprint){
         try {
             $res = $this->client->request('POST', 'api/user/refresh', ['json' => ["refresh_token" => $_SESSION["refresh_token"], "client_fingerprint" => $clientFingerprint]]);
-            $messageBody = $res->getBody()->read(2048);
+            $messageBody = $res->getBody()->getContents();
             $data = json_decode($messageBody);
             $_SESSION['access_token']= $data->access_token;
             $_SESSION['refresh_token'] = $data->refresh_token;
@@ -149,7 +149,7 @@ class ApiConnect
         try{
             $res = $this->client->request('POST', 'api/user/logout', ['headers' => ["Authorization" => 'bearer ' . $_SESSION['access_token']],'json' => ['client_fingerprint' => $clientFingerprint]]);
             session_destroy();
-            $messageBody = $res->getBody()->read(2048);
+            $messageBody = $res->getBody()->getContents();
             $data= json_decode($messageBody);
             return $data;
         }
@@ -182,7 +182,7 @@ class ApiConnect
     function requestSignup($inFirstName,$inLastName,$inPassword, $inEmail, $inDOB){
         try {
             $res = $this->client->request('POST', 'api/user/signup', ['json' => ["email_address" => $inEmail, "password" => $inPassword, "first_name" => $inFirstName, "last_name" => $inLastName, "date_of_birth" =>$inDOB]]);
-            $messageBody = $res->getBody()->read(2048);
+            $messageBody = $res->getBody()->getContents();
             $data = json_decode($messageBody);
             return $data;
         }
@@ -213,7 +213,7 @@ class ApiConnect
     function confirmAccount($confirmation){
         try {
             $res = $this->client->request('POST', 'api/user/confirm', ['json' => ["confirmation_token" => $confirmation]]);
-            $messageBody = $res->getBody()->read(2048);
+            $messageBody = $res->getBody()->getContents();
             $data = json_decode($messageBody);
             return $data;
         }
