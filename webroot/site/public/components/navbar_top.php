@@ -6,7 +6,7 @@
         <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarTop">
-        <ul class="navbar-nav <?= isset($_SESSION) ? "show" : "hide" ?>">
+        <ul class="navbar-nav <?= isset($_SESSION['account_link']) ? "show" : "hide" ?>">
             <li class="nav-item">
                 <a class="nav-link" href="./dashboard.php">Dashboard</a>
             </li>
@@ -15,7 +15,7 @@
                     My Data
                 </a>
                 <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                    <a class="dropdown-item" href="#">Sleep</a>
+                    <a class="dropdown-item" href="./sleep.php">Sleep</a>
                     <a class="dropdown-item" href="#">Mindful Minutes</a>
                     <a class="dropdown-item" href="#">Daily Steps</a>
                     <a class="dropdown-item" href="#">Weight</a>
