@@ -15,6 +15,7 @@ namespace Kalma\Api\Endpoint;
 
 use DateTime;
 use Kalma\Api\Business\UserManager;
+use Kalma\Api\Core\Config;
 use Kalma\Api\Response\Exception\ResponseException;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Kalma\Api\Response\Response;
@@ -23,6 +24,36 @@ require __DIR__ . '/../../vendor/autoload.php';
 
 class User extends Endpoint
 {
+    /**
+     * Return an associative array of links available to a given user
+     * @param int $user_id
+     * @param array $omit
+     * @return array
+     */
+    public static function getLinks(int $user_id, ...$omit) : array
+    {
+        $api = Config::get('api_root');
+        $links = array(
+            'logout' => "$api/user/logout",
+            'refresh' => "$api/user/refresh",
+            'account' => "$api/user/$user_id/account",
+            'targets' => "$api/user/$user_id/account/targets",
+            'sleep' => "$api/user/$user_id/sleep",
+            'calm' => "$api/user/$user_id/calm",
+            'steps' => "$api/user/$user_id/steps",
+            'weight' => "$api/user/$user_id/weight",
+            'height' => "$api/user/$user_id/height",
+        );
+
+        foreach ($omit as $key) {
+            if (isset($links[$key])) {
+                unset($links[$key]);
+            }
+        }
+
+        return $links;
+    }
+
     /**
      * Attempt to create a user account. Return a success/failure bool with a message.
      * @param Request $req
@@ -92,11 +123,7 @@ class User extends Endpoint
         $session = $um->createSession($user_id, $client_fingerprint);
 
         $resBody = $session;
-        $resBody['links'] = array
-        (
-            'account' => $this->api_root . "/user/$user_id/account",
-            'logout'  => $this->api_root . "/user/logout",
-        );
+        $resBody['links'] = static::getLinks($user_id);
         $res->setBody($resBody);
         return $res;
     }
@@ -123,10 +150,7 @@ class User extends Endpoint
         $um = UserManager::getInstance();
         [$session, $user_id] = $um->refreshSession($body['refresh_token'], $body['client_fingerprint']);
         $resBody = $session;
-        $resBody['links'] = array(
-            'account' => $this->api_root . "/user/$user_id/account",
-            'logout'  => $this->api_root . "/user/logout",
-        );
+        $resBody['links'] = static::getLinks($user_id, 'refresh');
         $res->setBody($resBody);
         return $res;
     }
@@ -202,10 +226,7 @@ class User extends Endpoint
 
         $res->setBody(array(
             'user' => $account_data,
-            'links' => array
-            (
-                'logout' => $this->api_root . '/user/logout',
-            ),
+            'links' => static::getLinks($args['id'], 'account'),
         ));
 
         return $res;
@@ -289,6 +310,7 @@ class User extends Endpoint
 
         $res->setBody(array(
             'message' => 'Updated your target' . (count($targets) > 1 ? 's!' : '!'),
+            'links' => static::getLinks($args['id'], 'targets'),
         ));
 
         return $res;

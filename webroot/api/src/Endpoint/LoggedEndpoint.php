@@ -82,7 +82,10 @@ class LoggedEndpoint extends DataEndpoint
 
         $this->database->commit();
 
-        $res->setBody(array('message' => 'Success.'));
+        $res->setBody(array(
+            'message' => 'Success.',
+            'links' => User::getLinks($args['id'], $this->name),
+        ));
         return $res;
     }
 
@@ -180,6 +183,7 @@ class LoggedEndpoint extends DataEndpoint
 
         $res->setBody(array(
             'entries' => $entries,
+            'links' => User::getLinks($args['id'], $this->name),
         ));
         return $res;
     }
@@ -239,6 +243,7 @@ class LoggedEndpoint extends DataEndpoint
         $res->setBody(array(
             'resources_affected' => $affected,
             'message' => count($affected) < count($body['entries']) ? 'One or more resources could not be updated.' : 'Success.',
+            'links' => User::getLinks($args['id'], $this->name),
         ));
 
         return $res;
@@ -289,6 +294,7 @@ class LoggedEndpoint extends DataEndpoint
         $res->setBody(array(
             'resources_affected' => $resources_affected,
             'message' => count($resources_affected) < count($body['entries']) ? 'One or more resources could not be updated.' : 'Success.',
+            'links' => User::getLinks($args['id'], $this->name),
         ));
 
         return $res;
