@@ -164,6 +164,50 @@ public class SleepTrackerActivity extends AppCompatActivity {
         getData(lastWeek);
     }
 
+    private void graphData(SleepDataEntry[] sleepDataEntries){//, DateTime startDate, DateTime stopDate) {
+        DateTimeFormatter formatter = DateTimeFormat.forPattern("dd/MM/yyy");
+        DateTime startDate = new DateTime().minusWeeks(1).minusDays(1).withHourOfDay(16);;
+        DateTime stopDate = new DateTime().withHourOfDay(16);
+
+        List<LineGraphEntry> graphEntries = new ArrayList<LineGraphEntry>();
+        int days = Days.daysBetween(startDate, stopDate).getDays();
+
+        for (int i = 0; i < days; i++) {
+            DateTime newDate = startDate.plusDays(i);
+            graphEntries.add(new LineGraphEntry(newDate, 0));
+        }
+
+
+        for (SleepDataEntry entry : sleepDataEntries) {
+            for (int i = 0; i < graphEntries.size() - 1; i++) {
+                Interval interval = new Interval(graphEntries.get(i).getDate(), graphEntries.get(i+1).getDate());
+                if (interval.contains(entry.getStartTime())) {
+                    if (interval.contains(entry.getStopTime())){
+                        Interval calcInterval = new Interval(entry.getStartTime(), entry.getStopTime());
+                        addHours(graphEntries, i, calcInterval);
+                    }
+                    else{
+                        Interval calcInterval = new Interval(entry.getStartTime(), interval.getEnd());
+                        addHours(graphEntries, i, calcInterval);
+                    }
+                }
+                else if(interval.contains(entry.getStopTime())){
+                    Interval calcInterval = new Interval(interval.getStart(), entry.getStopTime());
+                    addHours(graphEntries, i, calcInterval);
+                }
+            }
+        }
+    }
+
+    private void addHours(List<LineGraphEntry> graphEntries, int i, Interval calcInterval) {
+        Duration intervalDuration = calcInterval.toDuration();
+        double hours = (intervalDuration.getMillis() / 3.6f) * 1E-6;
+        BigDecimal bd = new BigDecimal(Double.toString(hours));
+        bd = bd.setScale(3, RoundingMode.HALF_UP);
+        hours = bd.doubleValue();
+        LineGraphEntry graphEntry = graphEntries.get(i);
+        graphEntry.setValue(graphEntry.getValue() + hours);
+    }
 
 
 
@@ -192,7 +236,7 @@ public class SleepTrackerActivity extends AppCompatActivity {
                                 newEntry.setMessage(periods.getJSONObject(i).getString("progress_message"));
                                 entries[i] = newEntry;
                             }
-                            //graphData(entries);
+                            graphData(entries);
 
                             Log.i("Response", response.toString());
                         } catch (JSONException je) {
