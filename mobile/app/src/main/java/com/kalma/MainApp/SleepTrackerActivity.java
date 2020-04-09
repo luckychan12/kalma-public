@@ -12,7 +12,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Spinner;
@@ -21,15 +20,22 @@ import android.widget.Toast;
 
 import com.android.volley.VolleyError;
 import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.utils.ViewPortHandler;
 import com.kalma.API_Interaction.APICaller;
 import com.kalma.API_Interaction.ServerCallback;
 import com.kalma.Data.AuthStrings;
+import com.kalma.Data.LineGraphEntry;
 import com.kalma.Data.SleepDataEntry;
 import com.kalma.R;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
+import org.joda.time.Days;
+import org.joda.time.Duration;
+import org.joda.time.Interval;
+import org.joda.time.LocalDate;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
@@ -38,17 +44,21 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
 public class SleepTrackerActivity extends AppCompatActivity {
-
     Context context = this;
+    String link = AuthStrings.getInstance(context).getAccountLink();
+
     EditText txtStartDate, txtStopDate;
     Button buttonProfile, buttonSettings, buttonHome, buttonSend;
 
@@ -56,9 +66,10 @@ public class SleepTrackerActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sleep_tracker);
+
+        link = link.replace("account", "sleep");
         setTitle("Sleep Tracker");
         final Calendar myCalendar = Calendar.getInstance();
-
         ((TimePicker)findViewById(R.id.startTimePicker)).setIs24HourView(true);
         ((TimePicker)findViewById(R.id.stopTimePicker)).setIs24HourView(true);
         Spinner spinner = (Spinner) findViewById(R.id.option_spinner);
@@ -146,14 +157,72 @@ public class SleepTrackerActivity extends AppCompatActivity {
         LineChart chart = (LineChart) findViewById(R.id.chart);
         SleepDataEntry[] dataObjects = {new SleepDataEntry()};
 
-        List<Entry> entries = new ArrayList<Entry>();
-        for (SleepDataEntry data : dataObjects) {
-            // turn your data into Entry objects
-            //entries.add(new Entry(data.getStartTime(), data.getDuration()));
-
-
-        }
+        DateTimeFormatter formatter = DateTimeFormat.forPattern("dd/MM/yyy");
+        DateTime today = new DateTime();
+        DateTime lastWeek = today.minusWeeks(1).minusDays(1);
+        lastWeek = lastWeek.withHourOfDay(16);
+        getData(lastWeek);
     }
+
+
+
+
+    private void getData(DateTime date) {
+        //create a json object and call API to log in
+        String lastWeekStr = date.toString(DateTimeFormat.forPattern("yyyy-MM-dd"));
+        String getLink = link + "?from=" + lastWeekStr;
+        Log.i("REQUEST", "getData: ");
+        APICaller apiCaller = new APICaller(getApplicationContext());
+        apiCaller.getData( true,null,buildMap(),getLink, new ServerCallback() {
+                    @Override
+                    public void onSuccess(JSONObject response) {
+                        try {
+                            JSONArray periods = response.getJSONArray(  "periods");
+                            SleepDataEntry[] entries  = new SleepDataEntry[periods.length()];
+                            DateTimeFormatter parser = ISODateTimeFormat.dateTimeParser();
+                            for (int i = 0; i < periods.length(); i++) {
+                                int id = periods.getJSONObject(i).getInt("id");
+                                DateTime startTime = parser.parseDateTime(periods.getJSONObject(i).getString("start_time"));
+                                DateTime stopTime = parser.parseDateTime(periods.getJSONObject(i).getString("stop_time"));
+                                int duration = periods.getJSONObject(i).getInt("duration");
+                                int rating = periods.getJSONObject(i).getInt("sleep_quality");
+                                SleepDataEntry newEntry = new SleepDataEntry(id, startTime, stopTime, duration, rating);
+                                newEntry.setDurationText(periods.getJSONObject(i).getString("duration_text"));
+                                newEntry.setPercentage(periods.getJSONObject(i).getInt("progress_percentage"));
+                                newEntry.setMessage(periods.getJSONObject(i).getString("progress_message"));
+                                entries[i] = newEntry;
+                            }
+                            //graphData(entries);
+
+                            Log.i("Response", response.toString());
+                        } catch (JSONException je) {
+                            Log.e("JSONException", "onErrorResponse: ", je);
+                        }
+                    }
+
+                    @Override
+                    public void onFail(VolleyError error) {
+                        try {
+                            //retrieve error message and display
+                            String jsonInput = new String(error.networkResponse.data, "utf-8");
+                            JSONObject responseBody = new JSONObject(jsonInput);
+                            String message = responseBody.getString("message");
+                            Log.e("Error.Response", responseBody.toString());
+                            Toast toast = Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG);
+                            toast.show();
+                        } catch (JSONException je) {
+                            Log.e("JSONException", "onErrorResponse: ", je);
+                        } catch (UnsupportedEncodingException err) {
+                            Log.e("EncodingError", "onErrorResponse: ", err);
+                        }
+                    }
+                }
+        );
+
+    }
+
+
+
     private void extractData() {
         Spinner spinner = (Spinner)findViewById(R.id.option_spinner);
 
@@ -176,14 +245,14 @@ public class SleepTrackerActivity extends AppCompatActivity {
 
         JSONObject object = null;
         try {
-            object = createObject(rating, startISO8601, stopISO68601);
+            object = createSendObject(rating, startISO8601, stopISO68601);
         }catch (JSONException e){
             e.printStackTrace();
         }
         sendCreate(object);
     }
 
-    private JSONObject createObject(int rating, String startISO8601, String stopISO68601) throws JSONException {
+    private JSONObject createSendObject(int rating, String startISO8601, String stopISO68601) throws JSONException {
         JSONObject entry = new JSONObject();
         entry.put("start_time", startISO8601);
         entry.put("stop_time", stopISO68601);
@@ -191,7 +260,7 @@ public class SleepTrackerActivity extends AppCompatActivity {
         JSONArray periods = new JSONArray();
         periods.put(entry);
         JSONObject object = new JSONObject();
-        object.put("Periods", periods);
+        object.put("periods", periods);
         return object;
     }
 
@@ -203,8 +272,7 @@ public class SleepTrackerActivity extends AppCompatActivity {
     public void sendCreate(JSONObject body) {
         //create a json object and call API to log in
 
-        String link = AuthStrings.getInstance(context).getAccountLink();
-        link = link.replace("account", "sleep");
+
         APICaller apiCaller = new APICaller(getApplicationContext());
         apiCaller.post(true, body, buildMap(), link, new ServerCallback() {
                     @Override
@@ -214,7 +282,7 @@ public class SleepTrackerActivity extends AppCompatActivity {
                             JSONObject responseBody = response;
                             Toast toast = Toast.makeText(getApplicationContext(), response.getString("message"), Toast.LENGTH_LONG);
                             toast.show();
-                            Log.d("Response", response.toString());
+                            Log.i("Response SEND DATA", response.toString());
                         } catch (JSONException je) {
                             Log.e("JSONException", "onErrorResponse: ", je);
                         }
