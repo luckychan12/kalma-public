@@ -260,10 +260,14 @@ class PeriodicEndpoint extends DataEndpoint
         }
 
         // Build response
-        $res->setBody(array(
-            'periods' => $periods,
-            'links' => User::getLinks($args['id'], $this->name),
-        ));
+        $res_body['periods'] = $periods;
+        if (isset($target)) {
+            $res_body['target'] = $target;
+            $res_body['target_string'] = self::minsToText($target);
+        }
+        $res_body['links'] = User::getLinks($args['id'], $this->name);
+
+        $res->setBody($res_body);
         return $res;
     }
 

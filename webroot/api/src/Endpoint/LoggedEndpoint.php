@@ -180,12 +180,17 @@ class LoggedEndpoint extends DataEndpoint
 
             $entries[] = $entry;
         }
-
         // Build the response
-        $res->setBody(array(
+        $res_body = array(
             'entries' => $entries,
             'links' => User::getLinks($args['id'], $this->name),
-        ));
+        );
+
+        if (isset($target)) {
+            $res_body['target'] = $target;
+        }
+
+        $res->setBody($res_body);
         return $res;
     }
 
