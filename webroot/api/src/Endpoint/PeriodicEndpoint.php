@@ -104,9 +104,10 @@ class PeriodicEndpoint extends DataEndpoint
                 // Disallow creation of periods that overlap existing records
                 $overlaps = $this->database->fetch(
                     "SELECT * FROM kalma.sleep_period
-	                     WHERE :start_time BETWEEN start_time AND stop_time
-                            OR :stop_time BETWEEN start_time AND stop_time;",
-                    array('start_time' => $start_time, 'stop_time' => $stop_time)
+	                     WHERE (:start_time BETWEEN start_time AND stop_time
+                                OR :stop_time BETWEEN start_time AND stop_time)
+                           AND (user_id = :user_id);",
+                    array('start_time' => $start_time, 'stop_time' => $stop_time, 'user_id' => $args['id'])
                 );
                 if (count($overlaps) > 0) {
                     throw new ResponseException(400, 1204, 'New period overlaps with an existing one.',
