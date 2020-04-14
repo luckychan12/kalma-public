@@ -49,39 +49,36 @@ class LoggedEndpoint extends DataEndpoint
     {
         $body = $req->getParsedBody();
 
-        if (!isset($body['entries']) || !is_array($body['entries']))
-        {
+        if (!isset($body['entries']) || !is_array($body['entries'])) {
             throw new ResponseException(...ResponseException::INVALID_BODY_ATTRS);
         }
 
         $this->database->beginTransaction();
 
-        foreach ($body['entries'] as $entry)
-        {
+        // Attempt to create a record for each entry in the array
+        foreach ($body['entries'] as $entry) {
+            // Build INSERT query
             $query_params = array('user_id' => $args['id'], 'date_logged' => date('Y-m-d'));
 
-            foreach ($this->attributes as $attribute)
-            {
-                if (!isset($entry[$attribute]))
-                {
+            foreach ($this->attributes as $attribute) {
+                if (!isset($entry[$attribute])) {
                     $this->database->rollBack();
                     throw new ResponseException(...ResponseException::INVALID_BODY_ATTRS);
                 }
-
                 $query_params[$attribute] = $entry[$attribute];
             }
 
             $query_attrs = implode(", ", array_keys($query_params));
-            $query_attr_params = implode(", ", array_map(function($v) { return ":".$v; }, array_keys($query_params)));
-
+            $query_attr_params = implode(", ", array_map(function($v) { return ":$v"; }, array_keys($query_params)));
             $query = "INSERT INTO `$this->table_name` ($query_attrs) VALUES ($query_attr_params);";
 
+            // Execute INSERT query
             $this->database->execute($query, $query_params);
-
         }
 
         $this->database->commit();
 
+        // Build response
         $res->setBody(array(
             'message' => 'Success.',
             'links' => User::getLinks($args['id'], $this->name),
@@ -102,24 +99,26 @@ class LoggedEndpoint extends DataEndpoint
     {
         $params = $_GET;
 
+        // Get sort order, default to chronological
         $order_by = 'date_logged';
-        if (isset($params['order']))
-        {
-            if (in_array($params['order'], ['date_logged', ...$this->attributes]))
-            {
+        if (isset($params['order'])) {
+            if (in_array($params['order'], ['date_logged', ...$this->attributes])) {
                 $order_by = $params['order'];
             }
-            else
-            {
-                throw new ResponseException(...ResponseException::INVALID_BODY_ATTRS);
+            else {
+                throw new ResponseException(...ResponseException::INVALID_URI_PARAMS);
             }
         }
 
+        // Get sort direction, default to ascending
         $order_dir = isset($params['desc']) ? 'DESC' : 'ASC';
 
+        // Get limits of the query, default to fetching all matching records
         $lim_offset = $params['offset'] ?? 0;
         $lim_count = $params['count'] ?? 2147483647;
 
+        // Get date parameters in SQL-friendly format. Default to min/max representable dates if not specified
+        // i.e. fetch records from any date
         try {
             $from_date = isset($params['from']) ? (new DateTime($params['from'], new DateTimeZone('UTC')))->format('Y-m-d') : '0000-00-00';
             $to_date = isset($params['to']) ? (new DateTime($params['to'], new DateTimeZone('UTC')))->format('Y-m-d') : '9999-12-31';
@@ -129,14 +128,13 @@ class LoggedEndpoint extends DataEndpoint
             throw new ResponseException(400, 1101, 'One or more of the form fields isn\'t valid.', 'Invalid date format.');
         };
 
+        // Build SELECT query string
         $query_params = array(
             'user_id' => $args['id'],
             'from_date' => $from_date,
             'to_date' => $to_date,
         );
-
         $query_attrs = implode(', ', $this->attributes);
-
         $query = "SELECT {$this->table_name}_id, date_logged, $query_attrs FROM `$this->table_name`
                       WHERE user_id = :user_id
                         AND date_logged > :from_date
@@ -144,14 +142,16 @@ class LoggedEndpoint extends DataEndpoint
                         ORDER BY $order_by $order_dir
                         LIMIT $lim_offset,$lim_count;";
 
+        // Execute SELECT query
         $rows = $this->database->fetch($query, $query_params);
 
+        // Get the user's target for this data
         $target = $this->database->fetch("SELECT `{$this->name}_target` AS `target` FROM `user` WHERE `user_id` = :user_id;",
                                           array('user_id' => $args['id']))[0]['target'];
 
+        // Build an array of entry records
         $entries = array();
-        foreach ($rows as $row)
-        {
+        foreach ($rows as $row) {
             $id = $row["{$this->table_name}_id"];
 
             try {
@@ -165,6 +165,7 @@ class LoggedEndpoint extends DataEndpoint
                 'date_logged' => $date_logged->format(DATE_ISO8601),
             );
 
+            // Calculate progress towards target, if a target is set
             $logged = $row[$this->attributes[0]];
             if (isset($target)) {
                 $progress = floor(($logged / $target) * 100);
@@ -173,18 +174,23 @@ class LoggedEndpoint extends DataEndpoint
                 $entry['progress_message'] = $message;
             }
 
-            foreach ($this->attributes as $attribute)
-            {
+            foreach ($this->attributes as $attribute) {
                 $entry[$attribute] = $row[$attribute];
             }
 
             $entries[] = $entry;
         }
-
-        $res->setBody(array(
+        // Build the response
+        $res_body = array(
             'entries' => $entries,
             'links' => User::getLinks($args['id'], $this->name),
-        ));
+        );
+
+        if (isset($target)) {
+            $res_body['target'] = $target;
+        }
+
+        $res->setBody($res_body);
         return $res;
     }
 
@@ -200,46 +206,45 @@ class LoggedEndpoint extends DataEndpoint
     public function _update(Request $req, Response $res, ?array $payload, array $args): Response
     {
         $body = $req->getParsedBody();
-        if (!isset($body['entries']) || !is_array($body['entries']))
-        {
+        if (!isset($body['entries']) || !is_array($body['entries'])) {
             throw new ResponseException(...ResponseException::INVALID_BODY_ATTRS);
         }
 
+        // Execute an UPDATE query for each record in the entries array
         $affected = array();
-        foreach ($body['entries'] as $entry)
-        {
-            if (!isset($entry['id']))
-            {
+        foreach ($body['entries'] as $entry) {
+            if (!isset($entry['id'])) {
                 throw new ResponseException(...ResponseException::INVALID_BODY_ATTRS);
             }
 
+            // Parse record body
             $allowed_fields = [...$this->attributes];
             $sets = array();
             $query_params = array('user_id' => $args['id'], "entry_id" => $entry['id']);
-            foreach ($allowed_fields as $field)
-            {
-                if (isset($entry[$field]))
-                {
+            foreach ($allowed_fields as $field) {
+                if (isset($entry[$field])) {
                     $sets[] = "$field = :$field";
                     $query_params[$field] = $entry[$field];
                 }
             }
 
+            // Build UPDATE query string
             $set_queries = implode(', ', $sets);
-
             $query = "UPDATE `$this->table_name`
                       SET $set_queries
                       WHERE {$this->table_name}_id = :entry_id
                         AND user_id = :user_id;";
 
+            // Execute UPDATE query
             $rows_affected = $this->database->execute($query, $query_params);
 
-            if ($rows_affected > 0)
-            {
+            // Track successfully updated records
+            if ($rows_affected > 0) {
                 $affected[] = $entry['id'];
             }
         }
 
+        // Build response
         $res->setBody(array(
             'resources_affected' => $affected,
             'message' => count($affected) < count($body['entries']) ? 'One or more resources could not be updated.' : 'Success.',
@@ -261,20 +266,18 @@ class LoggedEndpoint extends DataEndpoint
     public function _delete(Request $req, Response $res, ?array $payload, array $args): Response
     {
         $body = $req->getParsedBody();
-        if (!isset($body['entries']) || !is_array($body['entries']))
-        {
+        if (!isset($body['entries']) || !is_array($body['entries'])) {
             throw new ResponseException(...ResponseException::INVALID_BODY_ATTRS);
         }
 
+        // Create and execute a DELETE query for each record in the entries array
         $resources_affected = array();
-
-        foreach ($body['entries'] as $entry_id)
-        {
-            if (!is_integer($entry_id))
-            {
+        foreach ($body['entries'] as $entry_id) {
+            if (!is_integer($entry_id)) {
                 throw new ResponseException(...ResponseException::INVALID_BODY_ATTRS);
             }
 
+            // Build DELETE query string
             $query = "DELETE FROM `$this->table_name` 
                           WHERE {$this->table_name}_id = :entry_id
                             AND user_id = :user_id;";
@@ -283,14 +286,16 @@ class LoggedEndpoint extends DataEndpoint
                 'user_id' => $args['id'],
             );
 
+            // Execute DELETE query
             $rows_affected = $this->database->execute($query, $query_params);
 
-            if ($rows_affected > 0)
-            {
+            // Track successfully deleted records
+            if ($rows_affected > 0) {
                 $resources_affected[] = $entry_id;
             }
         }
 
+        // Build response
         $res->setBody(array(
             'resources_affected' => $resources_affected,
             'message' => count($resources_affected) < count($body['entries']) ? 'One or more resources could not be updated.' : 'Success.',
