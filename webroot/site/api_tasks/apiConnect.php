@@ -249,7 +249,6 @@ class ApiConnect
         }
         catch (ClientException $e){
             $response = json_decode($e->getResponse()->getBody()->getContents());
-            session_unset();
             $_SESSION['status'] = $response->status;
             $_SESSION['error'] = $response->error;
             $_SESSION['error_message'] = $response->message;
@@ -260,7 +259,35 @@ class ApiConnect
         }
         catch (RequestException $e){
             $response = json_decode($e->getResponse()->getBody()->getContents());
-            session_unset();
+            $_SESSION['status'] = $response->status;
+            $_SESSION['error'] = $response->error;
+            $_SESSION['error_message'] = $response->message;
+            if(isset($response->detail)) {
+                $_SESSION['detail'] = $response->detail;
+            }
+            return $response;
+        }
+
+    }
+    function addCalmData($startTime, $stopTime, $description ){
+        try{
+            $res = $this->client->request('POST',"api/user/".$_SESSION['user_id']."/calm", ['headers' => ["Authorization" => 'bearer ' . $_SESSION['access_token']],'json' => ['periods' => [['start_time' => $startTime, 'stop_time' => $stopTime, 'description' => $description]]]]);
+            $messageBody = $res->getBody()->getContents();
+            $data= json_decode($messageBody);
+            return $data;
+        }
+        catch (ClientException $e){
+            $response = json_decode($e->getResponse()->getBody()->getContents());
+            $_SESSION['status'] = $response->status;
+            $_SESSION['error'] = $response->error;
+            $_SESSION['error_message'] = $response->message;
+            if(isset($response->detail)) {
+                $_SESSION['detail'] = $response->detail;
+            }
+            return $response;
+        }
+        catch (RequestException $e){
+            $response = json_decode($e->getResponse()->getBody()->getContents());
             $_SESSION['status'] = $response->status;
             $_SESSION['error'] = $response->error;
             $_SESSION['error_message'] = $response->message;
