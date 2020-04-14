@@ -67,7 +67,7 @@ class PeriodicEndpoint extends DataEndpoint
     {
         $body = $req->getParsedBody();
 
-        if (!isset($body['periods']) || !is_array($body['periods'] || count($body['periods']) == 0)) {
+        if (!isset($body['periods']) || !is_array($body['periods']) || count($body['periods']) == 0) {
             throw new ResponseException(...ResponseException::INVALID_BODY_ATTRS);
         }
 
@@ -107,7 +107,11 @@ class PeriodicEndpoint extends DataEndpoint
 	                     WHERE (:start_time BETWEEN start_time AND stop_time
                                 OR :stop_time BETWEEN start_time AND stop_time)
                            AND (user_id = :user_id);",
-                    array('start_time' => $start_time, 'stop_time' => $stop_time, 'user_id' => $args['id'])
+                    array(
+                        'start_time' => $start_time->format('Y-m-d H:i:s'),
+                        'stop_time' => $stop_time->format('Y-m-d H:i:s'),
+                        'user_id' => $args['id'],
+                    )
                 );
                 if (count($overlaps) > 0) {
                     throw new ResponseException(400, 1204, 'New period overlaps with an existing one.',
