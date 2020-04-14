@@ -16,7 +16,7 @@
                 </a>
                 <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
                     <a class="dropdown-item" href="./sleep.php">Sleep</a>
-                    <a class="dropdown-item" href="#">Mindful Minutes</a>
+                    <a class="dropdown-item" href="./calm.php">Mindful Minutes</a>
                     <a class="dropdown-item" href="#">Daily Steps</a>
                     <a class="dropdown-item" href="#">Weight</a>
                     <a class="dropdown-item" href="#">Height</a>
