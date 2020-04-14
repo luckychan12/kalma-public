@@ -43,9 +43,15 @@ include_once '../controller/sleepController.php';
 <div class="container-fluid">
     <div class="row">
         <div class="col-lg-7 offset-lg-1">
+            <div class="alert alert-danger alert-dismissible fade text-center <?= isset($message->error) ? "show" : "hide"?>" role="alert">
+                <?= $message->message. " (" . $message->error.")" ?? ""; ?>
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
             <h1 style="margin-top: 20px">Sleep Period</h1>
-            <button class="btn btn-primary date-selector" onclick=showWeekChart(); style="margin-left: 5px">W</button>
-            <button class="btn btn-primary date-selector" onclick=showMonthChart();>M</button>
+            <button class="btn btn-primary date-selector" onclick=showWeekChart(); style="margin-left: 5px">Week</button>
+            <button class="btn btn-primary date-selector" onclick=showMonthChart();>Month</button>
             <br>
             <div style="margin-top: 10px; margin-left: 5px">
                 <!--Date choosers-->
@@ -67,14 +73,14 @@ include_once '../controller/sleepController.php';
         <div class="col-lg-3">
             <div class="outer">
                 <div class="module">
-                    <h2 style="font-size: x-large">Average sleep:</h2>
+                    <h2 style="font-size: x-large">Average sleep (Overall):</h2>
                     <hr>
                     <?php echo $average?> Hours a day
                 </div>
                 <div class="module">
-                    <h2 style="font-size: x-large">Progress:</h2>
+                    <h2 style="font-size: x-large">Progress Today:</h2>
                     <hr>
-                    <?php echo $progress_message?>
+                    <?php echo $progress_message?>% of your daily goal
                 </div>
             </div>
             <!--Add data button-->
