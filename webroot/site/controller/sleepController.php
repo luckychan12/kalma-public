@@ -10,9 +10,6 @@ if(isset($_POST['startDate'])){
     $newEndTime = new DateTime($_POST['endDate'] .' '. $_POST['endTime']);
     $newEndTime = $newEndTime->format(DateTime::ISO8601);
     $message = $api->addSleepData($newStartTime,$newEndTime,$_POST['sleepQuality']);
-    if (isset($message->error)) {
-        header('Location: ./errorPage.php');
-    }
 }
 
 
@@ -77,7 +74,7 @@ foreach ($dataPoints->periods as $data) {
             if (date("G", strtotime($data->start_time)) <= 16) {
                 $n--;
             }
-            $weekPoints[date("N", strtotime($data->start_time)) + $n] = $data->duration / 60;
+            $weekPoints[date("N", strtotime($data->start_time)) + $n] =$weekPoints[date("N", strtotime($data->start_time)) + $n] + $data->duration / 60;
         }
     }
 
@@ -112,11 +109,11 @@ for ($i = 1; $i <= date("t", strtotime($date)); $i++)
 //fills the data array with the correct data to use
 $monthPoints = array_fill(0, date("t", strtotime($date)), 0);;
 //sets the start and end of the current sleep to get the message on progress
-$progress_message="0% of your daily goal";
+$progress_message="0";
 $last_night = new DateTime('4pm');
-$last_night_start = $last_night->format(DateTime::ISO8601);
+$last_night_start = $last_night->format('Y-m-d H:i');
 $last_night_end = $last_night->modify("+1day");
-$last_night_end =$last_night_end->format(DateTime::ISO8601);
+$last_night_end =$last_night_end->format('Y-m-d H:i');
 
 foreach ($dataPoints->periods as $data)
 {
@@ -131,7 +128,7 @@ foreach ($dataPoints->periods as $data)
         }
         //finds the progress message for the current sleep period
         if (($startTime >= $last_night_start) && ($startTime < $last_night_end)){
-            $progress_message = $data->progress_message;
+            $progress_message = $progress_message + $data->progress_percentage;
         }
 
     }
