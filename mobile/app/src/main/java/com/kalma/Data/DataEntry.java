@@ -3,26 +3,37 @@ package com.kalma.Data;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 
-public class SleepDataEntry {
-    int id;
-    DateTime startTime;
-    DateTime stopTime;
-    int duration;
-    String durationText;
-    int sleepQuality;
-    String message;
-    int percentage;
+public class DataEntry {
+    private DateTime startTime;
+    private int id;
+    private DateTime stopTime;
+    private int duration;
+    private String durationText;
+    private int sleepQuality;
+    private String message;
+    private int percentage;
+    private String description;
 
-    public SleepDataEntry() {
+    public DataEntry() {
     }
 
-    public SleepDataEntry(int id, DateTime startTime, DateTime stopTime, int duration, int sleepQuality) {
+    public DataEntry(int id, DateTime startTime, DateTime stopTime, int duration, int sleepQuality) {
         this.id = id;
         this.startTime = startTime;
         this.stopTime = stopTime;
         this.duration = duration;
         this.sleepQuality = sleepQuality;
     }
+
+    public DataEntry(int id, DateTime startTime, DateTime stopTime, int duration, String description) {
+        this.id = id;
+        this.startTime = startTime;
+        this.stopTime = stopTime;
+        this.duration = duration;
+        this.description = description;
+    }
+
+
 
     public int getPercentage() {
         return percentage;
@@ -95,4 +106,5 @@ public class SleepDataEntry {
     public String getStopISO() {
         return stopTime.toString(DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ss"));
     }
+
 }
