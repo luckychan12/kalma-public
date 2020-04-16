@@ -13,10 +13,12 @@ import com.kalma.API_Interaction.ServerCallback;
 import com.kalma.MainApp.HomeActivity;
 import com.kalma.R;
 
+import org.joda.time.DateTimeZone;
 import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TimeZone;
 
 public class StartPage extends AppCompatActivity {
     public static final String MyPREFERENCES = "TOKENS";

@@ -106,7 +106,7 @@ public class SettingsActivity extends AppCompatActivity {
     public void logout() {
         //create a json object and call API to log in
         APICaller apiCaller = new APICaller(getApplicationContext());
-        apiCaller.post(true, logoutObject(), buildMap(), AuthStrings.getInstance(getApplicationContext()).getLogoutLink(),new ServerCallback() {
+        apiCaller.post(true, logoutObject(), buildMap(), AuthStrings.getInstance(getApplicationContext()).getLinks().get("logout").toString(),new ServerCallback() {
                     @Override
                     public void onSuccess(JSONObject response) {
                         try {

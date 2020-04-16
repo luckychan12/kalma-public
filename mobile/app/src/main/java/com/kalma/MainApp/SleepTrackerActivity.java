@@ -1,9 +1,5 @@
 package com.kalma.MainApp;
 
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
-
 import android.app.DatePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -20,22 +16,26 @@ import android.widget.Spinner;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
+
 import com.android.volley.VolleyError;
 import com.github.mikephil.charting.charts.LineChart;
-import com.github.mikephil.charting.components.AxisBase;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
-import com.github.mikephil.charting.formatter.IAxisValueFormatter;
-import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
+import com.github.mikephil.charting.formatter.ValueFormatter;
 import com.kalma.API_Interaction.APICaller;
 import com.kalma.API_Interaction.ServerCallback;
 import com.kalma.Data.AuthStrings;
 import com.kalma.Data.LineGraphEntry;
-import com.kalma.Data.SleepDataEntry;
+import com.kalma.Data.DataEntry;
 import com.kalma.R;
+
+import net.danlew.android.joda.JodaTimeAndroid;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -60,10 +60,10 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.TimeZone;
 
 public class SleepTrackerActivity extends AppCompatActivity {
     Context context = this;
-    String link = AuthStrings.getInstance(context).getAccountLink();
 
     EditText txtStartDate, txtStopDate;
     Button buttonProfile, buttonSettings, buttonHome, buttonSend;
@@ -72,8 +72,8 @@ public class SleepTrackerActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sleep_tracker);
+        JodaTimeAndroid.init(this);
 
-        link = link.replace("account", "sleep");
         setTitle("Sleep Tracker");
         final Calendar myCalendar = Calendar.getInstance();
         ((TimePicker)findViewById(R.id.startTimePicker)).setIs24HourView(true);
@@ -90,6 +90,7 @@ public class SleepTrackerActivity extends AppCompatActivity {
         txtStartDate = (EditText)findViewById(R.id.txtStartdate);
         txtStopDate = (EditText)findViewById(R.id.txtStopdate);
         final EditText[] selecting = {null};
+
         final DatePickerDialog.OnDateSetListener date = new DatePickerDialog.OnDateSetListener() {
             //Convert datepicker value into string and fill textbox
             @Override
@@ -160,99 +161,20 @@ public class SleepTrackerActivity extends AppCompatActivity {
         });
 
 
-        DateTime today = new DateTime();
+        DateTime today = new DateTime().plusDays(1);
         DateTime lastWeek = today.minusWeeks(1).minusDays(1);
         lastWeek = lastWeek.withHourOfDay(16);
         getData(lastWeek);
     }
 
-    private void processData(SleepDataEntry[] sleepDataEntries){//, DateTime startDate, DateTime stopDate) {
-        DateTime startDate = new DateTime().minusWeeks(1).minusDays(1).withHourOfDay(16);;
-        DateTime stopDate = new DateTime().withHourOfDay(16);
 
-        List<LineGraphEntry> graphEntries = new ArrayList<LineGraphEntry>();
-        int days = Days.daysBetween(startDate, stopDate).getDays();
-
-        for (int i = 0; i < days; i++) {
-            DateTime newDate = startDate.plusDays(i);
-            graphEntries.add(new LineGraphEntry(newDate, 0));
-        }
-
-
-        for (SleepDataEntry entry : sleepDataEntries) {
-            for (int i = 0; i < graphEntries.size() - 1; i++) {
-                Interval interval = new Interval(graphEntries.get(i).getDate(), graphEntries.get(i+1).getDate());
-                if (interval.contains(entry.getStartTime())) {
-                    if (interval.contains(entry.getStopTime())){
-                        Interval calcInterval = new Interval(entry.getStartTime(), entry.getStopTime());
-                        addHours(graphEntries, i, calcInterval);
-                    }
-                    else{
-                        Interval calcInterval = new Interval(entry.getStartTime(), interval.getEnd());
-                        addHours(graphEntries, i, calcInterval);
-                    }
-                }
-                else if(interval.contains(entry.getStopTime())){
-                    Interval calcInterval = new Interval(interval.getStart(), entry.getStopTime());
-                    addHours(graphEntries, i, calcInterval);
-                }
-            }
-        }
-
-
-        graphData(graphEntries);
-    }
-
-    private void graphData(List<LineGraphEntry> graphEntries){
-        final ArrayList<String> xLabel = new ArrayList<>();
-        for (LineGraphEntry entry :graphEntries) {
-            xLabel.add(Integer.toString(entry.getDate().getDayOfMonth()) + "/" + Integer.toString(entry.getDate().getMonthOfYear()));
-        }
-        List<Entry> entries = new ArrayList<Entry>();
-        for (int i = 0; i < graphEntries.size(); i++) {
-            entries.add(new Entry(i, graphEntries.get(i).getValue()));
-        }
-        LineDataSet dataSet = new LineDataSet(entries, "Time slept");
-        //todo styling here
-        //dataSet.setColor(...);
-        dataSet.setLineWidth(1);
-        dataSet.setColor(ContextCompat.getColor(context, R.color.colorPrimary));
-        int[] colors = {ContextCompat.getColor(context, R.color.textOnDark),
-                ContextCompat.getColor(context, R.color.colorSecondary) };
-        dataSet.setDrawFilled(true);
-        GradientDrawable gradientDrawable = new GradientDrawable();
-        gradientDrawable.setColors(colors);
-        //gradientDrawable.set
-        dataSet.setFillDrawable(gradientDrawable);
-        LineData lineData = new LineData(dataSet);
-        LineChart chart = (LineChart) findViewById(R.id.chart);
-        YAxis yAxis = chart.getAxisLeft();
-        yAxis.setAxisMinimum(0f);
-        XAxis xAxis = chart.getXAxis();
-
-        chart.getAxisRight().setEnabled(false);
-        chart.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
-        chart.getDescription().setEnabled(false);
-        chart.setData(lineData);
-        chart.invalidate();
-    }
-
-    private void addHours(List<LineGraphEntry> graphEntries, int i, Interval calcInterval) {
-        Duration intervalDuration = calcInterval.toDuration();
-        float millis = Float.parseFloat(Double.toString(intervalDuration.getMillis()));
-        float hours = ( millis / 3.6f) * 1E-6f;
-        BigDecimal bd = new BigDecimal(Double.toString(hours));
-        bd = bd.setScale(3, RoundingMode.HALF_UP);
-        hours = bd.floatValue();
-        graphEntries.get(i).setValue(graphEntries.get(i).getValue() + hours);
-    }
 
 
 
     private void getData(DateTime date) {
         //create a json object and call API to log in
         String lastWeekStr = date.toString(DateTimeFormat.forPattern("yyyy-MM-dd"));
-        String getLink = link + "?from=" + lastWeekStr;
+        String getLink = AuthStrings.getInstance(getApplicationContext()).getLinks().get("sleep").toString() + "?from=" + lastWeekStr;
         String url = context.getResources().getString(R.string.api_url) + getLink;
         Log.i("REQUEST", url);
         APICaller apiCaller = new APICaller(context.getApplicationContext());
@@ -263,7 +185,7 @@ public class SleepTrackerActivity extends AppCompatActivity {
                         try {
                             JSONObject responseBody = response;
                             JSONArray periods = responseBody.getJSONArray(  "periods");
-                            SleepDataEntry[] entries  = new SleepDataEntry[periods.length()];
+                            DataEntry[] entries  = new DataEntry[periods.length()];
                             DateTimeFormatter parser = ISODateTimeFormat.dateTimeParser();
                             for (int i = 0; i < periods.length(); i++) {
                                 int id = periods.getJSONObject(i).getInt("id");
@@ -272,7 +194,7 @@ public class SleepTrackerActivity extends AppCompatActivity {
                                 int duration = periods.getJSONObject(i).getInt("duration");
                                 Log.i("dur", Integer.toString(duration));
                                 int rating = periods.getJSONObject(i).getInt("sleep_quality");
-                                SleepDataEntry newEntry = new SleepDataEntry(id, startTime, stopTime, duration, rating);
+                                DataEntry newEntry = new DataEntry(id, startTime, stopTime, duration, rating);
                                 newEntry.setDurationText(periods.getJSONObject(i).getString("duration_text"));
                                 newEntry.setPercentage(periods.getJSONObject(i).getInt("progress_percentage"));
                                 newEntry.setMessage(periods.getJSONObject(i).getString("progress_message"));
@@ -312,27 +234,108 @@ public class SleepTrackerActivity extends AppCompatActivity {
 
     }
 
+    private void processData(DataEntry[] sleepDataEntries) {
+        DateTime startDate = new DateTime().minusWeeks(1).minusDays(0).withHourOfDay(16);
+        DateTime stopDate = new DateTime().plusDays(1).withHourOfDay(16);
+
+        List<LineGraphEntry> graphEntries = new ArrayList<LineGraphEntry>();
+        int days = Days.daysBetween(startDate, stopDate).getDays();
+
+        for (int i = 0; i < days; i++) {
+            DateTime newDate = startDate.plusDays(i);
+            graphEntries.add(new LineGraphEntry(newDate, 0));
+        }
+
+
+        for (DataEntry entry : sleepDataEntries) {
+            for (int i = 0; i < graphEntries.size() - 1; i++) {
+                Interval interval = new Interval(graphEntries.get(i).getDate(), graphEntries.get(i + 1).getDate());
+                if (interval.contains(entry.getStartTime())) {
+                    if (interval.contains(entry.getStopTime())) {
+                        Interval calcInterval = new Interval(entry.getStartTime(), entry.getStopTime());
+                        addHours(graphEntries, i, calcInterval);
+                    } else {
+                        Interval calcInterval = new Interval(entry.getStartTime(), interval.getEnd());
+                        addHours(graphEntries, i, calcInterval);
+                    }
+                } else if (interval.contains(entry.getStopTime())) {
+                    Interval calcInterval = new Interval(interval.getStart(), entry.getStopTime());
+                    addHours(graphEntries, i, calcInterval);
+                }
+            }
+        }
+        graphData(graphEntries);
+    }
+
+    private void graphData(List<LineGraphEntry> graphEntries) {
+        final ArrayList<String> xLabel = new ArrayList<>();
+        for (LineGraphEntry entry : graphEntries) {
+            xLabel.add(entry.getDate().getDayOfMonth() + "/" + String.format(Locale.UK, "%02d", entry.getDate().getMonthOfYear()));
+        }
+        List<Entry> entries = new ArrayList<Entry>();
+        for (int i = 0; i < graphEntries.size(); i++) {
+            entries.add(new Entry(i, graphEntries.get(i).getValue()));
+        }
+
+        LineDataSet dataSet = new LineDataSet(entries, "Time slept");
+        //todo styling here
+        //dataSet.setColor(...);
+        dataSet.setLineWidth(1);
+        dataSet.setColor(ContextCompat.getColor(context, R.color.colorPrimary));
+        int[] colors = {ContextCompat.getColor(context, R.color.textOnDark),
+                ContextCompat.getColor(context, R.color.colorSecondary)};
+        dataSet.setDrawFilled(true);
+        GradientDrawable gradientDrawable = new GradientDrawable();
+        gradientDrawable.setColors(colors);
+        //gradientDrawable.set
+        dataSet.setFillDrawable(gradientDrawable);
+        LineData lineData = new LineData(dataSet);
+        LineChart chart = findViewById(R.id.chart);
+        YAxis yAxis = chart.getAxisLeft();
+        yAxis.setAxisMinimum(0f);
+        XAxis xAxis = chart.getXAxis();
+
+        xAxis.setValueFormatter(new ValueFormatter() {
+            @Override
+            public String getFormattedValue(float value) {
+                return xLabel.get((int) value);
+            }
+        });
+        xAxis.setLabelCount(5);
+        chart.getAxisRight().setEnabled(false);
+        chart.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
+        chart.getDescription().setEnabled(false);
+        chart.setData(lineData);
+        chart.invalidate();
+    }
+
+    private void addHours(List<LineGraphEntry> graphEntries, int i, Interval calcInterval) {
+        Duration intervalDuration = calcInterval.toDuration();
+        float millis = Float.parseFloat(Double.toString(intervalDuration.getMillis()));
+        float hours = (millis / 3.6f) * 1E-6f;
+        BigDecimal bd = new BigDecimal(Double.toString(hours));
+        bd = bd.setScale(3, RoundingMode.HALF_UP);
+        hours = bd.floatValue();
+        graphEntries.get(i).setValue(graphEntries.get(i).getValue() + hours);
+    }
 
 
     private void extractData() {
         Spinner spinner = (Spinner)findViewById(R.id.option_spinner);
-
-
         TimePicker startTimePicker = (TimePicker) findViewById(R.id.startTimePicker);
-        DateTimeFormatter formatter = DateTimeFormat.forPattern("dd/MM/yyy");
-        DateTime startDateTime = new DateTime(formatter.parseDateTime(txtStartDate.getText().toString()), DateTimeZone.UTC)
+        DateTimeZone.setDefault(DateTimeZone.forTimeZone(TimeZone.getDefault()));
+        DateTimeFormatter formatter = DateTimeFormat.forPattern("dd/MM/yyy").withZone(DateTimeZone.getDefault());
+        DateTime startDateTime = new DateTime(formatter.parseDateTime(txtStartDate.getText().toString()), DateTimeZone.getDefault())
                 .withHourOfDay(startTimePicker.getHour())
                 .withMinuteOfHour(startTimePicker.getMinute());
 
-
         TimePicker stopTimePicker = (TimePicker) findViewById(R.id.stopTimePicker);
-        DateTime stopDateTime = new DateTime(formatter.parseDateTime(txtStopDate.getText().toString()), DateTimeZone.UTC)
+        DateTime stopDateTime = new DateTime(formatter.parseDateTime(txtStopDate.getText().toString()), DateTimeZone.getDefault())
                 .withHourOfDay(stopTimePicker.getHour())
                 .withMinuteOfHour(stopTimePicker.getMinute());
-
         int rating = Integer.parseInt(spinner.getSelectedItem().toString());
-        String startISO8601 = startDateTime.toString(DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ss"));
-        String stopISO68601 = stopDateTime.toString(DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ss"));
+        String startISO8601 = startDateTime.toString(DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ss").withZoneUTC());
+        String stopISO68601 = stopDateTime.toString(DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ss").withZoneUTC());
 
         JSONObject object = null;
         try {
@@ -352,6 +355,7 @@ public class SleepTrackerActivity extends AppCompatActivity {
         periods.put(entry);
         JSONObject object = new JSONObject();
         object.put("periods", periods);
+        Log.i("BODY", object.toString());
         return object;
     }
 
@@ -365,7 +369,7 @@ public class SleepTrackerActivity extends AppCompatActivity {
 
 
         APICaller apiCaller = new APICaller(getApplicationContext());
-        apiCaller.post(true, body, buildMap(), link, new ServerCallback() {
+        apiCaller.post(true, body, buildMap(), AuthStrings.getInstance(getApplicationContext()).getLinks().get("sleep").toString(), new ServerCallback() {
                     @Override
                     public void onSuccess(JSONObject response) {
                         try {
@@ -396,10 +400,7 @@ public class SleepTrackerActivity extends AppCompatActivity {
                     }
                 }
         );
-
     }
-
-
 }
 
 
