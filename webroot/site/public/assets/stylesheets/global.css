@@ -84,6 +84,14 @@ a:hover {
     text-decoration: none;
 }
 
+.progress {
+    background-color: var(--c-bg-shade);
+}
+
+.progress-bar {
+    background-color: var(--c-secondary);
+}
+
 /*
  * Navbar styles
  */
