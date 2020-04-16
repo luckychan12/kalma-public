@@ -10,10 +10,10 @@ use GuzzleHttp\Client;
  */
 class ApiConnect
 {
-    /**
-     * @var Client
-     */
-    private $client;
+
+    private Client $client;
+
+    private static ApiConnect $instance;
 
     /**
      * ApiConnect constructor.
@@ -25,8 +25,16 @@ class ApiConnect
             'base_uri' => 'https://kalma.club',
             // You can set any number of default request options.
             'timeout'  => 50.0,
-
         ]);
+    }
+
+    /**
+     * Return an instance of ApiConnect, using an existing instance if available, else constructing a new one
+     * @return ApiConnect
+     */
+    public static function getConnection() : ApiConnect
+    {
+        return static::$instance ?? new ApiConnect();
     }
 
     /**
@@ -70,23 +78,11 @@ class ApiConnect
             $data = json_decode($messageBody);
             return $data;
         }
-        catch (ClientException $e){
+        catch (ClientException | RequestException $e){
             $response = json_decode($e->getResponse()->getBody()->getContents());
-            session_unset();
             $_SESSION['status'] = $response->status;
             $_SESSION['error'] = $response->error;
-            $_SESSION['error_message'] = $response->message;
-            if(isset($response->detail)) {
-                $_SESSION['detail'] = $response->detail;
-            }
-            return $response;
-        }
-        catch (RequestException $e) {
-            $response = json_decode($e->getResponse()->getBody()->getContents());
-            session_unset();
-            $_SESSION['status'] = $response->status;
-            $_SESSION['error'] = $response->error;
-            $_SESSION['error_message'] = $response->message;
+            $_SESSION['error_message'] = $response->message . " ($response->uri)";
             if(isset($response->detail)) {
                 $_SESSION['detail'] = $response->detail;
             }
@@ -242,28 +238,16 @@ class ApiConnect
 
     function addSleepData($startTime, $stopTime, $sleepQuality ){
         try{
-            $res = $this->client->request('POST',"api/user/".$_SESSION['user_id']."/sleep", ['headers' => ["Authorization" => 'bearer ' . $_SESSION['access_token']],'json' => ['periods' => [['start_time' => $startTime, 'stop_time' => $stopTime, 'sleep_quality' => $sleepQuality]]]]);
+            $res = $this->client->request('POST', $_SESSION['links']->sleep, ['headers' => ["Authorization" => 'bearer ' . $_SESSION['access_token']],'json' => ['periods' => [['start_time' => $startTime, 'stop_time' => $stopTime, 'sleep_quality' => $sleepQuality]]]]);
             $messageBody = $res->getBody()->getContents();
             $data= json_decode($messageBody);
             return $data;
         }
-        catch (ClientException $e){
+        catch (ClientException | RequestException $e){
             $response = json_decode($e->getResponse()->getBody()->getContents());
-            session_unset();
             $_SESSION['status'] = $response->status;
             $_SESSION['error'] = $response->error;
-            $_SESSION['error_message'] = $response->message;
-            if(isset($response->detail)) {
-                $_SESSION['detail'] = $response->detail;
-            }
-            return $response;
-        }
-        catch (RequestException $e){
-            $response = json_decode($e->getResponse()->getBody()->getContents());
-            session_unset();
-            $_SESSION['status'] = $response->status;
-            $_SESSION['error'] = $response->error;
-            $_SESSION['error_message'] = $response->message;
+            $_SESSION['error_message'] = $response->message . " ($response->uri)";
             if(isset($response->detail)) {
                 $_SESSION['detail'] = $response->detail;
             }
