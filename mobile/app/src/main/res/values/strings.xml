@@ -1,6 +1,6 @@
 <resources>
-    <string name="default_email">dummy@example2.com</string>
-    <string name="default_password">Asdfghjkl!23</string>
+    <string name="default_email">dummy@example.com</string>
+    <string name="default_password">Password123!</string>
     <string name="api_url">https://kalma.club</string>
     <string name="api_login">/api/user/login</string>
     <string name="api_signup">/api/user/signup</string>
@@ -42,6 +42,14 @@
 
     <string name="log_out">Log out</string>
     <string name="remember_me">Remember me?</string>
+    <string name="_3_month">3 Month</string>
+    <string name="all_time">All Time</string>
+    <string name="_7_days">7 Days</string>
+    <string name="_6_month">6 Month</string>
+    <string name="start_date">Start Date</string>
+    <string name="sleep_quality_rating">Sleep Quality Rating</string>
+    <string name="stop_date">Stop Date</string>
+    <string name="description">Description</string>
 
 
 </resources>
