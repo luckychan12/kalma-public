@@ -27,10 +27,8 @@ import org.json.JSONObject;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
-
-import static com.android.volley.VolleyLog.TAG;
 
 public class APICaller {
     //set application context to use getResource methods
@@ -97,10 +95,16 @@ public class APICaller {
                                 DateTime refreshExp = parser.parseDateTime(result.getString("refresh_expiry"));
                                 authStrings.setRefreshToken(refreshToken, refreshExp);
                                 JSONObject links = result.getJSONObject("links");
-                                String accLink = links.getString("account");
-                                String logoutLink = links.getString("logout");
-                                authStrings.setAccountLink(accLink);
-                                authStrings.setLogoutLink(logoutLink);
+                                Hashtable<String, String> linksDict = new Hashtable<String, String>(); ;
+                                linksDict.put("account", links.getString("account"));
+                                linksDict.put("logout", links.getString("logout"));
+                                linksDict.put("sleep", links.getString("sleep"));
+                                linksDict.put("calm", links.getString("calm"));
+                                linksDict.put("steps", links.getString("steps"));
+                                linksDict.put("height", links.getString("height"));
+                                linksDict.put("weight", links.getString("weight"));
+
+                                authStrings.setLinks(linksDict);
                                 callback.onSuccess(result);
                             }
                             catch (JSONException je) {

@@ -25,7 +25,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
+import java.util.Dictionary;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.Map;
 
 public class LoginActivity extends AppCompatActivity {
@@ -58,7 +60,7 @@ public class LoginActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    private Map buildMap() {
+    private Map<String, String> buildMap() {
         Map<String, String> params = new HashMap<String, String>();
         return params;
     }
@@ -77,10 +79,18 @@ public class LoginActivity extends AppCompatActivity {
                             DateTime accessExp = parser.parseDateTime(responseBody.getString("access_expiry"));
                             DateTime refreshExp = parser.parseDateTime(responseBody.getString("refresh_expiry"));
                             JSONObject links = responseBody.getJSONObject("links");
-                            String accLink = links.getString("account");
-                            String logoutLink = links.getString("logout");
+                            Log.d("out", response.toString());
                             String refreshToken = responseBody.getString("refresh_token");
-                            StoreTokens(accessToken, accessExp, refreshExp, accLink, logoutLink, refreshToken);
+                            Hashtable linksDict = new Hashtable(); ;
+                            linksDict.put("account", links.getString("account"));
+                            linksDict.put("logout", links.getString("logout"));
+                            linksDict.put("sleep", links.getString("sleep"));
+                            linksDict.put("calm", links.getString("calm"));
+                            linksDict.put("steps", links.getString("steps"));
+                            linksDict.put("height", links.getString("height"));
+                            linksDict.put("weight", links.getString("weight"));
+
+                            StoreTokens(accessToken, accessExp, refreshExp, linksDict, refreshToken);
                             Log.d("Response", response.toString());
                             //open home page
                             onSuccessfulLogin();
@@ -89,11 +99,10 @@ public class LoginActivity extends AppCompatActivity {
                         }
                     }
 
-                    private void StoreTokens(String accessToken, DateTime accessExp, DateTime refreshExp, String accLink, String logoutLink, String refreshToken) {
+                    private void StoreTokens(String accessToken, DateTime accessExp, DateTime refreshExp, Hashtable links, String refreshToken) {
                         AuthStrings authStrings = AuthStrings.getInstance(getApplicationContext());
                         authStrings.setAuthToken(accessToken, accessExp);
-                        authStrings.setAccountLink(accLink);
-                        authStrings.setLogoutLink(logoutLink);
+                        authStrings.setLinks(links);
                         authStrings.setRefreshToken(refreshToken, refreshExp);
                         if (((CheckBox)findViewById(R.id.rememberCreds)).isChecked()){
                             authStrings.storeRefreshToken();
