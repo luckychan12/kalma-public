@@ -72,7 +72,6 @@ class ApiConnect
         }
         catch (ClientException $e){
             $response = json_decode($e->getResponse()->getBody()->getContents());
-            session_unset();
             $_SESSION['status'] = $response->status;
             $_SESSION['error'] = $response->error;
             $_SESSION['error_message'] = $response->message;
@@ -83,7 +82,6 @@ class ApiConnect
         }
         catch (RequestException $e) {
             $response = json_decode($e->getResponse()->getBody()->getContents());
-            session_unset();
             $_SESSION['status'] = $response->status;
             $_SESSION['error'] = $response->error;
             $_SESSION['error_message'] = $response->message;
@@ -242,7 +240,7 @@ class ApiConnect
 
     function addSleepData($startTime, $stopTime, $sleepQuality ){
         try{
-            $res = $this->client->request('POST',"api/user/".$_SESSION['user_id']."/sleep", ['headers' => ["Authorization" => 'bearer ' . $_SESSION['access_token']],'json' => ['periods' => [['start_time' => $startTime, 'stop_time' => $stopTime, 'sleep_quality' => $sleepQuality]]]]);
+            $res = $this->client->request('POST',$_SESSION['links']->sleep, ['headers' => ["Authorization" => 'bearer ' . $_SESSION['access_token']],'json' => ['periods' => [['start_time' => $startTime, 'stop_time' => $stopTime, 'sleep_quality' => $sleepQuality]]]]);
             $messageBody = $res->getBody()->getContents();
             $data= json_decode($messageBody);
             return $data;
@@ -271,7 +269,7 @@ class ApiConnect
     }
     function addCalmData($startTime, $stopTime, $description ){
         try{
-            $res = $this->client->request('POST',"api/user/".$_SESSION['user_id']."/calm", ['headers' => ["Authorization" => 'bearer ' . $_SESSION['access_token']],'json' => ['periods' => [['start_time' => $startTime, 'stop_time' => $stopTime, 'description' => $description]]]]);
+            $res = $this->client->request('POST',$_SESSION['links']->calm, ['headers' => ["Authorization" => 'bearer ' . $_SESSION['access_token']],'json' => ['periods' => [['start_time' => $startTime, 'stop_time' => $stopTime, 'description' => $description]]]]);
             $messageBody = $res->getBody()->getContents();
             $data= json_decode($messageBody);
             return $data;
@@ -297,6 +295,68 @@ class ApiConnect
             return $response;
         }
 
+    }
+    function editData($link,$data ){
+        try{
+            $res = $this->client->request('PUT',$link, ['headers' => ["Authorization" => 'bearer ' . $_SESSION['access_token']],'body' => json_encode($data)]);
+            $messageBody = $res->getBody()->getContents();
+            $data= json_decode($messageBody);
+            return $data;
+        }
+        catch (ClientException $e){
+            $response = json_decode($e->getResponse()->getBody()->getContents());
+            var_dump($e->getRequest()->getBody());
+            $_SESSION['status'] = $response->status;
+            $_SESSION['error'] = $response->error;
+            $_SESSION['error_message'] = $response->message;
+            if(isset($response->detail)) {
+                $_SESSION['detail'] = $response->detail;
+            }
+            return $response;
+        }
+        catch (RequestException $e){
+            var_dump($e->getRequest());
+            $response = json_decode($e->getResponse()->getBody()->getContents());
+            $_SESSION['status'] = $response->status;
+            $_SESSION['error'] = $response->error;
+            $_SESSION['error_message'] = $response->message;
+            if(isset($response->detail)) {
+                $_SESSION['detail'] = $response->detail;
+            }
+            return $response;
+        }
+
+    }
+    function deleteData($link,$data){
+        try{
+
+
+
+            $res = $this->client->request('DELETE',$link, ['headers' => ["Authorization" => 'bearer ' . $_SESSION['access_token']],'body' => json_encode($data)]);
+            $messageBody = $res->getBody()->getContents();
+            $data= json_decode($messageBody);
+            return $data;
+        }
+        catch (ClientException $e){
+            $response = json_decode($e->getResponse()->getBody()->getContents());
+            $_SESSION['status'] = $response->status;
+            $_SESSION['error'] = $response->error;
+            $_SESSION['error_message'] = $response->message;
+            if(isset($response->detail)) {
+                $_SESSION['detail'] = $response->detail;
+            }
+            return $response;
+        }
+        catch (RequestException $e){
+            $response = json_decode($e->getResponse()->getBody()->getContents());
+            $_SESSION['status'] = $response->status;
+            $_SESSION['error'] = $response->error;
+            $_SESSION['error_message'] = $response->message;
+            if(isset($response->detail)) {
+                $_SESSION['detail'] = $response->detail;
+            }
+            return $response;
+        }
     }
 }
 

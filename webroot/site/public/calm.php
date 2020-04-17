@@ -39,6 +39,52 @@ include_once '../controller/calmController.php';
         </div>
     </div>
 </div>
+<div id="overlayEdit">
+    <div id="addDisplay" class="col-md-6 offset-md-3">
+        <div class="outer" id="popup">
+            <button id="close" onclick="off()">x</button>
+            <div class="inner-content">
+                <h1>Edit Data</h1>
+                <hr>
+                <form method="post" action="calm.php">
+                    <label>Start Time:</label>
+                    <input id="editId" name="editId" value="0" hidden>
+                    <br>
+                    <input id="editStartDate" class="form-control" type="date" name="newStartDate" value="2020-02-01" required>
+                    <input id="editStartTime" class="form-control" type="time" name="newStartTime" value="20:00" required>
+
+                    <label>End Time:</label>
+                    <br>
+                    <input id="editEndDate" class="form-control" type="date" name="newEndDate" required>
+                    <input id="editEndTime" class="form-control" type="time" name="newEndTime" required>
+
+                    <label>Description:</label>
+                    <br>
+                    <input id="editDesc"  class="form-control" type="text" name="newDescription" required>
+                    <hr>
+                    <input type="submit" class="btn btn-primary" value="Save" name="editCalm">
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="overlayDelete">
+    <div id="addDisplay" class="col-md-6 offset-md-3">
+        <div class="outer" id="popup">
+            <button id="close" onclick="off()">x</button>
+            <div class="inner-content">
+                <h1>Are you sure?</h1>
+                <hr>
+                <form method="post" action="calm.php">
+                    <input id="deleteId" name="deleteId" value="0" hidden>
+
+                    <input type="submit" class="btn btn-primary" value="Yes" name="editSleep">
+                    <input type="button" class="btn btn-primary" onclick="off()" value="No">
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 <!--Main Body-->
 <div class="container-fluid">
     <div class="row">
@@ -109,11 +155,18 @@ include_once '../controller/calmController.php';
                 <?php
                 foreach ($dataPoints->periods as $data) {
                     if (isset($data->id)) {
+                        $StartTime = date('Y-m-dTH:i', strtotime($data->start_time));
+                        $EndTime = date('Y-m-dTH:i', strtotime($data->stop_time));
+                        $desc = "$data->description";
+                        $send = "edit({$data->id},'{$StartTime}','{$EndTime}','{$desc}')";
                         echo
                             "<tr>
-                            <td>$data->id</td>    
-                            <td>". date('d-m-Y H:i', strtotime($data->start_time))."</td>
-                            <td>".date('d-m-Y H:i', strtotime($data->stop_time))."</td>
+                            <td><a href=\"#\" onclick=\"$send\">
+                            <i class=\"fas fa-pencil-alt\"></i></a> 
+                            <a href=\"#\" onclick='remove($data->id)'>
+                            <i  class=\"fas fa-trash\"></a></td></td>    
+                            <td>". date('Y-m-d H:i', strtotime($data->start_time))."</td>
+                            <td>".date('Y-m-d H:i', strtotime($data->stop_time))."</td>
                             <td>$data->duration_text</td>
                             <td>$data->description</td>
                             <td>$data->progress_percentage %</td>
@@ -128,13 +181,53 @@ include_once '../controller/calmController.php';
 </div>
 
 <script>
+    function remove(id){
+        document.getElementById("overlayDelete").style.display = "block";
+        document.getElementById("deleteId").value = id;
+    }
+    function edit(id, fullStart, fullEnd, desc){
+        let start = new Date(fullStart);
+        let m = start.getMonth() + 1;
+        let d = start.getDate();
+        m = m > 9 ? m : "0"+m;
+        d = d > 9 ? d : "0"+d;
+        let startDate = start.getFullYear() + "-" + m + "-" + d;
+        let hour = start.getHours();
+        hour = hour > 9 ? hour :"0"+hour;
+        let min = start.getMinutes();
+        min = min > 9 ? min :"0"+min;
+        let startTime = hour + ":" + min;
+
+        let end = new Date(fullEnd);
+        m = end.getMonth() + 1;
+        d = end.getDate();
+        m = m > 9 ? m : "0"+m;
+        d = d > 9 ? d : "0"+d;
+        let endDate = end.getFullYear() + "-" + m + "-" + d;
+        hour = end.getHours();
+        hour = hour > 9 ? hour :"0"+hour;
+        min = end.getMinutes();
+        min = min > 9 ? min :"0"+min;
+        let endTime = hour+ ":" + min;
+        document.getElementById("overlayEdit").style.display = "block";
+        document.getElementById("editId").value = id;
+        document.getElementById("editStartDate").value = startDate;
+        document.getElementById("editStartTime").value = startTime;
+        document.getElementById("editEndDate").value = endDate;
+        document.getElementById("editEndTime").value = endTime;
+        document.getElementById("editDesc").value = desc;
+    }
+
     function on() {
         document.getElementById("overlay").style.display = "block";
     }
 
     function off() {
         document.getElementById("overlay").style.display = "none";
+        document.getElementById("overlayEdit").style.display = "none";
+        document.getElementById("overlayDelete").style.display = "none";
     }
+
 
 
     function showWeekChart() {
@@ -152,7 +245,8 @@ include_once '../controller/calmController.php';
         document.getElementById('weekForm').style.display = 'none';
     }
     function renderWeekChart() {
-
+        const style = getComputedStyle(document.body);
+        const textColor = style.getPropertyValue('--c-text-on-bg');
         var ctx = document.getElementById("myWeekChart").getContext('2d');
         var myChart = new Chart(ctx, {
             type: 'horizontalBar',
@@ -177,23 +271,30 @@ include_once '../controller/calmController.php';
                 scales: {
 
                     xAxes: [{
+                        gridLines: {
+                            zeroLineColor: textColor,
+                            color: textColor,
+                        },
                         scaleLabel: {
                             display: true,
                             labelString: "Number of minutes meditated",
-                            fontColor:'#000000',
+                            fontColor:textColor,
                         },
                         ticks: {
-                            fontColor:'#000000',
+                            fontColor:textColor,
                         }
                     }],
                     yAxes: [{
+                        gridLines: {
+                            display: false,
+                        },
                         scaleLabel: {
                             display: true,
                             labelString: "Days of the week",
-                            fontColor:'#000000',
+                            fontColor:textColor,
                         },
                         ticks: {
-                            fontColor:'#000000',
+                            fontColor:textColor,
                             beginAtZero:true
                         }
                     }]
@@ -203,6 +304,8 @@ include_once '../controller/calmController.php';
     }
 
     function renderMonthChart(){
+        const style = getComputedStyle(document.body);
+        const textColor = style.getPropertyValue('--c-text-on-bg');
         var ctx2 = document.getElementById("myMonthChart").getContext('2d');
         var myChart2 = new Chart(ctx2, {
             type: 'horizontalBar',
@@ -226,24 +329,31 @@ include_once '../controller/calmController.php';
             options: {
                 scales: {
                     xAxes: [{
+                        gridLines: {
+                            zeroLineColor: textColor,
+                            color: textColor,
+                        },
                         scaleLabel: {
                             display: true,
                             labelString: "Number of minutes meditated",
-                            fontColor:'#000000',
+                            fontColor:textColor,
                         },
                         ticks: {
-                            fontColor:'#000000',
+                            fontColor:textColor,
                         }
                     }],
                     yAxes: [{
+                        gridLines: {
+                            display: false,
+                        },
                         scaleLabel: {
                             display: true,
                             labelString: "Days of the month",
-                            fontColor:'#000000',
+                            fontColor:textColor,
                         },
 
                         ticks: {
-                            fontColor:'#000000',
+                            fontColor:textColor,
                             beginAtZero:true
                         }
                     }]

@@ -5,15 +5,38 @@ $api = new ApiConnect();
 
 
 if(isset($_POST['startDate'])){
-    $newStartTime = new DateTime($_POST['startDate'] .' '. $_POST['startTime']);
+    $newStartTime = new DateTime($_POST['startDate'] .' '. $_POST['startTime'], new DateTimeZone('Europe/London'));
     $newStartTime = $newStartTime->format(DateTime::ISO8601);
-    $newEndTime = new DateTime($_POST['endDate'] .' '. $_POST['endTime']);
+    $newEndTime = new DateTime($_POST['endDate'] .' '. $_POST['endTime'], new DateTimeZone('Europe/London'));
     $newEndTime = $newEndTime->format(DateTime::ISO8601);
     $message = $api->addSleepData($newStartTime,$newEndTime,$_POST['sleepQuality']);
 }
 
+if(isset($_POST['editId'])){
+    $id = $_POST['editId'];
+    $newStartTime = new DateTime($_POST['startDate'] .' '. $_POST['startTime'], new DateTimeZone('Europe/London'));
+    $newStartTime = $newStartTime->format(DateTime::ISO8601);
+    $newEndTime = new DateTime($_POST['endDate'] .' '. $_POST['endTime'], new DateTimeZone('Europe/London'));
+    $newEndTime = $newEndTime->format(DateTime::ISO8601);
+    $sleep_quality =$_POST['sleepQuality'];
+    $period['id'] = (int)$id;
+    $period['start_time'] = $newStartTime;
+    $period['stop_time'] = $newEndTime;
+    $period['sleep_quality'] = (int)$sleep_quality;
+    $periods = array($period);
+    $data['periods'] = $periods;
+    $message = $api->editData($_SESSION['links']->sleep, $data);
+    var_dump($message);
 
-$dataPoints = $api->getData("api/user/".$_SESSION['user_id']."/sleep");
+}
+
+if(isset($_POST['deleteId'])){
+    $data['periods'] = array((int)$_POST['deleteId']);
+    $message = $api->deleteData($_SESSION['links']->sleep, $data);
+    var_dump($message);
+}
+
+$dataPoints = $api->getData($_SESSION['links']->sleep);
 if (isset($dataPoints->error)){
     header('Location: ./errorPage.php');
 }
@@ -83,7 +106,10 @@ foreach ($dataPoints->periods as $data) {
 
 
 if ($average > 0) {
-    $average =number_format((($average / $i) / 60), 2, '.', '') ;
+    $total =($average / $i)/60;
+    $hours = floor($total);
+    $mins = ($total-$hours) *60;
+    $average =sprintf("%2.0f Hours %2.0f Minutes", $hours, $mins);
 }
 
 

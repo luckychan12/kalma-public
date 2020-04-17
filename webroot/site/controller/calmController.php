@@ -12,8 +12,29 @@ if(isset($_POST['startDate'])){
     $message = $api->addCalmData($newStartTime,$newEndTime,$_POST['description']);
 }
 
+if(isset($_POST['editId'])){
+    $id = $_POST['editId'];
+    $newStartTime = new DateTime($_POST['newStartDate'] .' '. $_POST['newStartTime'], new DateTimeZone('Europe/London'));
+    $newStartTime = $newStartTime->format(DateTime::ISO8601);
+    $newEndTime = new DateTime($_POST['newEndDate'] .' '. $_POST['newEndTime'], new DateTimeZone('Europe/London'));
+    $newEndTime = $newEndTime->format(DateTime::ISO8601);
+    $desc =$_POST['newDescription'];
+    $period['id'] = (int)$id;
+    $period['start_time'] = $newStartTime;
+    $period['stop_time'] = $newEndTime;
+    $period['description'] = $desc;
+    $periods = array($period);
+    $data['periods'] = $periods;
+    $message = $api->editData($_SESSION['links']->calm, $data);
 
-$dataPoints = $api->getData("api/user/".$_SESSION['user_id']."/calm");
+}
+
+if(isset($_POST['deleteId'])){
+    $data['periods'] = array((int)$_POST['deleteId']);
+    $message = $api->deleteData($_SESSION['links']->calm, $data);
+}
+
+$dataPoints = $api->getData($_SESSION['links']->calm);
 if (isset($dataPoints->error)){
     header('Location: ./errorPage.php');
 }
