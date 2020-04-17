@@ -16,12 +16,13 @@ public class HomeActivity extends AppCompatActivity {
         //Do nothing
     }
     Context context = this;
-    Button buttonProfile,buttonSettings;
+    Button buttonProfile,buttonSettings, buttonSleep, buttonCalm;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
+        setTitle("kalma Home");
         buttonProfile = findViewById(R.id.btnProfile);
         buttonProfile.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -35,6 +36,23 @@ public class HomeActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(context, SettingsActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        buttonSleep = findViewById(R.id.btnSleepTracker);
+        buttonSleep.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(context, SleepTrackerActivity.class);
+                startActivity(intent);
+            }
+        });
+        buttonCalm = findViewById(R.id.btnMindMins);
+        buttonCalm.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(context, CalmTracker.class);
                 startActivity(intent);
             }
         });

@@ -8,13 +8,12 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.VolleyError;
 import com.kalma.API_Interaction.APICaller;
-import com.kalma.API_Interaction.AuthStrings;
+import com.kalma.Data.AuthStrings;
 import com.kalma.API_Interaction.ServerCallback;
 import com.kalma.R;
 
@@ -34,6 +33,7 @@ public class UserProfileActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_profile);
+        setTitle("kalma Profile");
         getData();
         buttonHome = findViewById(R.id.btnHome);
         buttonHome.setOnClickListener(new View.OnClickListener() {
@@ -75,7 +75,7 @@ public class UserProfileActivity extends AppCompatActivity {
     private void getData() {
         //create a json object and call API to log in
         APICaller apiCaller = new APICaller(getApplicationContext());
-        apiCaller.getData( true,null,buildMap(),AuthStrings.getInstance(getApplicationContext()).getAccountLink(), new ServerCallback() {
+        apiCaller.getData( true,null,buildMap(),AuthStrings.getInstance(getApplicationContext()).getLinks().get("account").toString(), new ServerCallback() {
                     @Override
                     public void onSuccess(JSONObject response) {
                         try {
@@ -107,9 +107,6 @@ public class UserProfileActivity extends AppCompatActivity {
         );
 
     }
-
-
-
     private Map buildMap() {
         Map<String, String> params = new HashMap<String, String>();
         params.put("Authorization", "Bearer " + AuthStrings.getInstance(getApplicationContext()).getAuthToken());

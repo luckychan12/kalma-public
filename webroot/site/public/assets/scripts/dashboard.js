@@ -8,7 +8,7 @@ $(function() {
     const textColor = style.getPropertyValue('--c-text-on-bg');
     // Functions to format tick labels
     const countToString = (t) => t.toString();
-    const minsToString = (t) => t > 60 ? `${Math.floor(t / 60)}h` + (t % 60 ? `${t % 60}m` : '') : `${t % 60}m`;
+    const minsToString = (t) => t >= 60 ? `${Math.floor(t / 60)}h` + (t % 60 ? `${t % 60}m` : '') : `${t % 60}m`;
     // Create the charts
     $(".chart").each(function() {
         const ctx = $(this)[0].getContext('2d');

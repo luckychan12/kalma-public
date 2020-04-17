@@ -17,6 +17,8 @@ use DateTime;
 use DateTimeZone;
 use Exception;
 use Kalma\Api\Core\Logger;
+use Kalma\Api\Response\Exception\InvalidBodyAttributesException;
+use Kalma\Api\Response\Exception\InvalidUriParametersException;
 use Kalma\Api\Response\Exception\ResponseException;
 use Kalma\Api\Response\Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
@@ -68,7 +70,7 @@ class PeriodicEndpoint extends DataEndpoint
         $body = $req->getParsedBody();
 
         if (!isset($body['periods']) || !is_array($body['periods']) || count($body['periods']) == 0) {
-            throw new ResponseException(...ResponseException::INVALID_BODY_ATTRS);
+            throw new InvalidBodyAttributesException("The 'periods' array is missing, empty, or not an array.");
         }
 
         $this->database->beginTransaction();
@@ -79,7 +81,7 @@ class PeriodicEndpoint extends DataEndpoint
             foreach ($this->attributes as $attribute) {
                 if (!isset($period[$attribute])) {
                     $this->database->rollBack();
-                    throw new ResponseException(...ResponseException::INVALID_BODY_ATTRS);
+                    throw new InvalidBodyAttributesException("One of the period objects is missing the required attribute '$attribute'.");
                 }
 
                 // If valid, use the attribute in the SQL query
@@ -89,7 +91,7 @@ class PeriodicEndpoint extends DataEndpoint
             // Check start/stop times
             if (!isset($period['start_time']) || !isset($period['stop_time'])) {
                 $this->database->rollBack();
-                throw new ResponseException(...ResponseException::INVALID_BODY_ATTRS);
+                throw new InvalidBodyAttributesException("One of the period objects is missing one or both of 'start_time', 'stop_time'.");
             }
             // Parse start/stop times
             try {
@@ -97,8 +99,10 @@ class PeriodicEndpoint extends DataEndpoint
                 $start_time = new DateTime($period['start_time'], $utc);
                 $stop_time = new DateTime($period['stop_time'], $utc);
                 $now = new DateTime('now', $utc);
-                if ($start_time > $now || $stop_time > $now) {
-                    throw new ResponseException(...ResponseException::INVALID_BODY_ATTRS);
+                if ($start_time > $now || $stop_time > $now)
+                {
+                    $this->database->rollBack();
+                    throw new InvalidBodyAttributesException("One of the periods is in the future.");
                 }
 
                 // Disallow creation of periods that overlap existing records
@@ -171,7 +175,8 @@ class PeriodicEndpoint extends DataEndpoint
                 $order_by = $params['order'];
             }
             else {
-                throw new ResponseException(...ResponseException::INVALID_BODY_ATTRS);
+                $attr = $params['order'];
+                throw new InvalidUriParametersException("Cannot sort by unknown attribute '$attr'.");
             }
         }
 
@@ -288,25 +293,21 @@ class PeriodicEndpoint extends DataEndpoint
     public function _update(Request $req, Response $res, ?array $payload, array $args): Response
     {
         $body = $req->getParsedBody();
-        if (!isset($body['periods']) || !is_array($body['periods']) || count($body['periods']) == 0)
-        {
-            throw new ResponseException(...ResponseException::INVALID_BODY_ATTRS);
+        if (!isset($body['periods']) || !is_array($body['periods']) || count($body['periods']) == 0) {
+            throw new InvalidBodyAttributesException("The 'periods' array is missing, empty, or not an array.");
         }
 
         // Apply the updates, keeping track of which records were updated successfully
         $affected = array();
-        foreach ($body['periods'] as $period)
-        {
-            if (!isset($period['id']))
-            {
-                throw new ResponseException(...ResponseException::INVALID_BODY_ATTRS);
+        foreach ($body['periods'] as $period) {
+            if (!isset($period['id'])) {
+                throw new InvalidBodyAttributesException("One or more of the period objects is lacking an 'id' attribute.");
             }
 
             $allowed_fields = ['start_time', 'stop_time', ...$this->attributes];
             $sets = array();
             $query_params = array('user_id' => $args['id'], "period_id" => $period['id']);
-            foreach ($allowed_fields as $field)
-            {
+            foreach ($allowed_fields as $field) {
                 if (isset($period[$field]))
                 {
                     $sets[] = "$field = :$field";
@@ -325,8 +326,7 @@ class PeriodicEndpoint extends DataEndpoint
             $rows_affected = $this->database->execute($query, $query_params);
 
             // If a record was successfully updated, include it's ID in the response
-            if ($rows_affected > 0)
-            {
+            if ($rows_affected > 0) {
                 $affected[] = $period['id'];
             }
         }
@@ -354,14 +354,14 @@ class PeriodicEndpoint extends DataEndpoint
     {
         $body = $req->getParsedBody();
         if (!isset($body['periods']) || !is_array($body['periods'])) {
-            throw new ResponseException(...ResponseException::INVALID_BODY_ATTRS);
+            throw new InvalidBodyAttributesException("The 'periods' array is missing, empty, or not an array.");
         }
 
         // Apply deletions, keeping track of which periods were successfully deleted
         $resources_affected = array();
         foreach ($body['periods'] as $period_id) {
             if (!is_integer($period_id)) {
-                throw new ResponseException(...ResponseException::INVALID_BODY_ATTRS);
+                throw new InvalidBodyAttributesException("One or more of the period objects is lacking an 'id' attribute.");
             }
 
             // Build DELETE query string
