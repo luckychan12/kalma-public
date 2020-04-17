@@ -310,7 +310,13 @@ class PeriodicEndpoint extends DataEndpoint
                 if (isset($period[$field]))
                 {
                     $sets[] = "$field = :$field";
-                    $query_params[$field] = $period[$field];
+
+                    if ($field == 'start_time' || $field == 'stop_time') {
+                        $query_params[$field] = DateTime::createFromFormat(DATE_ISO8601, $period[$field])->format('Y-m-d H:i:s');
+                    }
+                    else {
+                        $query_params[$field] = $period[$field];
+                    }
                 }
             }
 
