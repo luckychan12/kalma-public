@@ -170,7 +170,7 @@ class LoggedEndpoint extends DataEndpoint
 
             // Calculate progress towards target, if a target is set
             $logged = $row[$this->attributes[0]];
-            if (isset($target)) {
+            if (isset($target) && $target > 0) {
                 $progress = floor(($logged / $target) * 100);
                 $message = "$progress% of your daily goal.";
                 $entry['progress_percentage'] = $progress;
