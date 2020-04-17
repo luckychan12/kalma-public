@@ -17,6 +17,8 @@ use DateTime;
 use DateTimeZone;
 use Exception;
 use Kalma\Api\Core\Logger;
+use Kalma\Api\Response\Exception\InvalidBodyAttributesException;
+use Kalma\Api\Response\Exception\InvalidUriParametersException;
 use Kalma\Api\Response\Exception\ResponseException;
 use Kalma\Api\Response\Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
@@ -49,8 +51,8 @@ class LoggedEndpoint extends DataEndpoint
     {
         $body = $req->getParsedBody();
 
-        if (!isset($body['entries']) || !is_array($body['entries'])) {
-            throw new ResponseException(...ResponseException::INVALID_BODY_ATTRS);
+        if (!isset($body['entries']) || !is_array($body['entries']) || !(count($body['entries']) > 0)) {
+            throw new InvalidBodyAttributesException("The 'entries' array is missing, empty, or not an array.");
         }
 
         $this->database->beginTransaction();
@@ -63,7 +65,7 @@ class LoggedEndpoint extends DataEndpoint
             foreach ($this->attributes as $attribute) {
                 if (!isset($entry[$attribute])) {
                     $this->database->rollBack();
-                    throw new ResponseException(...ResponseException::INVALID_BODY_ATTRS);
+                    throw new InvalidBodyAttributesException("One or more entry objects are missing the required attribute '$attribute'.");
                 }
                 $query_params[$attribute] = $entry[$attribute];
             }
@@ -106,7 +108,8 @@ class LoggedEndpoint extends DataEndpoint
                 $order_by = $params['order'];
             }
             else {
-                throw new ResponseException(...ResponseException::INVALID_URI_PARAMS);
+                $attr = $params['order'];
+                throw new InvalidUriParametersException("Cannot sort by unknown attribute '$attr'.");
             }
         }
 
@@ -206,15 +209,15 @@ class LoggedEndpoint extends DataEndpoint
     public function _update(Request $req, Response $res, ?array $payload, array $args): Response
     {
         $body = $req->getParsedBody();
-        if (!isset($body['entries']) || !is_array($body['entries'])) {
-            throw new ResponseException(...ResponseException::INVALID_BODY_ATTRS);
+        if (!isset($body['entries']) || !is_array($body['entries']) || !(count($body['entries']) > 0)) {
+            throw new InvalidBodyAttributesException("The 'entries' array is missing, empty, or not an array.");
         }
 
         // Execute an UPDATE query for each record in the entries array
         $affected = array();
         foreach ($body['entries'] as $entry) {
             if (!isset($entry['id'])) {
-                throw new ResponseException(...ResponseException::INVALID_BODY_ATTRS);
+                throw new InvalidBodyAttributesException("One or more entry objects are missing the required 'id' attribute.");
             }
 
             // Parse record body
@@ -266,15 +269,15 @@ class LoggedEndpoint extends DataEndpoint
     public function _delete(Request $req, Response $res, ?array $payload, array $args): Response
     {
         $body = $req->getParsedBody();
-        if (!isset($body['entries']) || !is_array($body['entries'])) {
-            throw new ResponseException(...ResponseException::INVALID_BODY_ATTRS);
+        if (!isset($body['entries']) || !is_array($body['entries']) || !(count($body['entries']) > 0)) {
+            throw new InvalidBodyAttributesException("The 'entries' array is missing, empty, or not an array.");
         }
 
         // Create and execute a DELETE query for each record in the entries array
         $resources_affected = array();
         foreach ($body['entries'] as $entry_id) {
             if (!is_integer($entry_id)) {
-                throw new ResponseException(...ResponseException::INVALID_BODY_ATTRS);
+                throw new InvalidBodyAttributesException("One or more entry objects are missing the required 'id' attribute.");
             }
 
             // Build DELETE query string
