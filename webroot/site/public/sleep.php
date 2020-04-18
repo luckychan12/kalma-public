@@ -167,8 +167,8 @@ include_once '../controller/sleepController.php';
                             <i class=\"fas fa-pencil-alt\"></i></a> 
                             <a href=\"#\" onclick='remove($data->id)'>
                             <i  class=\"fas fa-trash\"></a></td>  
-                            <td>". date('Y-m-d H:i', strtotime($data->start_time))."</td>
-                            <td>".date('Y-m-d H:i', strtotime($data->stop_time))."</td>
+                            <td>". date('d/m/Y H:i', strtotime($data->start_time))."</td>
+                            <td>".date('d/m/Y H:i', strtotime($data->stop_time))."</td>
                             <td>$data->duration_text</td>
                             <td>$data->sleep_quality</td>
                             <td>$data->progress_percentage %</td>
