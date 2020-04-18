@@ -6,7 +6,7 @@ include_once '../controller/sleepController.php';
 <link lang='en'>
 <?php include_once './components/global_head_inner.php' ?>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js"></script>
-<link rel="stylesheet" href="assets/stylesheets/sleep.css">
+<link rel="stylesheet" href="assets/stylesheets/trackerPages.css">
 </head>
 <body>
 <?php include_once './components/navbar_top.php'; ?>
@@ -91,7 +91,7 @@ include_once '../controller/sleepController.php';
 <div class="container-fluid">
     <div class="row">
         <div class="col-lg-7 offset-lg-1">
-            <div class="alert alert-danger alert-dismissible fade text-center <?= isset($message->message) ? "show" : "hide"?>" role="alert">
+            <div class="alert alert-danger alert-dismissible fade text-center <?= isset($message->error) ? "show" : "hide"?>" role="alert">
                 <?= $message->message. " (" . isset($message->error).")" ?? ""; ?>
                 <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
@@ -157,14 +157,15 @@ include_once '../controller/sleepController.php';
                 <?php
                 foreach ($dataPoints->periods as $data) {
                     if (isset($data->id)) {
-                        $StartTime = date('Y-m-dTH:i', strtotime($data->start_time));
-                        $EndTime = date('Y-m-dTH:i', strtotime($data->stop_time));
+                        $StartTime = date('Y-m-d H:i',strtotime($data->start_time));
+                        $EndTime = date('Y-m-d H:i', strtotime($data->stop_time));
                         $send = "edit({$data->id},'{$StartTime}','{$EndTime}',{$data->sleep_quality})";
                         echo
+
                             "<tr>
-                            <td><a href=\"#\" onclick=".$send.";>Edit
+                            <td><a href=\"#\" onclick=\"$send\";>
                             <i class=\"fas fa-pencil-alt\"></i></a> 
-                            <a href=\"#\" onclick='remove($data->id)'>Delete
+                            <a href=\"#\" onclick='remove($data->id)'>
                             <i  class=\"fas fa-trash\"></a></td>  
                             <td>". date('Y-m-d H:i', strtotime($data->start_time))."</td>
                             <td>".date('Y-m-d H:i', strtotime($data->stop_time))."</td>

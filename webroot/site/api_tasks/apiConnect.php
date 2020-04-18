@@ -305,7 +305,6 @@ class ApiConnect
         }
         catch (ClientException $e){
             $response = json_decode($e->getResponse()->getBody()->getContents());
-            var_dump($e->getRequest()->getBody());
             $_SESSION['status'] = $response->status;
             $_SESSION['error'] = $response->error;
             $_SESSION['error_message'] = $response->message;
@@ -315,7 +314,6 @@ class ApiConnect
             return $response;
         }
         catch (RequestException $e){
-            var_dump($e->getRequest());
             $response = json_decode($e->getResponse()->getBody()->getContents());
             $_SESSION['status'] = $response->status;
             $_SESSION['error'] = $response->error;

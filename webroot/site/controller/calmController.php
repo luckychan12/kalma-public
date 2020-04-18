@@ -1,22 +1,29 @@
 <?php
 session_start();
+date_default_timezone_set('Europe/London');
 include_once "../api_tasks/apiConnect.php";
 $api = new ApiConnect();
+$GMT = new DateTimeZone('GMT');
 
-
+//Deals with adding new data
 if(isset($_POST['startDate'])){
     $newStartTime = new DateTime($_POST['startDate'] .' '. $_POST['startTime']);
+    $newStartTime->setTimezone($GMT);
     $newStartTime = $newStartTime->format(DateTime::ISO8601);
     $newEndTime = new DateTime($_POST['endDate'] .' '. $_POST['endTime']);
+    $newEndTime->setTimezone($GMT);
     $newEndTime = $newEndTime->format(DateTime::ISO8601);
     $message = $api->addCalmData($newStartTime,$newEndTime,$_POST['description']);
 }
 
+//Deals with editing new data
 if(isset($_POST['editId'])){
     $id = $_POST['editId'];
-    $newStartTime = new DateTime($_POST['newStartDate'] .' '. $_POST['newStartTime'], new DateTimeZone('Europe/London'));
+    $newStartTime = new DateTime($_POST['newStartDate'] .' '. $_POST['newStartTime']);
+    $newStartTime->setTimezone($GMT);
     $newStartTime = $newStartTime->format(DateTime::ISO8601);
-    $newEndTime = new DateTime($_POST['newEndDate'] .' '. $_POST['newEndTime'], new DateTimeZone('Europe/London'));
+    $newEndTime = new DateTime($_POST['newEndDate'] .' '. $_POST['newEndTime']);
+    $newEndTime->setTimezone($GMT);
     $newEndTime = $newEndTime->format(DateTime::ISO8601);
     $desc =$_POST['newDescription'];
     $period['id'] = (int)$id;
@@ -26,29 +33,38 @@ if(isset($_POST['editId'])){
     $periods = array($period);
     $data['periods'] = $periods;
     $message = $api->editData($_SESSION['links']->calm, $data);
-
 }
 
+//Deals with deleting new data
 if(isset($_POST['deleteId'])){
     $data['periods'] = array((int)$_POST['deleteId']);
     $message = $api->deleteData($_SESSION['links']->calm, $data);
 }
 
-$dataPoints = $api->getData($_SESSION['links']->calm);
-if (isset($dataPoints->error)){
+//Reads the data for the page
+if(isset($_SESSION['links'])) {
+    $dataPoints = $api->getData($_SESSION['links']->calm);
+    if (isset($dataPoints->error)) {
+        $_SESSION['links'] = null;
+        header('Location: ./errorPage.php');
+    }
+}
+else{
     header('Location: ./errorPage.php');
 }
 
-
+//When you select a new week
 if (isset($_GET['weekDate'])){
     $selectedDate = new DateTime($_GET['weekDate']);
     $time = "this monday";
     echo '<script> document.onload = showWeekChart();</script>';
 }
+//when you select a new month
 else if (isset($_GET['monthDate'])){
     $selectedDate = new DateTime($_GET['monthDate']);
     $time  ="last monday";
 }
+//if nothing selected goes to today
 else {
     $selectedDate = new DateTime('today');
     $time  ="last monday";

@@ -1,22 +1,29 @@
 <?php
 session_start();
+date_default_timezone_set('Europe/London');
 include_once "../api_tasks/apiConnect.php";
 $api = new ApiConnect();
+$GMT = new DateTimeZone('GMT');
 
-
+//Deals with adding new data
 if(isset($_POST['startDate'])){
-    $newStartTime = new DateTime($_POST['startDate'] .' '. $_POST['startTime'], new DateTimeZone('Europe/London'));
+    $newStartTime = new DateTime($_POST['startDate'] .' '. $_POST['startTime']);
+    $newStartTime->setTimezone($GMT);
     $newStartTime = $newStartTime->format(DateTime::ISO8601);
-    $newEndTime = new DateTime($_POST['endDate'] .' '. $_POST['endTime'], new DateTimeZone('Europe/London'));
+    $newEndTime = new DateTime($_POST['endDate'] .' '. $_POST['endTime']);
+    $newEndTime->setTimezone($GMT);
     $newEndTime = $newEndTime->format(DateTime::ISO8601);
     $message = $api->addSleepData($newStartTime,$newEndTime,$_POST['sleepQuality']);
 }
 
+//Deals with editing new data
 if(isset($_POST['editId'])){
     $id = $_POST['editId'];
-    $newStartTime = new DateTime($_POST['startDate'] .' '. $_POST['startTime'], new DateTimeZone('Europe/London'));
+    $newStartTime = new DateTime($_POST['startDate'] .' '. $_POST['startTime']);
+    $newStartTime->setTimezone($GMT);
     $newStartTime = $newStartTime->format(DateTime::ISO8601);
-    $newEndTime = new DateTime($_POST['endDate'] .' '. $_POST['endTime'], new DateTimeZone('Europe/London'));
+    $newEndTime = new DateTime($_POST['endDate'] .' '. $_POST['endTime']);
+    $newEndTime->setTimezone($GMT);
     $newEndTime = $newEndTime->format(DateTime::ISO8601);
     $sleep_quality =$_POST['sleepQuality'];
     $period['id'] = (int)$id;
@@ -26,32 +33,39 @@ if(isset($_POST['editId'])){
     $periods = array($period);
     $data['periods'] = $periods;
     $message = $api->editData($_SESSION['links']->sleep, $data);
-    var_dump($message);
 
 }
 
+//Deals with deleting new data
 if(isset($_POST['deleteId'])){
     $data['periods'] = array((int)$_POST['deleteId']);
     $message = $api->deleteData($_SESSION['links']->sleep, $data);
-    var_dump($message);
 }
 
-$dataPoints = $api->getData($_SESSION['links']->sleep);
-if (isset($dataPoints->error)){
+//Reads the data for the page
+if(isset($_SESSION['links'])) {
+    $dataPoints = $api->getData($_SESSION['links']->sleep);
+    if (isset($dataPoints->error)) {
+        $_SESSION['links'] = null;
+        header('Location: ./errorPage.php');
+    }
+}
+else{
     header('Location: ./errorPage.php');
 }
 
-
-
+//When you select a new week
 if (isset($_GET['weekDate'])){
     $selectedDate = new DateTime($_GET['weekDate']);
     $time = "this monday";
     echo '<script> document.onload = showWeekChart();</script>';
 }
+//when you select a new month
 else if (isset($_GET['monthDate'])){
     $selectedDate = new DateTime($_GET['monthDate']);
     $time  ="last monday";
 }
+//if nothing selected goes to today
 else {
     $selectedDate = new DateTime('today');
     $time  ="last monday";
@@ -97,7 +111,7 @@ foreach ($dataPoints->periods as $data) {
             if (date("G", strtotime($data->start_time)) <= 16) {
                 $n--;
             }
-            $weekPoints[date("N", strtotime($data->start_time)) + $n] =$weekPoints[date("N", strtotime($data->start_time)) + $n] + $data->duration / 60;
+            $weekPoints[date("N", strtotime($data->start_time)) + $n] =$weekPoints[date("N", strtotime($data->start_time)) + $n] +  (float)number_format(($data->duration / 60), 2, ".","" );
         }
     }
 
@@ -150,7 +164,7 @@ foreach ($dataPoints->periods as $data)
             if (date("G", strtotime($data->start_time)) <= 16) {
                 $n--;
             }
-            $monthPoints[date("j", strtotime($data->start_time)) + $n] = $data->duration / 60;
+            $monthPoints[date("j", strtotime($data->start_time)) + $n] = $monthPoints[date("j", strtotime($data->start_time)) + $n] + (float)number_format(($data->duration / 60), 2, ".","" );
         }
         //finds the progress message for the current sleep period
         if (($startTime >= $last_night_start) && ($startTime < $last_night_end)){

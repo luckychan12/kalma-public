@@ -145,7 +145,7 @@ include_once '../controller/calmController.php';
         <div class="col-lg-10 offset-sm-1">
             <table class="table">
                 <tr>
-                    <th>ID</th>
+                    <th></th>
                     <th>Start Time</th>
                     <th>End Time</th>
                     <th>Duration</th>
@@ -155,8 +155,8 @@ include_once '../controller/calmController.php';
                 <?php
                 foreach ($dataPoints->periods as $data) {
                     if (isset($data->id)) {
-                        $StartTime = date('Y-m-dTH:i', strtotime($data->start_time));
-                        $EndTime = date('Y-m-dTH:i', strtotime($data->stop_time));
+                        $StartTime = date('Y-m-d H:i', strtotime($data->start_time));
+                        $EndTime = date('Y-m-d H:i', strtotime($data->stop_time));
                         $desc = "$data->description";
                         $send = "edit({$data->id},'{$StartTime}','{$EndTime}','{$desc}')";
                         echo
