@@ -4,7 +4,7 @@ input {
 .date-selector{
     background-color: var(--c-secondary);
 }
-#overlay {
+#overlay, #overlayDelete, #overlayEdit {
     position: fixed;
     display: none;
     width: 100%;
@@ -17,6 +17,7 @@ input {
     z-index: 99;
     cursor: pointer;
 }
+
 
 #addDisplay{
     position: absolute;
