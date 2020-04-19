@@ -1,33 +1,26 @@
-package com.kalma.API_Interaction;
+package com.kalma.Data;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
 import android.provider.Settings;
-import android.security.keystore.KeyGenParameterSpec;
-import android.security.keystore.KeyProperties;
 
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.security.GeneralSecurityException;
-import java.util.prefs.PreferenceChangeEvent;
+import org.joda.time.DateTime;
 
-import javax.crypto.KeyGenerator;
-import javax.crypto.SecretKey;
+import java.util.ArrayList;
+import java.util.Dictionary;
+import java.util.Hashtable;
+import java.util.List;
 
 //Auth strings singleton
 public class AuthStrings {
     private static AuthStrings authStrings;
     private static String authToken;
     private static String refreshToken;
-    private static String accountLink;
-    private static String LogoutLink;
+    private Hashtable links = new Hashtable(); ;
     private SharedPreferences settings;
-    private static int authTokenExp;
-    private static int refreshTokenExp;
+    private static DateTime authTokenExp;
+    private static DateTime refreshTokenExp;
     private static Context context;
 
     //private Constructor
@@ -44,34 +37,25 @@ public class AuthStrings {
         return authStrings;
     }
 
+    public void setLinks(Hashtable linksIn){
+        links = linksIn;
+    }
 
-    public void setAuthToken(String token,int exp){
+    public Hashtable getLinks(){
+        return links;
+    }
+
+    public void setAuthToken(String token,DateTime exp){
         authToken = token;
         authTokenExp = exp;
     }
 
-    public void setRefreshToken(String token, int exp){
+    public void setRefreshToken(String token, DateTime exp){
         refreshToken = token;
         refreshTokenExp = exp;
     }
 
-    public void setLogoutLink(String logoutLink) {
-        LogoutLink = logoutLink;
-    }
-
-    public void setAccountLink(String accountLink) {
-        AuthStrings.accountLink = accountLink;
-    }
-
-    public String getAccountLink(){
-        return accountLink;
-    }
-
-    public String getLogoutLink() {
-        return LogoutLink;
-    }
-
-    public int getAuthExp(){
+    public DateTime getAuthExp(){
         return authTokenExp;
     }
 
@@ -91,13 +75,13 @@ public class AuthStrings {
         settings = context.getSharedPreferences("TOKENS",  0);
         SharedPreferences.Editor editor = settings.edit();
         editor.putString("RefreshToken", refreshToken);
-        editor.commit();
+        editor.apply();
     }
 
     public void forgetRefreshToken() {
         refreshToken = "";
         SharedPreferences settings = context.getSharedPreferences("TOKENS", 0);
-        settings.edit().putString("RefreshToken", "").commit();
+        settings.edit().putString("RefreshToken", "").apply();
     }
 
     public void unstoreRefreshToken(){

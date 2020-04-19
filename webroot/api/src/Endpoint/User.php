@@ -16,6 +16,7 @@ namespace Kalma\Api\Endpoint;
 use DateTime;
 use Kalma\Api\Business\UserManager;
 use Kalma\Api\Core\Config;
+use Kalma\Api\Response\Exception\InvalidBodyAttributesException;
 use Kalma\Api\Response\Exception\ResponseException;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Kalma\Api\Response\Response;
@@ -87,9 +88,8 @@ class User extends Endpoint
     public function confirm(Request $req, Response $res, ?array $payload, array $args) : Response
     {
         $body = $req->getParsedBody();
-        if (!isset($body['confirmation_token']))
-        {
-            throw new ResponseException(400, 1002, 'Oops! Something went wrong accessing this resource.', 'Invalid request attributes.');
+        if (!isset($body['confirmation_token'])) {
+            throw new InvalidBodyAttributesException("The request body is missing the required 'confirmation_token' attribute.");
         }
 
         $um = UserManager::getInstance();
@@ -112,9 +112,10 @@ class User extends Endpoint
     public function login(Request $req, Response $res, ?array $payload, array $args) : Response
     {
         $body = $req->getParsedBody();
-        if (!isset($body['email_address']) || !isset($body['password']) || !isset($body['client_fingerprint']))
-        {
-            throw new ResponseException(400, 1002, 'Oops! Something went wrong accessing this resource.', 'Invalid request attributes.');
+        foreach(['email_address', 'password', 'client_fingerprint'] as $attribute) {
+            if (!isset($body[$attribute])) {
+                throw new InvalidBodyAttributesException("The request body is missing the required attribute '$attribute'.");
+            }
         }
 
         $um = UserManager::getInstance();
@@ -142,9 +143,10 @@ class User extends Endpoint
     {
         $body = $req->getParsedBody();
 
-        if (!isset($body['refresh_token']) || !isset($body['client_fingerprint']))
-        {
-            throw new ResponseException(400, 1002, 'Oops! Something went wrong accessing this resource.', 'Invalid request attributes.');
+        foreach(['refresh_token', 'client_fingerprint'] as $attribute) {
+            if (!isset($body[$attribute])) {
+                throw new InvalidBodyAttributesException("The request body is missing the required attribute '$attribute'.");
+            }
         }
 
         $um = UserManager::getInstance();
@@ -172,21 +174,18 @@ class User extends Endpoint
                     'The subject of the access token may not access the requested user\'s data.');
         }
 
-        $rows = $this->database->fetch
-        (
+        $rows = $this->database->fetch(
             'SELECT * FROM `user_account` WHERE `user_id` = :user_id',
             array('user_id' => $args['id'])
         );
 
-        if (count($rows) == 0)
-        {
+        if (count($rows) == 0) {
             throw new ResponseException(404, 1500, 'The requested user could not be found');
         }
 
         $account_data = $rows[0];
 
-        $sessions = $this->database->fetch
-        (
+        $sessions = $this->database->fetch(
             'SELECT `client_fingerprint`, `created_time`, `expiry_time` FROM `session` WHERE `user_id` = :user_id;',
             array('user_id' => $args['id']),
         );
@@ -245,16 +244,14 @@ class User extends Endpoint
     public function logout(Request $req, Response $res, ?array $payload, array $args) : Response
     {
         $body = $req->getParsedBody();
-        if (!isset($body['client_fingerprint']))
-        {
-            throw new ResponseException(400, 1002, 'Oops! Something went wrong accessing this resource.', 'Invalid request attributes.');
+        if (!isset($body['client_fingerprint'])) {
+            throw new InvalidBodyAttributesException("The request body is missing the required attribute 'client_fingerprint'.");
         }
 
         $user_id = $payload['sub'];
         $client_fingerprint = $body['client_fingerprint'];
 
-        $this->database->execute
-        (
+        $this->database->execute(
             'DELETE FROM `session` 
                  WHERE `session`.`user_id` = :user_id 
                  AND `session`.`client_fingerprint` = :client_fingerprint;',
@@ -286,8 +283,8 @@ class User extends Endpoint
 
         $body = $req->getParsedBody();
 
-        if (!isset($body['targets'])) {
-            throw new ResponseException(...ResponseException::INVALID_BODY_ATTRS);
+        if (!isset($body['targets']) || !is_array('targets')) {
+            throw new InvalidBodyAttributesException("The 'targets' object is missing or not an object.");
         }
 
         $targets = $body['targets'];
@@ -295,7 +292,7 @@ class User extends Endpoint
 
         foreach($targets as $key => $value) {
             if (!in_array($key, $valid_targets)) {
-                throw new ResponseException(...ResponseException::INVALID_BODY_ATTRS);
+                throw new InvalidBodyAttributesException("The 'targets' object contains the invalid key '$key'");
             }
         }
 

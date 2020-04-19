@@ -10,10 +10,10 @@ use GuzzleHttp\Client;
  */
 class ApiConnect
 {
-    /**
-     * @var Client
-     */
-    private $client;
+
+    private Client $client;
+
+    private static ApiConnect $instance;
 
     /**
      * ApiConnect constructor.
@@ -25,8 +25,16 @@ class ApiConnect
             'base_uri' => 'https://kalma.club',
             // You can set any number of default request options.
             'timeout'  => 50.0,
-
         ]);
+    }
+
+    /**
+     * Return an instance of ApiConnect, using an existing instance if available, else constructing a new one
+     * @return ApiConnect
+     */
+    public static function getConnection() : ApiConnect
+    {
+        return static::$instance ?? new ApiConnect();
     }
 
     /**
@@ -84,7 +92,7 @@ class ApiConnect
             $response = json_decode($e->getResponse()->getBody()->getContents());
             $_SESSION['status'] = $response->status;
             $_SESSION['error'] = $response->error;
-            $_SESSION['error_message'] = $response->message;
+            $_SESSION['error_message'] = $response->message . " ($response->uri)";
             if(isset($response->detail)) {
                 $_SESSION['detail'] = $response->detail;
             }
@@ -239,8 +247,8 @@ class ApiConnect
     }
 
     function addSleepData($startTime, $stopTime, $sleepQuality ){
-        try{
-            $res = $this->client->request('POST',$_SESSION['links']->sleep, ['headers' => ["Authorization" => 'bearer ' . $_SESSION['access_token']],'json' => ['periods' => [['start_time' => $startTime, 'stop_time' => $stopTime, 'sleep_quality' => $sleepQuality]]]]);
+        try {
+            $res = $this->client->request('POST', $_SESSION['links']->sleep, ['headers' => ["Authorization" => 'bearer ' . $_SESSION['access_token']],'json' => ['periods' => [['start_time' => $startTime, 'stop_time' => $stopTime, 'sleep_quality' => $sleepQuality]]]]);
             $messageBody = $res->getBody()->getContents();
             $data= json_decode($messageBody);
             return $data;
@@ -265,16 +273,16 @@ class ApiConnect
             }
             return $response;
         }
-
     }
+  
     function addCalmData($startTime, $stopTime, $description ){
         try{
-            $res = $this->client->request('POST',$_SESSION['links']->calm, ['headers' => ["Authorization" => 'bearer ' . $_SESSION['access_token']],'json' => ['periods' => [['start_time' => $startTime, 'stop_time' => $stopTime, 'description' => $description]]]]);
+            $res = $this->client->request('POST', $_SESSION['links']->calm, ['headers' => ["Authorization" => 'bearer ' . $_SESSION['access_token']],'json' => ['periods' => [['start_time' => $startTime, 'stop_time' => $stopTime, 'description' => $description]]]]);
             $messageBody = $res->getBody()->getContents();
             $data= json_decode($messageBody);
             return $data;
         }
-        catch (ClientException $e){
+        catch (ClientException | RequestException $e){
             $response = json_decode($e->getResponse()->getBody()->getContents());
             $_SESSION['status'] = $response->status;
             $_SESSION['error'] = $response->error;
@@ -294,9 +302,9 @@ class ApiConnect
             }
             return $response;
         }
-
     }
-    function editData($link,$data ){
+  
+    function editData($link,$data){
         try{
             $res = $this->client->request('PUT',$link, ['headers' => ["Authorization" => 'bearer ' . $_SESSION['access_token']],'body' => json_encode($data)]);
             $messageBody = $res->getBody()->getContents();
@@ -326,10 +334,7 @@ class ApiConnect
 
     }
     function deleteData($link,$data){
-        try{
-
-
-
+        try {
             $res = $this->client->request('DELETE',$link, ['headers' => ["Authorization" => 'bearer ' . $_SESSION['access_token']],'body' => json_encode($data)]);
             $messageBody = $res->getBody()->getContents();
             $data= json_decode($messageBody);

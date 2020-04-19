@@ -1,0 +1,63 @@
+.chart-group {
+    background: var(--c-bg-shade);
+    padding: 10px;
+    border-radius: 10px;
+}
+
+.chart-group > .chart {
+    background: var(--c-bg);
+    border-radius: 5px;
+    padding: 10px;
+}
+
+.stat-list {
+    margin-top: 10px;
+    padding: 10px;
+    background: var(--c-bg);
+    border-radius: 5px;
+}
+
+.stat-label {
+    font-weight: bold;
+}
+
+.stat-value {
+
+}
+
+.stat-list .error {
+    text-align: center;
+    color: var(--c-error);
+}
+
+.progress {
+    position: relative;
+    top: 4px;
+}
+
+@media (max-width: 991.98px) {
+    .progress {
+        margin: 5px 0;
+    }
+}
+
+.progress .progress-bar.progress-target {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    background-color: var(--c-secondary);
+    width: 2%;
+}
+
+#sleepCard .progress-bar:not(.progress-target) {
+    background-color: rgb(156, 39, 176);
+}
+
+#calmCard .progress-bar:not(.progress-target) {
+    background-color: rgb(233, 30, 99);
+}
+
+#stepsCard .progress-bar:not(.progress-target) {
+    background-color: rgb(77, 208, 225);
+}
+

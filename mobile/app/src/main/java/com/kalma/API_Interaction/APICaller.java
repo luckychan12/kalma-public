@@ -5,22 +5,30 @@ import android.content.SharedPreferences;
 import android.util.Log;
 
 import com.android.volley.AuthFailureError;
+import com.android.volley.DefaultRetryPolicy;
+import com.android.volley.NetworkResponse;
+import com.android.volley.ParseError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.JsonObjectRequest;
+
+import com.kalma.Data.AuthStrings;
 import com.kalma.R;
 
 import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
+import org.joda.time.format.DateTimeFormatter;
+import org.joda.time.format.ISODateTimeFormat;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.Map;
-
 
 public class APICaller {
     //set application context to use getResource methods
@@ -32,40 +40,31 @@ public class APICaller {
     public void loginRefresh(final ServerCallback callback){
         SharedPreferences settings = context.getSharedPreferences("TOKENS", 0);
         String token = settings.getString("RefreshToken", "");
-        if (token == ""){
+        if (token.equals("")){
             return;
         }
         refreshTokens(token, callback);
     }
 
-    public void checkTokenExpiry(){
-        DateTime dateTimeGMT = new DateTime();
-        long now = dateTimeGMT.getMillis() / 1000;
+    private void checkTokenExpiry(){
+        DateTime now = new DateTime();
         String token = AuthStrings.getInstance(context).getRefreshToken();
-        if(AuthStrings.getInstance(context).getAuthExp() > now){
+        if(AuthStrings.getInstance(context).getAuthExp().isAfter(now)){
             Log.i("refreshed token", "refresh not needed");
             return;
         }
-
-
         Log.e("refresh token", token);
-
         ServerCallback callback = new ServerCallback() {
             @Override
             public void onSuccess(JSONObject result) {
                 Log.i("refreshed token", "true");
             }
-
             @Override
             public void onFail(VolleyError error) {
-
             }
         };
-
         refreshTokens(token, callback);
     }
-
-
 
     private void refreshTokens(final String token, final ServerCallback callback) {
         String location = context.getResources().getString(R.string.api_refresh);
@@ -88,18 +87,24 @@ public class APICaller {
                         public void onResponse(JSONObject result) {
                             try {
                                 AuthStrings authStrings = AuthStrings.getInstance(context);
-                                JSONObject responseBody = result;
-                                String accessToken = responseBody.getString("access_token");
-                                int accessExp = Integer.parseInt(responseBody.getString("access_expiry"));
+                                String accessToken = result.getString("access_token");
+                                DateTimeFormatter parser = ISODateTimeFormat.dateTimeParser();
+                                DateTime accessExp = parser.parseDateTime(result.getString("access_expiry"));
                                 authStrings.setAuthToken(accessToken, accessExp);
-                                String refreshToken = responseBody.getString("refresh_token");
-                                int refreshExp = Integer.parseInt(responseBody.getString("refresh_expiry"));
+                                String refreshToken = result.getString("refresh_token");
+                                DateTime refreshExp = parser.parseDateTime(result.getString("refresh_expiry"));
                                 authStrings.setRefreshToken(refreshToken, refreshExp);
-                                JSONObject links = responseBody.getJSONObject("links");
-                                String accLink = links.getString("account");
-                                String logoutLink = links.getString("logout");
-                                authStrings.setAccountLink(accLink);
-                                authStrings.setLogoutLink(logoutLink);
+                                JSONObject links = result.getJSONObject("links");
+                                Hashtable<String, String> linksDict = new Hashtable<String, String>(); ;
+                                linksDict.put("account", links.getString("account"));
+                                linksDict.put("logout", links.getString("logout"));
+                                linksDict.put("sleep", links.getString("sleep"));
+                                linksDict.put("calm", links.getString("calm"));
+                                linksDict.put("steps", links.getString("steps"));
+                                linksDict.put("height", links.getString("height"));
+                                linksDict.put("weight", links.getString("weight"));
+
+                                authStrings.setLinks(linksDict);
                                 callback.onSuccess(result);
                             }
                             catch (JSONException je) {
@@ -113,7 +118,7 @@ public class APICaller {
                         public void onErrorResponse(VolleyError error ) {
                             try {
                                 //retrieve error message and display
-                                String jsonInput = new String(error.networkResponse.data, "utf-8");
+                                String jsonInput = new String(error.networkResponse.data, StandardCharsets.UTF_8);
                                 JSONObject responseBody = new JSONObject(jsonInput);
                                 String message = responseBody.getString("message");
                                 AuthStrings.getInstance(context).forgetRefreshToken();
@@ -121,8 +126,6 @@ public class APICaller {
 
                             } catch (JSONException je) {
                                 Log.e("JSONException", "onErrorResponse: ", je);
-                            } catch (UnsupportedEncodingException err) {
-                                Log.e("EncodingError", "onErrorResponse: ", err);
                             }
                             callback.onFail(error);
                         }
@@ -138,7 +141,6 @@ public class APICaller {
             e.printStackTrace();
         }
     }
-
 
     public void post(Boolean requiresAuth, final JSONObject content, final Map headers, String location, final ServerCallback callback) {
         if (requiresAuth) {
@@ -196,12 +198,40 @@ public class APICaller {
                 public Map getHeaders() throws AuthFailureError {
                     return headers;
                 }
+
+                @Override
+                protected Response<JSONObject> parseNetworkResponse(NetworkResponse response) {
+                    try {
+                        Log.i("STATUS CODE", Integer.toString(response.statusCode));
+                        Log.i("RESPONSE LENGTH", Integer.toString(response.data.length));
+                        String str = new String(response.data);
+                        Log.i("RESPONSE", str);
+                        Log.i("RESPONSE2", response.data.toString());
+
+                        String jsonString = new String(response.data,
+                                HttpHeaderParser.parseCharset(response.headers, PROTOCOL_CHARSET));
+
+                        JSONObject result = null;
+
+                        if (jsonString != null && jsonString.length() > 0)
+                            result = new JSONObject(jsonString);
+
+                        return Response.success(result,
+                                HttpHeaderParser.parseCacheHeaders(response));
+                    } catch (UnsupportedEncodingException e) {
+                        return Response.error(new ParseError(e));
+                    } catch (JSONException je) {
+                        return Response.error(new ParseError(je));
+                    }
+                }
             };
+            jsonObjectRequest.setRetryPolicy(new DefaultRetryPolicy(
+                    DefaultRetryPolicy.DEFAULT_TIMEOUT_MS,
+                    DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                    DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
             requestQueue.add(jsonObjectRequest);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
-
-
 }

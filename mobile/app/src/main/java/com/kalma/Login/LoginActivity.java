@@ -13,17 +13,21 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.android.volley.VolleyError;
 import com.kalma.API_Interaction.APICaller;
-import com.kalma.API_Interaction.AuthStrings;
+import com.kalma.Data.AuthStrings;
 import com.kalma.API_Interaction.ServerCallback;
 import com.kalma.MainApp.HomeActivity;
 import com.kalma.R;
 
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormatter;
+import org.joda.time.format.ISODateTimeFormat;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
-import java.nio.charset.StandardCharsets;
+import java.util.Dictionary;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.Map;
 
 public class LoginActivity extends AppCompatActivity {
@@ -56,7 +60,7 @@ public class LoginActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    private Map buildMap() {
+    private Map<String, String> buildMap() {
         Map<String, String> params = new HashMap<String, String>();
         return params;
     }
@@ -71,13 +75,22 @@ public class LoginActivity extends AppCompatActivity {
                             //retrieve access token and store.
                             JSONObject responseBody = response;
                             String accessToken = responseBody.getString("access_token");
-                            int accessExp = Integer.parseInt(responseBody.getString("access_expiry"));
-                            int refreshExp = Integer.parseInt(responseBody.getString("refresh_expiry"));
+                            DateTimeFormatter parser = ISODateTimeFormat.dateTimeParser();
+                            DateTime accessExp = parser.parseDateTime(responseBody.getString("access_expiry"));
+                            DateTime refreshExp = parser.parseDateTime(responseBody.getString("refresh_expiry"));
                             JSONObject links = responseBody.getJSONObject("links");
-                            String accLink = links.getString("account");
-                            String logoutLink = links.getString("logout");
+                            Log.d("out", response.toString());
                             String refreshToken = responseBody.getString("refresh_token");
-                            StoreTokens(accessToken, accessExp, refreshExp, accLink, logoutLink, refreshToken);
+                            Hashtable linksDict = new Hashtable(); ;
+                            linksDict.put("account", links.getString("account"));
+                            linksDict.put("logout", links.getString("logout"));
+                            linksDict.put("sleep", links.getString("sleep"));
+                            linksDict.put("calm", links.getString("calm"));
+                            linksDict.put("steps", links.getString("steps"));
+                            linksDict.put("height", links.getString("height"));
+                            linksDict.put("weight", links.getString("weight"));
+
+                            StoreTokens(accessToken, accessExp, refreshExp, linksDict, refreshToken);
                             Log.d("Response", response.toString());
                             //open home page
                             onSuccessfulLogin();
@@ -86,11 +99,10 @@ public class LoginActivity extends AppCompatActivity {
                         }
                     }
 
-                    private void StoreTokens(String accessToken, int accessExp, int refreshExp, String accLink, String logoutLink, String refreshToken) {
+                    private void StoreTokens(String accessToken, DateTime accessExp, DateTime refreshExp, Hashtable links, String refreshToken) {
                         AuthStrings authStrings = AuthStrings.getInstance(getApplicationContext());
                         authStrings.setAuthToken(accessToken, accessExp);
-                        authStrings.setAccountLink(accLink);
-                        authStrings.setLogoutLink(logoutLink);
+                        authStrings.setLinks(links);
                         authStrings.setRefreshToken(refreshToken, refreshExp);
                         if (((CheckBox)findViewById(R.id.rememberCreds)).isChecked()){
                             authStrings.storeRefreshToken();
@@ -107,7 +119,7 @@ public class LoginActivity extends AppCompatActivity {
                             String jsonInput = new String(error.networkResponse.data, "utf-8");
                             JSONObject responseBody = new JSONObject(jsonInput);
                             String message = responseBody.getString("message");
-                            AuthStrings.getInstance(getApplicationContext()).setAuthToken(null, 0);
+                            AuthStrings.getInstance(getApplicationContext()).setAuthToken(null, null);
                             Log.w("Error.Response", jsonInput);
                             Toast toast = Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG);
                             toast.show();
