@@ -14,7 +14,9 @@ if(isset($_POST['startDate'])){
     $newEndTime->setTimezone($GMT);
     $newEndTime = $newEndTime->format(DateTime::ISO8601);
     $descriptionString = 'description';
-    $message = $api->addPeriodicData($_SESSION['links']->calm,$newStartTime,$newEndTime,$descriptionString,$_POST['description']);
+    if(isset($_SESSION['links'])) {
+        $message = $api->addPeriodicData($_SESSION['links']->calm, $newStartTime, $newEndTime, $descriptionString, $_POST['description']);
+    }
 }
 
 //Deals with editing new data
@@ -33,13 +35,17 @@ if(isset($_POST['editId'])){
     $period['description'] = $desc;
     $periods = array($period);
     $data['periods'] = $periods;
-    $message = $api->editData($_SESSION['links']->calm, $data);
+    if(isset($_SESSION['links'])) {
+        $message = $api->editData($_SESSION['links']->calm, $data);
+    }
 }
 
 //Deals with deleting new data
 if(isset($_POST['deleteId'])){
     $data['periods'] = array((int)$_POST['deleteId']);
-    $message = $api->deleteData($_SESSION['links']->calm, $data);
+    if(isset($_SESSION['links'])) {
+        $message = $api->deleteData($_SESSION['links']->calm, $data);
+    }
 }
 
 //Reads the data for the page

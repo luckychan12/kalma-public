@@ -14,7 +14,9 @@ if(isset($_POST['startDate'])){
     $newEndTime->setTimezone($GMT);
     $newEndTime = $newEndTime->format(DateTime::ISO8601);
     $sleepQualityString = 'sleep_quality';
-    $message = $api->addPeriodicData( $_SESSION['links']->sleep,$newStartTime,$newEndTime,$sleepQualityString, $_POST['sleepQuality']);
+    if(isset($_SESSION['links'])) {
+        $message = $api->addPeriodicData($_SESSION['links']->sleep, $newStartTime, $newEndTime, $sleepQualityString, $_POST['sleepQuality']);
+    }
 }
 
 //Deals with editing new data
@@ -33,14 +35,17 @@ if(isset($_POST['editId'])){
     $period['sleep_quality'] = (int)$sleep_quality;
     $periods = array($period);
     $data['periods'] = $periods;
-    $message = $api->editData($_SESSION['links']->sleep, $data);
-
+    if(isset($_SESSION['links'])) {
+        $message = $api->editData($_SESSION['links']->sleep, $data);
+    }
 }
 
 //Deals with deleting new data
 if(isset($_POST['deleteId'])){
     $data['periods'] = array((int)$_POST['deleteId']);
-    $message = $api->deleteData($_SESSION['links']->sleep, $data);
+    if(isset($_SESSION['links'])) {
+        $message = $api->deleteData($_SESSION['links']->sleep, $data);
+    }
 }
 
 //Reads the data for the page
