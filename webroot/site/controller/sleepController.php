@@ -13,7 +13,8 @@ if(isset($_POST['startDate'])){
     $newEndTime = new DateTime($_POST['endDate'] .' '. $_POST['endTime']);
     $newEndTime->setTimezone($GMT);
     $newEndTime = $newEndTime->format(DateTime::ISO8601);
-    $message = $api->addSleepData($newStartTime,$newEndTime,$_POST['sleepQuality']);
+    $sleepQualityString = 'sleep_quality';
+    $message = $api->addPeriodicData( $_SESSION['links']->sleep,$newStartTime,$newEndTime,$sleepQualityString, $_POST['sleepQuality']);
 }
 
 //Deals with editing new data
@@ -139,8 +140,6 @@ $end = strtotime('+1 days +16 hours -1 min', $end);
 $start = date('Y-m-d H:i' , $start);
 $end = date('Y-m-d H:i', $end);
 
-echo $start;
-echo $end;
 
 //fills the month labels
 $monthLabels = "";

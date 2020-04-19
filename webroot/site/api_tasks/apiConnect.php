@@ -246,43 +246,14 @@ class ApiConnect
         }
     }
 
-    function addSleepData($startTime, $stopTime, $sleepQuality ){
+    function addPeriodicData($link, $startTime, $stopTime, $extraLabel,$extraData){
         try {
-            $res = $this->client->request('POST', $_SESSION['links']->sleep, ['headers' => ["Authorization" => 'bearer ' . $_SESSION['access_token']],'json' => ['periods' => [['start_time' => $startTime, 'stop_time' => $stopTime, 'sleep_quality' => $sleepQuality]]]]);
+            $res = $this->client->request('POST', $link, ['headers' => ["Authorization" => 'bearer ' . $_SESSION['access_token']],'json' => ['periods' => [['start_time' => $startTime, 'stop_time' => $stopTime, $extraLabel => $extraData]]]]);
             $messageBody = $res->getBody()->getContents();
             $data= json_decode($messageBody);
             return $data;
         }
         catch (ClientException $e){
-            $response = json_decode($e->getResponse()->getBody()->getContents());
-            $_SESSION['status'] = $response->status;
-            $_SESSION['error'] = $response->error;
-            $_SESSION['error_message'] = $response->message;
-            if(isset($response->detail)) {
-                $_SESSION['detail'] = $response->detail;
-            }
-            return $response;
-        }
-        catch (RequestException $e){
-            $response = json_decode($e->getResponse()->getBody()->getContents());
-            $_SESSION['status'] = $response->status;
-            $_SESSION['error'] = $response->error;
-            $_SESSION['error_message'] = $response->message;
-            if(isset($response->detail)) {
-                $_SESSION['detail'] = $response->detail;
-            }
-            return $response;
-        }
-    }
-  
-    function addCalmData($startTime, $stopTime, $description ){
-        try{
-            $res = $this->client->request('POST', $_SESSION['links']->calm, ['headers' => ["Authorization" => 'bearer ' . $_SESSION['access_token']],'json' => ['periods' => [['start_time' => $startTime, 'stop_time' => $stopTime, 'description' => $description]]]]);
-            $messageBody = $res->getBody()->getContents();
-            $data= json_decode($messageBody);
-            return $data;
-        }
-        catch (ClientException | RequestException $e){
             $response = json_decode($e->getResponse()->getBody()->getContents());
             $_SESSION['status'] = $response->status;
             $_SESSION['error'] = $response->error;

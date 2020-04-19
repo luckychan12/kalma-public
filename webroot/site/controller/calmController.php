@@ -13,7 +13,8 @@ if(isset($_POST['startDate'])){
     $newEndTime = new DateTime($_POST['endDate'] .' '. $_POST['endTime']);
     $newEndTime->setTimezone($GMT);
     $newEndTime = $newEndTime->format(DateTime::ISO8601);
-    $message = $api->addCalmData($newStartTime,$newEndTime,$_POST['description']);
+    $descriptionString = 'description';
+    $message = $api->addPeriodicData($_SESSION['links']->calm,$newStartTime,$newEndTime,$descriptionString,$_POST['description']);
 }
 
 //Deals with editing new data
