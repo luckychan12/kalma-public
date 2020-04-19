@@ -131,13 +131,16 @@ if ($average > 0) {
 
 //Gets the start and end of the selected month
 $ts = strtotime($date);
-$start = (date('w', $ts) == 0) ? $ts : strtotime("first day of this month", $ts);
+$start = (date('W', $ts) == 0) ? $ts : strtotime("first day of this month", $ts);
 $start = strtotime('+16 hours', $start);
 
 $end =  strtotime("last day of this month", $ts);
 $end = strtotime('+1 days +16 hours -1 min', $end);
 $start = date('Y-m-d H:i' , $start);
 $end = date('Y-m-d H:i', $end);
+
+echo $start;
+echo $end;
 
 //fills the month labels
 $monthLabels = "";

@@ -123,7 +123,7 @@ if ($average > 0) {
 
 //Gets the start and end of the selected month
 $ts = strtotime($date);
-$start = (date('w', $ts) == 0) ? $ts : strtotime("first day of this month", $ts);
+$start = (date('W', $ts) == 0) ? $ts : strtotime("first day of this month", $ts);
 
 $end =  strtotime("last day of this month", $ts);
 $start = date('Y-m-d H:i' , $start);
