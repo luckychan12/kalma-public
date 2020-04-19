@@ -13,30 +13,30 @@ if(isset($_POST['startDate'])){
     $newEndTime = new DateTime($_POST['endDate'] .' '. $_POST['endTime']);
     $newEndTime->setTimezone($GMT);
     $newEndTime = $newEndTime->format(DateTime::ISO8601);
-    $sleepQualityString = 'sleep_quality';
+    $descriptionString = 'description';
     if(isset($_SESSION['links'])) {
-        $message = $api->addPeriodicData($_SESSION['links']->sleep, $newStartTime, $newEndTime, $sleepQualityString, $_POST['sleepQuality']);
+        $message = $api->addPeriodicData($_SESSION['links']->calm, $newStartTime, $newEndTime, $descriptionString, $_POST['description']);
     }
 }
 
 //Deals with editing new data
 if(isset($_POST['editId'])){
     $id = $_POST['editId'];
-    $newStartTime = new DateTime($_POST['startDate'] .' '. $_POST['startTime']);
+    $newStartTime = new DateTime($_POST['newStartDate'] .' '. $_POST['newStartTime']);
     $newStartTime->setTimezone($GMT);
     $newStartTime = $newStartTime->format(DateTime::ISO8601);
-    $newEndTime = new DateTime($_POST['endDate'] .' '. $_POST['endTime']);
+    $newEndTime = new DateTime($_POST['newEndDate'] .' '. $_POST['newEndTime']);
     $newEndTime->setTimezone($GMT);
     $newEndTime = $newEndTime->format(DateTime::ISO8601);
-    $sleep_quality =$_POST['sleepQuality'];
+    $desc =$_POST['newDescription'];
     $period['id'] = (int)$id;
     $period['start_time'] = $newStartTime;
     $period['stop_time'] = $newEndTime;
-    $period['sleep_quality'] = (int)$sleep_quality;
+    $period['description'] = $desc;
     $periods = array($period);
     $data['periods'] = $periods;
     if(isset($_SESSION['links'])) {
-        $message = $api->editData($_SESSION['links']->sleep, $data);
+        $message = $api->editData($_SESSION['links']->calm, $data);
     }
 }
 
@@ -44,13 +44,13 @@ if(isset($_POST['editId'])){
 if(isset($_POST['deleteId'])){
     $data['periods'] = array((int)$_POST['deleteId']);
     if(isset($_SESSION['links'])) {
-        $message = $api->deleteData($_SESSION['links']->sleep, $data);
+        $message = $api->deleteData($_SESSION['links']->calm, $data);
     }
 }
 
 //Reads the data for the page
 if(isset($_SESSION['links'])) {
-    $dataPoints = $api->getData($_SESSION['links']->sleep);
+    $dataPoints = $api->getData($_SESSION['links']->calm);
     if (isset($dataPoints->error)) {
         $_SESSION['links'] = null;
         header('Location: ./errorPage.php');
@@ -93,7 +93,6 @@ $date = $selectedDate->format(DateTime::ISO8601);
 $ts = strtotime($date);
 $week = date('W', $ts);
 $start = strtotime($time, $ts);
-$start = strtotime('+16 hours', $start);
 $end = strtotime('+1 weeks -1 minute', $start);
 $start = date('Y-m-d H:i' , $start);
 $end = date('Y-m-d H:i', $end);
@@ -114,10 +113,7 @@ foreach ($dataPoints->periods as $data) {
         if (($startTime >= $start) && ($startTime <= $end)) {
 
             $n = -1;
-            if (date("G", strtotime($data->start_time)) <= 16) {
-                $n--;
-            }
-            $weekPoints[date("N", strtotime($data->start_time)) + $n] =$weekPoints[date("N", strtotime($data->start_time)) + $n] +  (float)number_format(($data->duration / 60), 2, ".","" );
+            $weekPoints[date("N", strtotime($data->start_time)) + $n] = $data->duration;
         }
     }
 
@@ -126,10 +122,7 @@ foreach ($dataPoints->periods as $data) {
 
 
 if ($average > 0) {
-    $total =($average / $i)/60;
-    $hours = floor($total);
-    $mins = ($total-$hours) *60;
-    $average =sprintf("%2.0f Hours %2.0f Minutes", $hours, $mins);
+    $average =number_format((($average / $i))) ;
 }
 
 
@@ -138,13 +131,10 @@ if ($average > 0) {
 //Gets the start and end of the selected month
 $ts = strtotime($date);
 $start = (date('W', $ts) == 0) ? $ts : strtotime("first day of this month", $ts);
-$start = strtotime('+16 hours', $start);
 
 $end =  strtotime("last day of this month", $ts);
-$end = strtotime('+1 days +16 hours -1 min', $end);
 $start = date('Y-m-d H:i' , $start);
 $end = date('Y-m-d H:i', $end);
-
 
 //fills the month labels
 $monthLabels = "";
@@ -157,24 +147,19 @@ for ($i = 1; $i <= date("t", strtotime($date)); $i++)
 $monthPoints = array_fill(0, date("t", strtotime($date)), 0);;
 //sets the start and end of the current sleep to get the message on progress
 $progress_message="0";
-$last_night = new DateTime('4pm');
-$last_night_start = $last_night->format('Y-m-d H:i');
-$last_night_end = $last_night->modify("+1day");
-$last_night_end =$last_night_end->format('Y-m-d H:i');
-
+$last_night = new DateTime('today');
+$last_night_start = $last_night->format('Y-m-d');
 foreach ($dataPoints->periods as $data)
 {
     if (isset($data->id)) {
         $startTime = date('Y-m-d H:i', strtotime($data->start_time));
         if (($startTime >= $start) && ($startTime <= $end)) {
             $n = -1;
-            if (date("G", strtotime($data->start_time)) <= 16) {
-                $n--;
-            }
-            $monthPoints[date("j", strtotime($data->start_time)) + $n] = $monthPoints[date("j", strtotime($data->start_time)) + $n] + (float)number_format(($data->duration / 60), 2, ".","" );
+            $monthPoints[date("j", strtotime($data->start_time)) + $n] = $data->duration;
         }
         //finds the progress message for the current sleep period
-        if (($startTime >= $last_night_start) && ($startTime < $last_night_end)){
+        $startTime = date('Y-m-d', strtotime($data->start_time));
+        if (($startTime == $last_night_start)){
             $progress_message = $progress_message + $data->progress_percentage;
         }
 

@@ -1,5 +1,5 @@
 <?php
-include_once '../controller/sleepController.php';
+include_once '../controller/calmController.php';
 ?>
 
 <!doctype html>
@@ -11,70 +11,71 @@ include_once '../controller/sleepController.php';
 <body>
 <?php include_once './components/navbar_top.php'; ?>
 <!--Add sleep period overlay-->
-<div id="addingSleep" class="modal" tabindex="-1" role="dialog">
+<div id="addingCalm" class="modal" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
-        <div  class="modal-content">
+        <div class="modal-content">
             <div class="modal-header">
-                <h2 class="modal-title">Add Sleep Data</h2>
+                <h2 class="modal-title">Add Mindful Minutes Data</h2>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
-                <form method="post" action="sleep.php">
+                <form method="post" action="calm.php">
                     <label>Start Time:</label>
                     <br>
                     <input class="form-control" type="date" name="startDate" required>
                     <input class="form-control" type="time" name="startTime" required>
+
                     <label>End Time:</label>
                     <br>
                     <input class="form-control" type="date" name="endDate" required>
                     <input class="form-control" type="time" name="endTime" required>
-                    <label>Sleep Quality:</label>
+
+                    <label>Description:</label>
                     <br>
-                    <input class="form-control" type="number" max="5" min="1"  name="sleepQuality" required>
+                    <input class="form-control" type="text" name="description" >
                     <div class="modal-footer">
-                        <input type="submit" class="btn btn-primary" value="Submit" name="addSleep">
+                        <input type="submit" class="btn btn-primary" value="Submit" name="addCalm">
                     </div>
                 </form>
             </div>
         </div>
     </div>
 </div>
-<!--Edit Overlay-->
 <div id="overlayEdit" class="modal" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h2 class="modal-title">Edit Sleep Date</h2>
+                <h2 class="modal-title">Edit Data</h2>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
-                <form method="post" action="sleep.php">
+                <form method="post" action="calm.php">
                     <label>Start Time:</label>
                     <input id="editId" name="editId" value="0" hidden>
                     <br>
-                    <input id="editStartDate" class="form-control" type="date" name="startDate" value="2020-02-01" required>
-                    <input id="editStartTime" class="form-control" type="time" name="startTime" value="20:00" required>
+                    <input id="editStartDate" class="form-control" type="date" name="newStartDate" value="2020-02-01" required>
+                    <input id="editStartTime" class="form-control" type="time" name="newStartTime" value="20:00" required>
+
                     <label>End Time:</label>
                     <br>
-                    <input id="editEndDate" class="form-control" type="date" name="endDate" required>
-                    <input id="editEndTime" class="form-control" type="time" name="endTime" required>
-                    <label>Sleep Quality:</label>
-                    <br>
-                    <input id="editSleepQuality" class="form-control" type="number" max="5" min="1"  name="sleepQuality" required>
+                    <input id="editEndDate" class="form-control" type="date" name="newEndDate" required>
+                    <input id="editEndTime" class="form-control" type="time" name="newEndTime" required>
 
+                    <label>Description:</label>
+                    <br>
+                    <input id="editDesc"  class="form-control" type="text" name="newDescription" required>
                     <div class="modal-footer">
-                        <input type="submit" class="btn btn-primary" value="Save" name="editSleep">
+                        <input type="submit" class="btn btn-primary" value="Save" name="editCalm">
                     </div>
                 </form>
             </div>
         </div>
     </div>
 </div>
-<!--Delete Overlay-->
 <div id="overlayDelete" class="modal" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -85,10 +86,10 @@ include_once '../controller/sleepController.php';
                 </button>
             </div>
             <div class="modal-body">
-                <form method="post" action="sleep.php">
+                <form method="post" action="calm.php">
                     <input id="deleteId" name="deleteId" value="0" hidden>
-                        <input type="submit" class="btn btn-primary" value="Yes" name="editSleep">
-                        <input type="button" class="btn btn-secondary" data-dismiss="modal" value="No">
+                    <input type="submit" class="btn btn-primary" value="Yes" name="editSleep">
+                    <input type="button" class="btn btn-secondary" data-dismiss="modal" value="No">
                 </form>
             </div>
         </div>
@@ -99,22 +100,22 @@ include_once '../controller/sleepController.php';
     <div class="row">
         <div class="col-lg-7 offset-lg-1">
             <div class="alert alert-danger alert-dismissible fade text-center <?= isset($message->error) ? "show" : "hide"?>" role="alert">
-                <?= $message->message. " (" . isset($message->error).")" ?? ""; ?>
+                <?= $message->message. " (" . $message->error.")" ?? ""; ?>
                 <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <h1 style="margin-top: 20px">Sleep Period</h1>
+            <h1 style="margin-top: 20px">Mindful Minutes</h1>
             <button class="btn btn-primary date-selector" onclick=showWeekChart(); style="margin-left: 5px">Week</button>
             <button class="btn btn-primary date-selector" onclick=showMonthChart();>Month</button>
             <br>
             <div style="margin-top: 10px; margin-left: 5px">
                 <!--Date choosers-->
-                <form id="weekForm" method="get" action="sleep.php"style="display: none">
+                <form id="weekForm" method="get" action="calm.php"style="display: none">
                     <input onchange=document.getElementById('weekSubmit').click(); style="text-align: center" type="week" id="weekDate" value="<?php echo $setWeekDate ?>" name="weekDate">
                     <input type="submit" id="weekSubmit" hidden>
                 </form>
-                <form id="monthForm" method="get" action="sleep.php"style="display: none">
+                <form id="monthForm" method="get" action="calm.php"style="display: none">
                     <input onchange=document.getElementById('monthSubmit').click(); style="text-align: center" type="month" value="<?php echo $setMonthDate ?>" name="monthDate">
                     <input type="submit" id="monthSubmit" hidden>
                 </form>
@@ -128,9 +129,9 @@ include_once '../controller/sleepController.php';
         <div class="col-lg-3">
             <div class="outer">
                 <div class="module">
-                    <h2 style="font-size: x-large">Average sleep (Overall):</h2>
+                    <h2 style="font-size: x-large">Average Mindful Minutes (Overall):</h2>
                     <hr>
-                    <?php echo $average?>
+                    <?php echo $average?> Minutes a day
                 </div>
                 <div class="module">
                     <h2 style="font-size: x-large">Progress Today:</h2>
@@ -158,28 +159,28 @@ include_once '../controller/sleepController.php';
                     <th>Start Time</th>
                     <th>End Time</th>
                     <th>Duration</th>
-                    <th>Quality</th>
+                    <th>Description</th>
                     <th>Progress Percentage</th>
                 </tr>
                 <?php
                 foreach ($dataPoints->periods as $data) {
                     if (isset($data->id)) {
-                        $StartTime = date('Y-m-d H:i',strtotime($data->start_time));
+                        $StartTime = date('Y-m-d H:i', strtotime($data->start_time));
                         $EndTime = date('Y-m-d H:i', strtotime($data->stop_time));
-                        $send = "edit({$data->id},'{$StartTime}','{$EndTime}',{$data->sleep_quality})";
+                        $desc = "$data->description";
+                        $send = "edit({$data->id},'{$StartTime}','{$EndTime}','{$desc}')";
                         echo
-
                             "<tr>
-                            <td><a href=\"#\" data-toggle=\"modal\" data-target=\"#overlayEdit\" onclick=\"$send\";>
+                            <td><a href=\"#\" data-toggle=\"modal\" data-target=\"#overlayEdit\" onclick=\"$send\">
                             <i class=\"fas fa-pencil-alt\"></i></a> 
                             <a href=\"#\" data-toggle=\"modal\" data-target=\"#overlayDelete\" onclick='remove($data->id)'>
-                            <i  class=\"fas fa-trash\"></a></td>  
+                            <i  class=\"fas fa-trash\"></a></td></td>    
                             <td>". date('d/m/Y H:i', strtotime($data->start_time))."</td>
                             <td>".date('d/m/Y H:i', strtotime($data->stop_time))."</td>
                             <td>$data->duration_text</td>
-                            <td>$data->sleep_quality</td>
+                            <td>$data->description</td>
                             <td>$data->progress_percentage %</td>
-                            </tr>";
+                        </tr>";
                     }
                 }
                 ?>
@@ -190,10 +191,10 @@ include_once '../controller/sleepController.php';
 </div>
 
 <script>
-    function remove(id){f
+    function remove(id){
         document.getElementById("deleteId").value = id;
     }
-    function edit(id, fullStart, fullEnd, quality){
+    function edit(id, fullStart, fullEnd, desc){
         let start = new Date(fullStart);
         let m = start.getMonth() + 1;
         let d = start.getDate();
@@ -212,9 +213,9 @@ include_once '../controller/sleepController.php';
         m = m > 9 ? m : "0"+m;
         d = d > 9 ? d : "0"+d;
         let endDate = end.getFullYear() + "-" + m + "-" + d;
-         hour = end.getHours();
+        hour = end.getHours();
         hour = hour > 9 ? hour :"0"+hour;
-         min = end.getMinutes();
+        min = end.getMinutes();
         min = min > 9 ? min :"0"+min;
         let endTime = hour+ ":" + min;
         document.getElementById("editId").value = id;
@@ -222,7 +223,7 @@ include_once '../controller/sleepController.php';
         document.getElementById("editStartTime").value = startTime;
         document.getElementById("editEndDate").value = endDate;
         document.getElementById("editEndTime").value = endTime;
-        document.getElementById("editSleepQuality").value =quality;
+        document.getElementById("editDesc").value = desc;
     }
 
     function on() {
@@ -234,6 +235,7 @@ include_once '../controller/sleepController.php';
         document.getElementById("overlayEdit").style.display = "none";
         document.getElementById("overlayDelete").style.display = "none";
     }
+
 
 
     function showWeekChart() {
@@ -259,7 +261,7 @@ include_once '../controller/sleepController.php';
             data: {
                 labels: ["Mon", "Tue", "Wed", "Thus", "Fri", "Sat","Sun"],
                 datasets: [{
-                    label: 'Hours slept',
+                    label: 'Minutes Meditated',
                     data: <?php
                     echo "[";
                     foreach ($weekPoints as $point)
@@ -277,30 +279,30 @@ include_once '../controller/sleepController.php';
                 scales: {
 
                     xAxes: [{
-                        scaleLabel: {
-                            display: true,
-                            labelString: "Number of hours slept",
-                            fontColor: textColor,
-                        },
-                        ticks: {
-                            fontColor: textColor,
-                        },
                         gridLines: {
                             zeroLineColor: textColor,
                             color: textColor,
                         },
+                        scaleLabel: {
+                            display: true,
+                            labelString: "Number of minutes meditated",
+                            fontColor:textColor,
+                        },
+                        ticks: {
+                            fontColor:textColor,
+                        }
                     }],
                     yAxes: [{
                         gridLines: {
-                            display:false,
+                            display: false,
                         },
                         scaleLabel: {
                             display: true,
-                            labelString: "Nights of the week",
-                            fontColor: textColor,
+                            labelString: "Days of the week",
+                            fontColor:textColor,
                         },
                         ticks: {
-                            fontColor: textColor,
+                            fontColor:textColor,
                             beginAtZero:true
                         }
                     }]
@@ -318,7 +320,7 @@ include_once '../controller/sleepController.php';
             data: {
                 labels: [<?php echo $monthLabels ?>],
                 datasets: [{
-                    label: 'Hours slept',
+                    label: 'Minutes Meditated',
                     data: <?php
                     echo "[";
                     foreach ($monthPoints as $point)
@@ -341,11 +343,11 @@ include_once '../controller/sleepController.php';
                         },
                         scaleLabel: {
                             display: true,
-                            labelString: "Number of hours slept",
-                            fontColor: textColor,
+                            labelString: "Number of minutes meditated",
+                            fontColor:textColor,
                         },
                         ticks: {
-                            fontColor: textColor,
+                            fontColor:textColor,
                         }
                     }],
                     yAxes: [{
@@ -355,11 +357,11 @@ include_once '../controller/sleepController.php';
                         scaleLabel: {
                             display: true,
                             labelString: "Days of the month",
-                            fontColor: textColor,
+                            fontColor:textColor,
                         },
 
                         ticks: {
-                            fontColor: textColor,
+                            fontColor:textColor,
                             beginAtZero:true
                         }
                     }]
