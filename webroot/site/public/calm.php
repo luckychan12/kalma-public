@@ -6,7 +6,7 @@ include_once '../controller/calmController.php';
 <link lang='en'>
 <?php include_once './components/global_head_inner.php' ?>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js"></script>
-<link rel="stylesheet" href="assets/stylesheets/sleep.css">
+<link rel="stylesheet" href="assets/stylesheets/trackerPages.css">
 </head>
 <body>
 <?php include_once './components/navbar_top.php'; ?>
@@ -253,7 +253,7 @@ include_once '../controller/calmController.php';
             data: {
                 labels: ["Mon", "Tue", "Wed", "Thus", "Fri", "Sat","Sun"],
                 datasets: [{
-                    label: 'Hours slept',
+                    label: 'Minutes Meditated',
                     data: <?php
                     echo "[";
                     foreach ($weekPoints as $point)
