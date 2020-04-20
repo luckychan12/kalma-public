@@ -1,19 +1,28 @@
 <?php
+/**
+ * Create and dispatch requests to the Kalma API, and handle the responses
+ *
+ * @author Georgia Perrins (georgiadmperrins@btinternet.com)
+ * @author Fergus Bentley (fergusbentley@gmail.com)
+ * @category Kalma
+ * @package  Web
+ */
+
 require '../vendor/autoload.php';
+
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Client;
 
-
 /**
  * Class ApiConnect
  */
-class ApiConnect
+class ApiConnector
 {
 
     private Client $client;
 
-    private static ApiConnect $instance;
+    private static ApiConnector $instance;
 
     /**
      * ApiConnect constructor.
@@ -25,16 +34,114 @@ class ApiConnect
             'base_uri' => 'https://kalma.club',
             // You can set any number of default request options.
             'timeout'  => 50.0,
+            'verify' => false,
         ]);
     }
 
     /**
      * Return an instance of ApiConnect, using an existing instance if available, else constructing a new one
-     * @return ApiConnect
+     * @return ApiConnector
      */
-    public static function getConnection() : ApiConnect
+    public static function getConnection() : ApiConnector
     {
-        return static::$instance ?? new ApiConnect();
+        return static::$instance ?? new ApiConnector();
+    }
+
+    /**
+     * Make a request to the API
+     *
+     * @param string $method     An HTTP method corresponding to one of the CRUD actions
+     * @param string $uri        The API resource identifier (excluding the server's address)
+     * @param array|null $params The request body. Converted to JSON if method != "GET", else URL encoded
+     * @param bool $private      Whether the endpoint requires an Authorization
+     * @param array $headers     Additional headers to supply with the request
+     * @return object|null
+     */
+    public function request(string $method, string $uri, ?array $params = null, bool $private = false, array $headers = []) : ?object
+    {
+        $options = array(
+            'headers' => $headers,
+        );
+
+        // Provide an up-to-date Bearer token for endpoints requiring authentication
+        if ($private) {
+            if($this->ensureValidAccess()) {
+                $access_token = $_SESSION['auth']->access_token;
+                $options['headers']['Authorization'] = "Bearer $access_token";
+            }
+            else {
+                session_unset();
+                header('Location: https://kalma.club/login');
+                exit();
+            }
+        }
+
+        // Pass request parameters as either query parameters or a JSON request body, depending on the method
+        if ($params !== null) {
+            if (strcasecmp($method, 'GET') === 0) {
+                $options['query'] = $params;
+            }
+            else {
+                $options['json'] = $params;
+            }
+        }
+
+        // Make the request
+        $res = $this->client->request($method, $uri, $options);
+
+        $response_body = $res->getBody()->getContents();
+        $data = json_decode($response_body);
+
+        return $data;
+    }
+
+    /**
+     * Ensure that the $_SESSION variable contains a valid access token.
+     * If an access_token exists, check it's expiry. If necessary, refresh the token.
+     * Return true if a valid access_token exists by the end of execution, else false.
+     *
+     * @return bool
+     */
+    private function ensureValidAccess() : bool
+    {
+        if(!isset($_SESSION['auth'])) {
+            return false;
+        }
+
+        $access_expiry = $_SESSION['auth']->access_expiry;
+        $now = new DateTime("now");
+        if ($access_expiry <= $now) {
+            return $this->refreshSession();
+        }
+
+        return isset($_SESSION['auth']['access_token']);
+    }
+
+    /**
+     * Attempt to get a new set of auth tokens to replace those in the $_SESSION variable
+     * Return false if there is no refresh token exists, either in $_COOKIE or the $_SESSION
+     *
+     * @return bool
+     */
+    private function refreshSession() : bool
+    {
+        if (!isset($_COOKIE['refresh']) && !isset($_SESSION['auth'])) {
+            return false;
+        }
+
+        $refresh_token = $_COOKIE['refresh'] ?? $_SESSION['auth']->refresh_token;
+
+        $request_body = array(
+            'refresh_token' => $refresh_token,
+            'client_fingerprint' => $_SESSION['fingerprint'],
+        );
+
+        $response = $this->request('POST', 'api/user/refresh', $request_body);
+        if ($response !== null) {
+
+        }
+
+        return false;
     }
 
     /**

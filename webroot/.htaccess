@@ -1,0 +1,5 @@
+RewriteEngine On
+RewriteCond %{Request_Filename} !-f
+RewriteCond %{Request_Filename} !-d
+RewriteCond %{REQUEST_URI} !/api
+RewriteRule ^(.+)$ site/public/$1 [QSA,L]
