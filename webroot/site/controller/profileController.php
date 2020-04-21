@@ -1,9 +1,9 @@
 <?php
-include_once '../api_tasks/apiConnect.php';
+include_once '../api_tasks/ApiConnector.php';
 
 session_start();
 
-$api = new ApiConnect();
+$api = new ApiConnector();
 if (isset($_SESSION['account_link'])) {
     $data = $api->getData($_SESSION['account_link']);
 }

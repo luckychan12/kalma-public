@@ -1,6 +1,6 @@
 <?php
-include_once "../api_tasks/apiConnect.php";
-$api = new ApiConnect();
+include_once "../api_tasks/ApiConnector.php";
+$api = new ApiConnector();
 
 $token = $_GET['confirmation'] ?? "";
 $data = $api->confirmAccount($token);

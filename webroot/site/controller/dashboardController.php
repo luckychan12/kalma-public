@@ -1,6 +1,6 @@
 <?php
 session_start();
-include_once '../api_tasks/apiConnect.php';
+include_once '../api_tasks/ApiConnector.php';
 
 /**
  * Make a GET request to the API
@@ -13,7 +13,7 @@ include_once '../api_tasks/apiConnect.php';
  */
 function get(string $link) : ?object
 {
-    $api = ApiConnect::getConnection();
+    $api = ApiConnector::getConnection();
     $data = $api->getData($link);
     if (isset($data->error)) {
         header('Location: ./errorPage.php');

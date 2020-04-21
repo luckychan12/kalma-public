@@ -1,5 +1,5 @@
 <?php
-include_once '../api_tasks/apiConnect.php';
+include_once '../api_tasks/ApiConnector.php';
 session_start();
 if(isset($_POST['signup'])){
     try {
@@ -9,7 +9,7 @@ if(isset($_POST['signup'])){
 
     } catch (Exception $e) {
     }
-    $api = new ApiConnect();
+    $api = new ApiConnector();
     $result = $api->requestSignup($_POST['firstName'],$_POST['lastName'],$_POST['password'],$_POST['email'],$dob);
     if (!isset($result->error)){
 

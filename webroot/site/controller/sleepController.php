@@ -1,8 +1,8 @@
 <?php
 session_start();
 date_default_timezone_set('Europe/London');
-include_once "../api_tasks/apiConnect.php";
-$api = new ApiConnect();
+include_once "../api_tasks/ApiConnector.php";
+$api = new ApiConnector();
 $GMT = new DateTimeZone('GMT');
 
 //Deals with adding new data
