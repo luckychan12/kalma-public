@@ -2,8 +2,8 @@
 /**
  * Create and dispatch requests to the Kalma API, and handle the responses
  *
- * @author Georgia Perrins (georgiadmperrins@btinternet.com)
- * @author Fergus Bentley (fergusbentley@gmail.com)
+ * @author Georgia Perrins <georgiadmperrins@btinternet.com>
+ * @author Fergus Bentley <fergusbentley@gmail.com>
  * @category Kalma
  * @package  Web
  */
@@ -25,7 +25,7 @@ class ApiConnector
     private static ApiConnector $instance;
 
     /**
-     * ApiConnect constructor.
+     * ApiConnector constructor.
      */
     function __construct()
     {
@@ -44,7 +44,8 @@ class ApiConnector
      */
     public static function getConnection() : ApiConnector
     {
-        return static::$instance ?? new ApiConnector();
+        static::$instance = static::$instance ?? new ApiConnector();
+        return static::$instance;
     }
 
     /**
@@ -61,6 +62,7 @@ class ApiConnector
     {
         $options = array(
             'headers' => $headers,
+            'http_errors' => false, // Prevent BadResponseException being thrown when API returns 4xx or 5xx status code
         );
 
         // Provide an up-to-date Bearer token for endpoints requiring authentication
@@ -71,7 +73,7 @@ class ApiConnector
             }
             else {
                 session_unset();
-                header('Location: https://kalma.club/login');
+                header('Location:./login');
                 exit();
             }
         }
@@ -92,7 +94,10 @@ class ApiConnector
         $response_body = $res->getBody()->getContents();
         $data = json_decode($response_body);
 
-        return $data;
+        return $data ?? (object)[
+            'error' => 6000,
+            'message' => 'Oops! An unexpected error has occurred.',
+        ];
     }
 
     /**
@@ -111,10 +116,10 @@ class ApiConnector
         $access_expiry = $_SESSION['auth']->access_expiry;
         $now = new DateTime("now");
         if ($access_expiry <= $now) {
-            return $this->refreshSession();
+            $this->refreshSession();
         }
 
-        return isset($_SESSION['auth']['access_token']);
+        return isset($_SESSION['auth']->access_token);
     }
 
     /**
@@ -129,16 +134,35 @@ class ApiConnector
             return false;
         }
 
+        // Get refresh token from either available source
         $refresh_token = $_COOKIE['refresh'] ?? $_SESSION['auth']->refresh_token;
 
+        // Request a refresh
         $request_body = array(
             'refresh_token' => $refresh_token,
             'client_fingerprint' => $_SESSION['fingerprint'],
         );
-
         $response = $this->request('POST', 'api/user/refresh', $request_body);
-        if ($response !== null) {
 
+        if ($response !== null) {
+            if (isset($response->error)) {
+                return false;
+            }
+
+            // Update session variable
+            $_SESSION['auth'] = (object)[
+                'access_token' => $response->access_token,
+                'access_expiry' => $response->access_expiry,
+                'refresh_token' => $response->refresh_token,
+                'refresh_expiry' => $response->refresh_expiry,
+            ];
+
+            // Update the refresh cookie, if it already exists
+            if(isset($_COOKIE['refresh'])) {
+                setcookie('refresh', $response->refresh_token);
+            }
+
+            return true;
         }
 
         return false;
@@ -146,6 +170,8 @@ class ApiConnector
 
     /**
      * Request to login
+     *
+     * @deprecated
      * @param $inPassword
      * @param $inEmail
      * @param $inClientFingerprint
@@ -175,25 +201,14 @@ class ApiConnector
 
     /**
      * Get data from the api
-     * @param $link
-     * @return mixed|string
+     * @param string $link
+     * @param array $params
+     * @return object
      */
-    function getData($link){
+    function getData(string $link, array $params = []) : object
+    {
         try {
-            $res = $this->client->request('GET', $link, ['headers' => ["Authorization" => 'bearer ' . $_SESSION['access_token']]]);
-            $messageBody = $res->getBody()->getContents();
-            $data = json_decode($messageBody);
-            return $data;
-        }
-        catch (ClientException $e){
-            $response = json_decode($e->getResponse()->getBody()->getContents());
-            $_SESSION['status'] = $response->status;
-            $_SESSION['error'] = $response->error;
-            $_SESSION['error_message'] = $response->message;
-            if(isset($response->detail)) {
-                $_SESSION['detail'] = $response->detail;
-            }
-            return $response;
+            $response = $this->request('GET', $link, $params, true);
         }
         catch (RequestException $e) {
             $response = json_decode($e->getResponse()->getBody()->getContents());
@@ -203,16 +218,15 @@ class ApiConnector
             if(isset($response->detail)) {
                 $_SESSION['detail'] = $response->detail;
             }
-            return $response;
         }
 
-
+        return $response;
     }
 
     /**
      * Get new tokens
      *
-     * Work in progress
+     * @deprecated
      * @param $clientFingerprint
      * @return mixed
      */
@@ -225,8 +239,7 @@ class ApiConnector
             $_SESSION['refresh_token'] = $data->refresh_token;
             return $data;
         }
-        catch (ClientException $e)
-        {
+        catch (RequestException $e) {
             $response = json_decode($e->getResponse()->getBody()->getContents());
             session_unset();
             $_SESSION['status'] = $response->status;
@@ -237,37 +250,24 @@ class ApiConnector
             }
             return $response;
         }
-        catch (RequestException $e){
-            $response = json_decode($e->getResponse()->getBody()->getContents());
-            session_unset();
-            $_SESSION['status'] = $response->status;
-            $_SESSION['error'] = $response->error;
-            $_SESSION['error_message'] = $response->message;
-            if(isset($response->detail)) {
-                $_SESSION['detail'] = $response->detail;
-            }
-            return $response;
-        }
-
-
-
-
     }
 
     /**
      * Request to signout using the api
+     *
+     * @deprecated
      * @param $clientFingerprint
      * @return mixed
      */
-    function signOut($clientFingerprint){
-        try{
+    function signOut($clientFingerprint) {
+        try {
             $res = $this->client->request('POST', 'api/user/logout', ['headers' => ["Authorization" => 'bearer ' . $_SESSION['access_token']],'json' => ['client_fingerprint' => $clientFingerprint]]);
             session_destroy();
             $messageBody = $res->getBody()->getContents();
             $data= json_decode($messageBody);
             return $data;
         }
-        catch (ClientException $e){
+        catch (RequestException $e) {
             $response = json_decode($e->getResponse()->getBody()->getContents());
             session_unset();
             $_SESSION['status'] = $response->status;
@@ -278,39 +278,24 @@ class ApiConnector
             }
             return $response;
         }
-        catch (RequestException $e){
-            $response = json_decode($e->getResponse()->getBody()->getContents());
-            session_unset();
-            $_SESSION['status'] = $response->status;
-            $_SESSION['error'] = $response->error;
-            $_SESSION['error_message'] = $response->message;
-            if(isset($response->detail)) {
-                $_SESSION['detail'] = $response->detail;
-            }
-            return $response;
-        }
-
-
-
     }
-    function requestSignup($inFirstName,$inLastName,$inPassword, $inEmail, $inDOB){
+
+    /**
+     * @deprecated
+     * @param $inFirstName
+     * @param $inLastName
+     * @param $inPassword
+     * @param $inEmail
+     * @param $inDOB
+     * @return mixed
+     */
+    function requestSignup($inFirstName, $inLastName, $inPassword, $inEmail, $inDOB) {
         try {
             $res = $this->client->request('POST', 'api/user/signup', ['json' => ["email_address" => $inEmail, "password" => $inPassword, "first_name" => $inFirstName, "last_name" => $inLastName, "date_of_birth" =>$inDOB]]);
             $messageBody = $res->getBody()->getContents();
             $data = json_decode($messageBody);
             return $data;
         }
-        catch (ClientException $e){
-            $response = json_decode($e->getResponse()->getBody());
-            session_unset();
-            $_SESSION['status'] = $response->status;
-            $_SESSION['error'] = $response->error;
-            $_SESSION['error_message'] = $response->message;
-            if(isset($response->detail)) {
-                $_SESSION['detail'] = $response->detail;
-            }
-            return $response;
-        }
         catch (RequestException $e){
             $response = json_decode($e->getResponse()->getBody()->getContents());
             session_unset();
@@ -324,6 +309,12 @@ class ApiConnector
         }
     }
 
+    /**
+     *
+     * @deprecated
+     * @param $confirmation
+     * @return mixed
+     */
     function confirmAccount($confirmation){
         try {
             $res = $this->client->request('POST', 'api/user/confirm', ['json' => ["confirmation_token" => $confirmation]]);
@@ -331,16 +322,6 @@ class ApiConnector
             $data = json_decode($messageBody);
             return $data;
         }
-        catch (ClientException $e){
-            $response = json_decode($e->getResponse()->getBody());
-            $_SESSION['status'] = $response->status;
-            $_SESSION['error'] = $response->error;
-            $_SESSION['error_message'] = $response->message;
-            if(isset($response->detail)) {
-                $_SESSION['detail'] = $response->detail;
-            }
-            return $response;
-        }
         catch (RequestException $e){
             $response = json_decode($e->getResponse()->getBody()->getContents());
             $_SESSION['status'] = $response->status;
@@ -353,6 +334,15 @@ class ApiConnector
         }
     }
 
+    /**
+     * @deprecated
+     * @param $link
+     * @param $startTime
+     * @param $stopTime
+     * @param $extraLabel
+     * @param $extraData
+     * @return mixed
+     */
     function addPeriodicData($link, $startTime, $stopTime, $extraLabel,$extraData){
         try {
             $res = $this->client->request('POST', $link, ['headers' => ["Authorization" => 'bearer ' . $_SESSION['access_token']],'json' => ['periods' => [['start_time' => $startTime, 'stop_time' => $stopTime, $extraLabel => $extraData]]]]);
@@ -381,7 +371,14 @@ class ApiConnector
             return $response;
         }
     }
-  
+
+
+    /**
+     * @deprecated
+     * @param $link
+     * @param $data
+     * @return mixed
+     */
     function editData($link,$data){
         try{
             $res = $this->client->request('PUT',$link, ['headers' => ["Authorization" => 'bearer ' . $_SESSION['access_token']],'body' => json_encode($data)]);
@@ -411,6 +408,13 @@ class ApiConnector
         }
 
     }
+
+    /**
+     * @deprecated
+     * @param $link
+     * @param $data
+     * @return mixed
+     */
     function deleteData($link,$data){
         try {
             $res = $this->client->request('DELETE',$link, ['headers' => ["Authorization" => 'bearer ' . $_SESSION['access_token']],'body' => json_encode($data)]);
