@@ -36,7 +36,7 @@ if(isset($_POST['editId'])){
     $periods = array($period);
     $data['periods'] = $periods;
     if(isset($_SESSION['links'])) {
-        $message = $api->editData($_SESSION['links']->sleep, $data);
+        $message = $api->request('PUT', $_SESSION['links']->sleep, $data, true);
     }
 }
 
@@ -44,7 +44,7 @@ if(isset($_POST['editId'])){
 if(isset($_POST['deleteId'])){
     $data['periods'] = array((int)$_POST['deleteId']);
     if(isset($_SESSION['links'])) {
-        $message = $api->deleteData($_SESSION['links']->sleep, $data);
+        $message = $api->request('DELETE', $_SESSION['links']->sleep, $data, true);
     }
 }
 

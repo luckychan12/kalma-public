@@ -4,7 +4,7 @@
         <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarTop">
-        <ul class="navbar-nav <?= isset($_SESSION['links']) ? "show" : "hide" ?>">
+        <ul class="navbar-nav <?= isset($_SESSION['auth']) ? "show" : "hide" ?>">
             <li class="nav-item">
                 <a class="nav-link" href="./dashboard">Dashboard</a>
             </li>
@@ -22,9 +22,9 @@
             </li>
         </ul>
         <ul class="navbar-nav ml-auto">
-            <a class="nav-link <?= isset($_SESSION['account_link']) ? "show" : "hide" ?>" href="./profile"><i class="fa fa-fw fa-user"></i><span>Profile</span></a>
-            <a class="nav-link <?= isset($_SESSION['logout_link']) ? "show" : "hide" ?>" href="./logout"><i class="fas fa-sign-out-alt"></i><span>Logout</span></a>
-            <a class="nav-link <?= !isset($_SESSION['account_link']) ? "show" : "hide" ?>" href="./loginAndSignup"><i class="fas fa-sign-in-alt"></i><span>Login/Signup</span></a>
+            <a class="nav-link <?= isset($_SESSION['auth']) ? "show" : "hide" ?>" href="./profile"><i class="fa fa-fw fa-user"></i><span>Profile</span></a>
+            <a class="nav-link <?= isset($_SESSION['auth']) ? "show" : "hide" ?>" href="./logout"><i class="fas fa-sign-out-alt"></i><span>Logout</span></a>
+            <a class="nav-link <?= isset($_SESSION['auth']) ? "hide" : "show" ?>" href="./loginAndSignup"><i class="fas fa-sign-in-alt"></i><span>Login/Signup</span></a>
         </ul>
     </div>
 </nav>

@@ -9,12 +9,12 @@ require_once '../api_tasks/ApiConnector.php';
 require_once '../controller/ensureFingerprint.php';
 
 $api = ApiConnector::getConnection();
-$data = $api->signOut($_SESSION['fingerprint']);
+$data = $api->request('POST', $_SESSION['links']->logout, ['client_fingerprint' => $_SESSION['fingerprint']]);
+session_unset();
 
 if(!isset($data->error)){
-    session_unset();
     header('Location: ./loginAndSignup');
 }
 else {
-    header('Location: ./errorPage');
+    header("Location: ./errorPage?code=$data->error&message=$data->message");
 }
