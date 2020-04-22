@@ -22,7 +22,7 @@ session_start();
         <b>Detail:</b> <?= $_SESSION['detail'] ?? "Unknown" ?>
         <br>
         <br>
-        <a class="btn btn-primary" href="./loginAndSignup.php">Back to login</a>
+        <a class="btn btn-primary" href="./login-and-signup.php">Back to login</a>
     </div>
 
 </body>

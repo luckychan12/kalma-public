@@ -13,8 +13,8 @@ $data = $api->request('POST', $_SESSION['links']->logout, ['client_fingerprint' 
 session_unset();
 
 if(!isset($data->error)){
-    header('Location: ./loginAndSignup');
+    header('Location: ./login-and-signup.php');
 }
 else {
-    header("Location: ./errorPage?code=$data->error&message=$data->message");
+    header("Location: ./error.php?code=$data->error&message=$data->message");
 }

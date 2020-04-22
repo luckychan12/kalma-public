@@ -17,7 +17,7 @@ $data = $api->confirmAccount($token);
     <?php include_once "./components/navbar_top.php" ?>
 
     <div>
-        <a class="btn btn-primary" href="./loginAndSignup.php">Login</a>
+        <a class="btn btn-primary" href="./login-and-signup.php">Login</a>
     </div>
 
     <div>

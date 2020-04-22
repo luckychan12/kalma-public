@@ -53,11 +53,11 @@ if(isset($_SESSION['links'])) {
     $dataPoints = $api->getData($_SESSION['links']->calm);
     if (isset($dataPoints->error)) {
         $_SESSION['links'] = null;
-        header('Location: ./errorPage.php');
+        header('Location: ./error.php');
     }
 }
 else{
-    header('Location: ./errorPage.php');
+    header('Location: ./error.php');
 }
 
 //When you select a new week

@@ -9,10 +9,10 @@ if (isset($_SESSION['links'])) {
     $data = $api->getData($_SESSION['links']->account);
 }
 else {
-    header('Location: ./loginAndSignup');
+    header('Location: ./login-and-signup.php');
 }
 
 if (isset($data->error)) {
-    header('Location: ./errorPage');
+    header("Location: ./error.php?code=$data->error&message=$data->message");
 }
 ?>

@@ -24,14 +24,14 @@ if (isset($_SESSION['confirmationLink'])) {
             click the button below to activate your account.
         </p>
         <div>
-            <a class="btn btn-primary" href="./confirmationPage.php?<?= $token ?? '' ?>">Click here to activate your account</a>
+            <a class="btn btn-primary" href="./confirm-account.php?<?= $token ?? '' ?>">Click here to activate your account</a>
         </div>
     </div>
 
     <div class="container-fluid text-center <?= isset($token) ? "hide" : "show" ?>">
         <h1>Something went wrong creating your account.</h1>
         <div>
-            <a class="btn btn-primary" href="./loginAndSignup.php">Back to login / signup</a>
+            <a class="btn btn-primary" href="./login-and-signup.php">Back to login / signup</a>
         </div>
     </div>
 </body>

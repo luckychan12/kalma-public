@@ -73,7 +73,7 @@ class ApiConnector
             }
             else {
                 session_unset();
-                header('Location:./login');
+                header('Location: ./login-and-signup.php');
                 exit();
             }
         }

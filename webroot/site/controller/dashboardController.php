@@ -17,7 +17,7 @@ function get(string $link, array $params = []) : ?object
     $api = ApiConnector::getConnection();
     $data = $api->getData($link, $params);
     if (isset($data->error)) {
-        header("Location: ./error?message=$data->message&code=$data->error");
+        header("Location: ./error.php?message=$data->message&code=$data->error");
         exit();
     }
     return $data;
@@ -201,7 +201,7 @@ function build_periodic_stats(object $periodic_data) : array
 $data = new stdClass();
 
 if (!isset($_SESSION['auth'])) {
-    header('Location: ./loginAndSignup.php?redirect=dashboard');
+    header('Location: ./login-and-signup.php?redirect=dashboard');
     exit();
 }
 
