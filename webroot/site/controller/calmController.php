@@ -1,8 +1,8 @@
 <?php
 session_start();
 date_default_timezone_set('Europe/London');
-include_once "../api_tasks/apiConnect.php";
-$api = new ApiConnect();
+include_once "../api_tasks/ApiConnector.php";
+$api = new ApiConnector();
 $GMT = new DateTimeZone('GMT');
 
 //Deals with adding new data
@@ -13,7 +13,10 @@ if(isset($_POST['startDate'])){
     $newEndTime = new DateTime($_POST['endDate'] .' '. $_POST['endTime']);
     $newEndTime->setTimezone($GMT);
     $newEndTime = $newEndTime->format(DateTime::ISO8601);
-    $message = $api->addCalmData($newStartTime,$newEndTime,$_POST['description']);
+    $descriptionString = 'description';
+    if(isset($_SESSION['links'])) {
+        $message = $api->addPeriodicData($_SESSION['links']->calm, $newStartTime, $newEndTime, $descriptionString, $_POST['description']);
+    }
 }
 
 //Deals with editing new data
@@ -32,13 +35,17 @@ if(isset($_POST['editId'])){
     $period['description'] = $desc;
     $periods = array($period);
     $data['periods'] = $periods;
-    $message = $api->editData($_SESSION['links']->calm, $data);
+    if(isset($_SESSION['links'])) {
+        $message = $api->request('PUT', $_SESSION['links']->calm, $data, true);
+    }
 }
 
 //Deals with deleting new data
 if(isset($_POST['deleteId'])){
     $data['periods'] = array((int)$_POST['deleteId']);
-    $message = $api->deleteData($_SESSION['links']->calm, $data);
+    if(isset($_SESSION['links'])) {
+        $message = $api->request('DELETE', $_SESSION['links']->calm, $data, true);
+    }
 }
 
 //Reads the data for the page
@@ -123,7 +130,7 @@ if ($average > 0) {
 
 //Gets the start and end of the selected month
 $ts = strtotime($date);
-$start = (date('w', $ts) == 0) ? $ts : strtotime("first day of this month", $ts);
+$start = (date('W', $ts) == 0) ? $ts : strtotime("first day of this month", $ts);
 
 $end =  strtotime("last day of this month", $ts);
 $start = date('Y-m-d H:i' , $start);

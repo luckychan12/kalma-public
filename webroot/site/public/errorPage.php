@@ -15,9 +15,9 @@ session_start();
     <div class="text-center">
         <b>Status:</b> <?= $_SESSION['status'] ?? "Unknown" ?>
         <br>
-        <b>Error:</b> <?= $_SESSION['error'] ?? "Unknown" ?>
+        <b>Error Code:</b> <?= $_GET['code'] ?? $_SESSION['error'] ?? "Unknown" ?>
         <br>
-        <b>Message:</b> <?= $_SESSION['error_message'] ?? "Unknown" ?>
+        <b>Message:</b> <?= $_GET['message'] ?? $_SESSION['error_message'] ?? "Unknown" ?>
         <br>
         <b>Detail:</b> <?= $_SESSION['detail'] ?? "Unknown" ?>
         <br>

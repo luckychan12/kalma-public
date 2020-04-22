@@ -148,9 +148,10 @@ HTML;
     </div>
 
     <script type="text/javascript">
-        let logoutLink = "<?= $_SESSION['logout_link'] ?>";
-        let targetsLink = "<?= $_SESSION['account_link'] ?>/targets";
-        let accessToken = "<?= $_SESSION['access_token'] ?>";
+        let logoutLink = "<?= $_SESSION['links']->logout ?>";
+        let targetsLink = "<?= $_SESSION['links']->account ?>/targets";
+        let accessToken = "<?= $_SESSION['auth']->access_token ?>";
+        let fingerprint = "<?= $_SESSION['fingerprint']?>"
     </script>
     <script type="text/javascript" src="assets/scripts/profile.js"></script>
 </body>

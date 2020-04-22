@@ -11,77 +11,84 @@ include_once '../controller/sleepController.php';
 <body>
 <?php include_once './components/navbar_top.php'; ?>
 <!--Add sleep period overlay-->
-<div id="overlay">
-    <div id="addDisplay" class="col-md-6 offset-md-3">
-        <div class="outer" id="popup">
-            <button id="close" onclick="off()">x</button>
-            <div class="inner-content">
-                <h1>Add Sleep Data</h1>
-                <hr>
+<div id="addingSleep" class="modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div  class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Add Sleep Data</h2>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
                 <form method="post" action="sleep.php">
                     <label>Start Time:</label>
                     <br>
                     <input class="form-control" type="date" name="startDate" required>
                     <input class="form-control" type="time" name="startTime" required>
-
                     <label>End Time:</label>
                     <br>
                     <input class="form-control" type="date" name="endDate" required>
                     <input class="form-control" type="time" name="endTime" required>
-
                     <label>Sleep Quality:</label>
                     <br>
                     <input class="form-control" type="number" max="5" min="1"  name="sleepQuality" required>
-                    <hr>
-                    <input type="submit" class="btn btn-primary" value="Submit" name="addSleep">
+                    <div class="modal-footer">
+                        <input type="submit" class="btn btn-primary" value="Submit" name="addSleep">
+                    </div>
                 </form>
             </div>
         </div>
     </div>
 </div>
 <!--Edit Overlay-->
-<div id="overlayEdit">
-    <div id="addDisplay" class="col-md-6 offset-md-3">
-        <div class="outer" id="popup">
-            <button id="close" onclick="off()">x</button>
-            <div class="inner-content">
-                <h1>Edit Sleep Data</h1>
-                <hr>
+<div id="overlayEdit" class="modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Edit Sleep Date</h2>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
                 <form method="post" action="sleep.php">
                     <label>Start Time:</label>
                     <input id="editId" name="editId" value="0" hidden>
                     <br>
                     <input id="editStartDate" class="form-control" type="date" name="startDate" value="2020-02-01" required>
                     <input id="editStartTime" class="form-control" type="time" name="startTime" value="20:00" required>
-
                     <label>End Time:</label>
                     <br>
                     <input id="editEndDate" class="form-control" type="date" name="endDate" required>
                     <input id="editEndTime" class="form-control" type="time" name="endTime" required>
-
                     <label>Sleep Quality:</label>
                     <br>
                     <input id="editSleepQuality" class="form-control" type="number" max="5" min="1"  name="sleepQuality" required>
-                    <hr>
-                    <input type="submit" class="btn btn-primary" value="Save" name="editSleep">
+
+                    <div class="modal-footer">
+                        <input type="submit" class="btn btn-primary" value="Save" name="editSleep">
+                    </div>
                 </form>
             </div>
         </div>
     </div>
 </div>
 <!--Delete Overlay-->
-<div id="overlayDelete">
-    <div id="addDisplay" class="col-md-6 offset-md-3">
-        <div class="outer" id="popup">
-            <button id="close" onclick="off()">x</button>
-            <div class="inner-content">
-                <h1>Are you sure?</h1>
-                <hr>
+<div id="overlayDelete" class="modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Are you sure?</h2>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
                 <form method="post" action="sleep.php">
                     <input id="deleteId" name="deleteId" value="0" hidden>
-
-                    <input type="submit" class="btn btn-primary" value="Yes" name="editSleep">
-                    <input type="button" class="btn btn-primary" onclick="off()" value="No">
+                        <input type="submit" class="btn btn-primary" value="Yes" name="editSleep">
+                        <input type="button" class="btn btn-secondary" data-dismiss="modal" value="No">
                 </form>
             </div>
         </div>
@@ -133,7 +140,7 @@ include_once '../controller/sleepController.php';
             </div>
             <!--Add data button-->
             <div style="text-align: center">
-                <button id="add-button" class="btn btn-primary" onclick="on()">
+                <button id="add-button" type="button" class="btn btn-primary" data-toggle="modal" data-target="#addingSleep">
                     Add Data
                 </button>
             </div>
@@ -163,9 +170,9 @@ include_once '../controller/sleepController.php';
                         echo
 
                             "<tr>
-                            <td><a href=\"#\" onclick=\"$send\";>
+                            <td><a href=\"#\" data-toggle=\"modal\" data-target=\"#overlayEdit\" onclick=\"$send\";>
                             <i class=\"fas fa-pencil-alt\"></i></a> 
-                            <a href=\"#\" onclick='remove($data->id)'>
+                            <a href=\"#\" data-toggle=\"modal\" data-target=\"#overlayDelete\" onclick='remove($data->id)'>
                             <i  class=\"fas fa-trash\"></a></td>  
                             <td>". date('d/m/Y H:i', strtotime($data->start_time))."</td>
                             <td>".date('d/m/Y H:i', strtotime($data->stop_time))."</td>
@@ -183,8 +190,7 @@ include_once '../controller/sleepController.php';
 </div>
 
 <script>
-    function remove(id){
-        document.getElementById("overlayDelete").style.display = "block";
+    function remove(id){f
         document.getElementById("deleteId").value = id;
     }
     function edit(id, fullStart, fullEnd, quality){
@@ -211,7 +217,6 @@ include_once '../controller/sleepController.php';
          min = end.getMinutes();
         min = min > 9 ? min :"0"+min;
         let endTime = hour+ ":" + min;
-        document.getElementById("overlayEdit").style.display = "block";
         document.getElementById("editId").value = id;
         document.getElementById("editStartDate").value = startDate;
         document.getElementById("editStartTime").value = startTime;

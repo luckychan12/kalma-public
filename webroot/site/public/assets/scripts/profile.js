@@ -33,7 +33,7 @@ $(function() {
                             $('#errorModal').modal('show');
                         }
                         else {
-                            if (clientFingerprint === '' + getFingerprint()) {
+                            if (clientFingerprint === '' + fingerprint) {
                                 location.href = '?logout';
                             }
                             else {
