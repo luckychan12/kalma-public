@@ -53,7 +53,7 @@ if(isset($_SESSION['links'])) {
     $dataPoints = $api->getData($_SESSION['links']->sleep);
     if (isset($dataPoints->error)) {
         $_SESSION['links'] = null;
-        header('Location: ./errorPage.php');
+        header("Location: ./error.php?code=$dataPoints->error&message=$dataPoints->message");
     }
 }
 else{

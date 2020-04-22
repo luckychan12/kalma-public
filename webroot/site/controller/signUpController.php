@@ -17,11 +17,11 @@ if(isset($_POST['signup'])){
 
     if (!isset($result->error)){
         $_SESSION['confirmationLink'] = $result->confirmation_url;
-        header('Location: .loginSuccess');
+        header('Location: ./signup-success.php');
         exit();
     }
     else {
-        header("Location: .errorPage?code=$result->error&message=$result->message");
+        header("Location: ./error.php?code=$result->error&message=$result->message");
         exit();
     }
 }
