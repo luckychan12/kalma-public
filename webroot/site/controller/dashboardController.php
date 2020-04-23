@@ -241,9 +241,9 @@ if ($steps_data !== null) {
     $data->steps_stats = array(
         (object)array(
             'label' => '7-day Average',
-            'value' => to_time_string($avg_steps),
+            'value' => $avg_steps,
             'width' => $avg_steps < 1 ? 1 : ($avg_steps / $steps_target) * 75,
-            'target' => to_time_string($steps_target),
+            'target' => $steps_target,
             'target_offset' => 74,
         ),
     );
