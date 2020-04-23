@@ -7,7 +7,7 @@ $(function() {
     const style = getComputedStyle(document.body);
     const textColor = style.getPropertyValue('--c-text-on-bg');
     // Functions to format tick labels
-    const countToString = (t) => t.toString();
+    const countToString = (t) => Math.round(t + Number.EPSILON).toString();
     const minsToString = (t) => t >= 60 ? `${Math.floor(t / 60)}h` + (t % 60 ? `${t % 60}m` : '') : `${t % 60}m`;
     // Create the charts
     $(".chart").each(function() {
@@ -23,7 +23,7 @@ $(function() {
                     yAxes: [
                         {
                             ticks: {
-                                stepSize: 60,
+                                stepSize: $(this).hasClass('logged') ? 1000 : 60,
                                 min: 0,
                                 callback: $(this).hasClass('logged') ? countToString : minsToString,
                                 fontColor: textColor,
