@@ -25,6 +25,8 @@ $(function() {
                             ticks: {
                                 stepSize: $(this).hasClass('logged') ? 1000 : 60,
                                 min: 0,
+                                autoSkip: true,
+                                maxTicksLimit: 10,
                                 callback: $(this).hasClass('logged') ? countToString : minsToString,
                                 fontColor: textColor,
                             },
