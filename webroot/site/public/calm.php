@@ -150,6 +150,19 @@ include_once '../controller/calmController.php';
     <br>
     <hr>
     <br>
+    <div class="row">
+        <div class="offset-md-1">
+            <form method="post" action="calm.php">
+                <input id="dateSearch" type="date" name="searchDate" value="<?php if(isset($_POST['searchDate'])){echo $_POST['searchDate'];} ?>">
+                <input class="btn btn-primary" type="submit" value="Search">
+            </form>
+            <form method="post" action="calm.php">
+                <input class="btn btn-primary" type="submit" value="Cancel" name="showAll">
+            </form>
+        </div>
+    </div>
+    <br>
+
     <!--Data table-->
     <div class="row" style="margin-bottom: 200px">
         <div class="col-lg-10 offset-sm-1">
@@ -163,27 +176,55 @@ include_once '../controller/calmController.php';
                     <th>Progress Percentage</th>
                 </tr>
                 <?php
-                foreach ($dataPoints->periods as $data) {
-                    if (isset($data->id)) {
-                        $StartTime = date('Y-m-d H:i', strtotime($data->start_time));
-                        $EndTime = date('Y-m-d H:i', strtotime($data->stop_time));
-                        $desc = "$data->description";
-                        $send = "edit({$data->id},'{$StartTime}','{$EndTime}','{$desc}')";
-                        echo
-                            "<tr>
+                if(isset($_POST['searchDate'])){
+                    $searchDate = date('Y-m-d', strtotime($_POST['searchDate']));
+                    foreach ($dataPoints->periods as $data) {
+                        if (isset($data->id)) {
+                            if($searchDate ==  date('Y-m-d', strtotime($data->start_time))) {
+                                $StartTime = date('Y-m-d H:i', strtotime($data->start_time));
+                                $EndTime = date('Y-m-d H:i', strtotime($data->stop_time));
+                                $desc = "$data->description";
+                                $send = "edit({$data->id},'{$StartTime}','{$EndTime}','{$desc}')";
+                                echo
+                                    "<tr>
+                                        <td><a href=\"#\" data-toggle=\"modal\" data-target=\"#overlayEdit\" onclick=\"$send\">
+                                        <i class=\"fas fa-pencil-alt\"></i></a> 
+                                        <a href=\"#\" data-toggle=\"modal\" data-target=\"#overlayDelete\" onclick='remove($data->id)'>
+                                        <i  class=\"fas fa-trash\"></a></td></td>    
+                                        <td>" . date('d/m/Y H:i', strtotime($data->start_time)) . "</td>
+                                        <td>" . date('d/m/Y H:i', strtotime($data->stop_time)) . "</td>
+                                        <td>$data->duration_text</td>
+                                        <td>$data->description</td>
+                                        <td>$data->progress_percentage %</td>
+                                    </tr>";
+                            }
+                        }
+                    }
+                }
+                else {
+                    foreach ($dataPoints->periods as $data) {
+                        if (isset($data->id)) {
+                            $StartTime = date('Y-m-d H:i', strtotime($data->start_time));
+                            $EndTime = date('Y-m-d H:i', strtotime($data->stop_time));
+                            $desc = "$data->description";
+                            $send = "edit({$data->id},'{$StartTime}','{$EndTime}','{$desc}')";
+                            echo
+                                "<tr>
                             <td><a href=\"#\" data-toggle=\"modal\" data-target=\"#overlayEdit\" onclick=\"$send\">
                             <i class=\"fas fa-pencil-alt\"></i></a> 
                             <a href=\"#\" data-toggle=\"modal\" data-target=\"#overlayDelete\" onclick='remove($data->id)'>
                             <i  class=\"fas fa-trash\"></a></td></td>    
-                            <td>". date('d/m/Y H:i', strtotime($data->start_time))."</td>
-                            <td>".date('d/m/Y H:i', strtotime($data->stop_time))."</td>
+                            <td>" . date('d/m/Y H:i', strtotime($data->start_time)) . "</td>
+                            <td>" . date('d/m/Y H:i', strtotime($data->stop_time)) . "</td>
                             <td>$data->duration_text</td>
                             <td>$data->description</td>
                             <td>$data->progress_percentage %</td>
                         </tr>";
+                        }
                     }
                 }
                 ?>
+
             </table>
         </div>
     </div>
@@ -225,17 +266,6 @@ include_once '../controller/calmController.php';
         document.getElementById("editEndTime").value = endTime;
         document.getElementById("editDesc").value = desc;
     }
-
-    function on() {
-        document.getElementById("overlay").style.display = "block";
-    }
-
-    function off() {
-        document.getElementById("overlay").style.display = "none";
-        document.getElementById("overlayEdit").style.display = "none";
-        document.getElementById("overlayDelete").style.display = "none";
-    }
-
 
 
     function showWeekChart() {

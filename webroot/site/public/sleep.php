@@ -149,6 +149,18 @@ include_once '../controller/sleepController.php';
     <br>
     <hr>
     <br>
+    <div class="row">
+        <div class="offset-md-1">
+            <form method="post" action="sleep.php">
+                <input id="dateSearch" type="date" name="searchDate" value="<?php if(isset($_POST['searchDate'])){echo $_POST['searchDate'];} ?>">
+                <input class="btn btn-primary" type="submit" value="Search">
+            </form>
+            <form method="post" action="sleep.php">
+                <input class="btn btn-primary" type="submit" value="Cancel" name="showAll">
+            </form>
+        </div>
+    </div>
+    <br>
     <!--Data table-->
     <div class="row" style="margin-bottom: 200px">
         <div class="col-lg-10 offset-sm-1">
@@ -162,14 +174,40 @@ include_once '../controller/sleepController.php';
                     <th>Progress Percentage</th>
                 </tr>
                 <?php
-                foreach ($dataPoints->periods as $data) {
-                    if (isset($data->id)) {
-                        $StartTime = date('Y-m-d H:i',strtotime($data->start_time));
-                        $EndTime = date('Y-m-d H:i', strtotime($data->stop_time));
-                        $send = "edit({$data->id},'{$StartTime}','{$EndTime}',{$data->sleep_quality})";
-                        echo
+                if(isset($_POST['searchDate'])){
+                    $searchDate = date('Y-m-d', strtotime($_POST['searchDate']));
+                    foreach ($dataPoints->periods as $data) {
+                        if (isset($data->id)) {
+                             if($searchDate ==  date('Y-m-d', strtotime($data->start_time))) {
+                                 $StartTime = date('Y-m-d H:i', strtotime($data->start_time));
+                                 $EndTime = date('Y-m-d H:i', strtotime($data->stop_time));
+                                 $send = "edit({$data->id},'{$StartTime}','{$EndTime}',{$data->sleep_quality})";
+                                 echo
 
-                            "<tr>
+                                     "<tr>
+                                        <td><a href=\"#\" data-toggle=\"modal\" data-target=\"#overlayEdit\" onclick=\"$send\";>
+                                        <i class=\"fas fa-pencil-alt\"></i></a> 
+                                        <a href=\"#\" data-toggle=\"modal\" data-target=\"#overlayDelete\" onclick='remove($data->id)'>
+                                        <i  class=\"fas fa-trash\"></a></td>  
+                                        <td>" . date('d/m/Y H:i', strtotime($data->start_time)) . "</td>
+                                        <td>" . date('d/m/Y H:i', strtotime($data->stop_time)) . "</td>
+                                        <td>$data->duration_text</td>
+                                        <td>$data->sleep_quality</td>
+                                        <td>$data->progress_percentage %</td>
+                                     </tr>";
+                             }
+                        }
+                    }
+                }
+                else{
+                    foreach ($dataPoints->periods as $data) {
+                        if (isset($data->id)) {
+                            $StartTime = date('Y-m-d H:i',strtotime($data->start_time));
+                            $EndTime = date('Y-m-d H:i', strtotime($data->stop_time));
+                            $send = "edit({$data->id},'{$StartTime}','{$EndTime}',{$data->sleep_quality})";
+                            echo
+
+                                "<tr>
                             <td><a href=\"#\" data-toggle=\"modal\" data-target=\"#overlayEdit\" onclick=\"$send\";>
                             <i class=\"fas fa-pencil-alt\"></i></a> 
                             <a href=\"#\" data-toggle=\"modal\" data-target=\"#overlayDelete\" onclick='remove($data->id)'>
@@ -180,8 +218,10 @@ include_once '../controller/sleepController.php';
                             <td>$data->sleep_quality</td>
                             <td>$data->progress_percentage %</td>
                             </tr>";
+                        }
                     }
                 }
+
                 ?>
             </table>
         </div>
