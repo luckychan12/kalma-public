@@ -56,13 +56,13 @@ HTML;
                         <hr>
                         <?php
                             foreach ($data->user->sessions as $session) {
-                                $created_time = DateTime::createFromFormat(DATE_ISO8601, $session->created_time)->format('H:i:s d/m/y');
+                                $created_time = DateTime::createFromFormat(DATE_ISO8601, $session->created_time)->format(DATE_ISO8601);
                                 $created_time = str_replace(' ', '&nbsp; &nbsp;', $created_time);
                                 echo
 <<<HTML
                         <div class="list-item row">
                             <div class="col-4 col-sm-6">$session->client_fingerprint</div>
-                            <div class="col-6 col-sm-4">$created_time</div>
+                            <div class="col-6 col-sm-4 session-created">$created_time</div>
                             <div class="list-item-controls col-sm"><a href="#" class="logout-session-link" data-target="$session->client_fingerprint"><i class="fas fa-trash"></i><span class="d-inline d-sm-none">Log out of this device</span></a></div>
                         </div>
 HTML;

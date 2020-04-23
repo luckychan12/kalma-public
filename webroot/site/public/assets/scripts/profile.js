@@ -2,6 +2,13 @@ $(function() {
 
     let base_uri = 'https://kalma.club';
 
+    // Convert dates to local format
+    $('.session-created').each(function() {
+        const isoDate = $(this).html();
+        const date = new Date(isoDate);
+        $(this).html(date.toLocaleString());
+    });
+
     /* Log a device out when the corresponding row in the sessions table is clicked */
     $('.logout-session-link').each(function() {
         $(this).click(function() {
