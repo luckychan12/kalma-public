@@ -14,8 +14,12 @@ if(isset($_POST['startDate'])){
     $newEndTime->setTimezone($GMT);
     $newEndTime = $newEndTime->format(DateTime::ISO8601);
     $descriptionString = 'description';
+    $newPeriod['start_time'] =  $newStartTime;
+    $newPeriod['stop_time'] = $newEndTime;
+    $newPeriod['description'] = $_POST['description'];
+    $data['periods'] = array($newPeriod);
     if(isset($_SESSION['links'])) {
-        $message = $api->addPeriodicData($_SESSION['links']->calm, $newStartTime, $newEndTime, $descriptionString, $_POST['description']);
+        $message = $api->request('POST',$_SESSION['links']->calm, $data, true);
     }
 }
 

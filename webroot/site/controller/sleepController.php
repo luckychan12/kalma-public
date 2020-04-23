@@ -13,9 +13,12 @@ if(isset($_POST['startDate'])){
     $newEndTime = new DateTime($_POST['endDate'] .' '. $_POST['endTime']);
     $newEndTime->setTimezone($GMT);
     $newEndTime = $newEndTime->format(DateTime::ISO8601);
-    $sleepQualityString = 'sleep_quality';
+    $newPeriod['start_time'] =  $newStartTime;
+    $newPeriod['stop_time'] = $newEndTime;
+    $newPeriod['sleep_quality'] = $_POST['sleepQuality'];
+    $data['periods'] = array($newPeriod);
     if(isset($_SESSION['links'])) {
-        $message = $api->addPeriodicData($_SESSION['links']->sleep, $newStartTime, $newEndTime, $sleepQualityString, $_POST['sleepQuality']);
+        $message = $api->request('POST',$_SESSION['links']->sleep, $data, true);
     }
 }
 
