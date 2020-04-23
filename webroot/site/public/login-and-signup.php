@@ -1,5 +1,5 @@
 <?php
-    session_start();
+    require_once __DIR__ . '/../controller/loginController.php';
 ?>
 
 <!doctype html>
@@ -19,14 +19,14 @@
 
             <div class="col-lg-5">
                 <h2> Login </h2>
-                <div class="alert alert-danger alert-dismissible fade text-center <?= isset($_SESSION['login_message']) ? "show" : "hide"?>" role="alert">
-                    <?= $_SESSION['login_message'] ?? ""; ?>
+                <div class="alert alert-danger alert-dismissible fade text-center <?= isset($_SESSION['login_message']) ? 'show' : 'hide'?>" role="alert">
+                    <?= $_SESSION['login_message'] ?? ''; ?>
                     <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
 
-                <form class="form-login" action="../controller/loginController.php" method="post">
+                <form class="form-login" action="#" method="post">
                     <div class="form-group">
                         <label for="logEmail">Email Address:</label><br>
                         <input class="form-control" type="email" placeholder="Email" name="logEmail" id="logEmail" required>
@@ -35,7 +35,6 @@
                         <label for="logPassword">Password:</label>
                         <input class="form-control" type="password" placeholder="Password" name="logPassword" id="logPassword" required>
                     </div>
-                    <input type="hidden" name="fingerprint" id="hiddenFingerprint">
                     <input class="btn btn-primary" type="submit" name="login" value="Submit">
                 </form>
             </div>
@@ -72,7 +71,7 @@
                         <input class="form-control" type="password" placeholder="Password" name="password" id="password" required minlength="8">
                     </div>
                     <div class="form-group">
-                        <label for="password">Confirm Password:</label><br>
+                        <label for="retypePassword">Confirm Password:</label><br>
                         <input class="form-control" type="password" placeholder="Password" name="retypePassword" id="retypePassword" required equalto="#password">
                     </div>
                     <div class="form-group">

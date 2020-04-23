@@ -1,6 +1,6 @@
 <?php
 session_start();
-include_once '../api_tasks/apiConnect.php';
+include_once '../api_tasks/ApiConnector.php';
 
 /**
  * Make a GET request to the API
@@ -9,14 +9,15 @@ include_once '../api_tasks/apiConnect.php';
  *
  * @param string $link The URI to GET
  *
+ * @param array $params
  * @return object The response body
  */
-function get(string $link) : ?object
+function get(string $link, array $params = []) : ?object
 {
-    $api = ApiConnect::getConnection();
-    $data = $api->getData($link);
+    $api = ApiConnector::getConnection();
+    $data = $api->getData($link, $params);
     if (isset($data->error)) {
-        header('Location: ./errorPage.php');
+        header("Location: ./error.php?message=$data->message&code=$data->error");
         exit();
     }
     return $data;
@@ -199,20 +200,22 @@ function build_periodic_stats(object $periodic_data) : array
 
 $data = new stdClass();
 
-if (!isset($_SESSION['account_link'])) {
-    header('Location: ./loginAndSignup.php?redirect=dashboard');
+if (!isset($_SESSION['auth'])) {
+    header('Location: ./login-and-signup.php?redirect=dashboard');
     exit();
 }
 
-$account_data = get($_SESSION['account_link']);
+$account_data = get($_SESSION['links']->account);
 $data->user = $account_data->user;
 $data->links = $account_data->links;
 
 $lastWeek = date('Y-m-d', strtotime('-1 week 8 hours'));
 
-$sleep_data = get($data->links->sleep . "?from=$lastWeek");
-$calm_data = get($data->links->calm . "?from=$lastWeek");
-$steps_data = get($data->links->steps . "?from=$lastWeek");
+$params = ['from' => $lastWeek];
+
+$sleep_data = get($data->links->sleep, $params);
+$calm_data = get($data->links->calm, $params);
+$steps_data = get($data->links->steps, $params);
 
 
 if ($sleep_data !== null) {

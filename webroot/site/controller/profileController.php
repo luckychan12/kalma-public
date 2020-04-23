@@ -1,21 +1,18 @@
 <?php
-include_once '../api_tasks/apiConnect.php';
-
 session_start();
 
-$api = new ApiConnect();
-if (isset($_SESSION['account_link'])) {
-    $data = $api->getData($_SESSION['account_link']);
+require_once '../controller/ensureFingerprint.php';
+require_once '../api_tasks/ApiConnector.php';
+
+$api = new ApiConnector();
+if (isset($_SESSION['links'])) {
+    $data = $api->getData($_SESSION['links']->account);
 }
 else {
-    header('Location: ../public/loginAndSignup.php');
+    header('Location: ./login-and-signup.php');
 }
 
 if (isset($data->error)) {
-    header('Location: ../public/errorPage.php');
+    header("Location: ./error.php?code=$data->error&message=$data->message");
 }
-
 ?>
-
-
-

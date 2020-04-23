@@ -1,6 +1,6 @@
 <?php
-include_once "../api_tasks/apiConnect.php";
-$api = new ApiConnect();
+include_once "../api_tasks/ApiConnector.php";
+$api = new ApiConnector();
 
 $token = $_GET['confirmation'] ?? "";
 $data = $api->confirmAccount($token);
@@ -17,7 +17,7 @@ $data = $api->confirmAccount($token);
     <?php include_once "./components/navbar_top.php" ?>
 
     <div>
-        <a class="btn btn-primary" href="./loginAndSignup.php">Login</a>
+        <a class="btn btn-primary" href="./login-and-signup.php">Login</a>
     </div>
 
     <div>

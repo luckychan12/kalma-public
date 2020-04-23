@@ -4,12 +4,17 @@
  */
 
 session_start();
-include_once '../api_tasks/apiConnect.php';
-$api= new ApiConnect();
-$data = $api->signOut($_GET['clientFingerprint']);
+
+require_once '../api_tasks/ApiConnector.php';
+require_once '../controller/ensureFingerprint.php';
+
+$api = ApiConnector::getConnection();
+$data = $api->request('POST', $_SESSION['links']->logout, ['client_fingerprint' => $_SESSION['fingerprint']], true);
+session_unset();
+
 if(!isset($data->error)){
-    echo '<script> location.href = "../public/logoutSuccess.php"</script>';
+    header('Location: ./login-and-signup.php');
 }
-else{
-    echo'<script>location.href = "../public/errorPage.php" </script>';
+else {
+    header("Location: ./error.php?code=$data->error&message=$data->message");
 }

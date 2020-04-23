@@ -1,8 +1,8 @@
 <?php
 session_start();
 date_default_timezone_set('Europe/London');
-include_once "../api_tasks/apiConnect.php";
-$api = new ApiConnect();
+include_once "../api_tasks/ApiConnector.php";
+$api = new ApiConnector();
 $GMT = new DateTimeZone('GMT');
 
 //Deals with adding new data
@@ -36,7 +36,7 @@ if(isset($_POST['editId'])){
     $periods = array($period);
     $data['periods'] = $periods;
     if(isset($_SESSION['links'])) {
-        $message = $api->editData($_SESSION['links']->calm, $data);
+        $message = $api->request('PUT', $_SESSION['links']->calm, $data, true);
     }
 }
 
@@ -44,7 +44,7 @@ if(isset($_POST['editId'])){
 if(isset($_POST['deleteId'])){
     $data['periods'] = array((int)$_POST['deleteId']);
     if(isset($_SESSION['links'])) {
-        $message = $api->deleteData($_SESSION['links']->calm, $data);
+        $message = $api->request('DELETE', $_SESSION['links']->calm, $data, true);
     }
 }
 
@@ -53,11 +53,11 @@ if(isset($_SESSION['links'])) {
     $dataPoints = $api->getData($_SESSION['links']->calm);
     if (isset($dataPoints->error)) {
         $_SESSION['links'] = null;
-        header('Location: ./errorPage.php');
+        header('Location: ./error.php');
     }
 }
 else{
-    header('Location: ./errorPage.php');
+    header('Location: ./error.php');
 }
 
 //When you select a new week
