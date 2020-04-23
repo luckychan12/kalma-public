@@ -113,7 +113,7 @@ class ApiConnector
             return false;
         }
 
-        $access_expiry = $_SESSION['auth']->access_expiry;
+        $access_expiry = DateTime::createFromFormat(DATE_ISO8601, $_SESSION['auth']->access_expiry);
         $now = new DateTime("now");
         if ($access_expiry <= $now) {
             $this->refreshSession();
