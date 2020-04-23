@@ -1,0 +1,46 @@
+input {
+    margin-bottom: 5px;
+}
+.date-selector{
+    background-color: var(--c-secondary);
+}
+
+label {
+    font-size: large;
+    margin-top: 10px;
+    color: var(--c-text-on-bg);
+}
+.outer {
+    padding: 10px;
+    border-radius: 10px;
+    background: var(--c-bg-shade);
+}
+.module {
+    margin-bottom: 10px;
+    border-radius: 5px;
+    background: var(--c-bg);
+    padding: 10px;
+}
+h1, h2, h3, h4, h5 {
+    color: var(--c-text-on-bg);
+}
+
+#add-button {
+    margin-top:20px;
+}
+
+.modal  .modal-content {
+    background: var(--c-bg);
+}
+
+.modal .modal-header {
+    border-bottom: 1px solid var(--c-secondary);
+}
+
+.modal  .modal-footer {
+    border-top: 1px solid var(--c-secondary);
+}
+
+.modal .close {
+    color: var(--c-text-on-bg);
+}

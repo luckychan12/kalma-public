@@ -2,6 +2,7 @@ package com.kalma.MainApp;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
 import android.content.Context;
 import android.content.DialogInterface;
@@ -14,7 +15,7 @@ import android.widget.Toast;
 
 import com.android.volley.VolleyError;
 import com.kalma.API_Interaction.APICaller;
-import com.kalma.API_Interaction.AuthStrings;
+import com.kalma.Data.AuthStrings;
 import com.kalma.API_Interaction.ServerCallback;
 import com.kalma.Login.StartPage;
 import com.kalma.R;
@@ -34,6 +35,7 @@ public class SettingsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
+        setTitle("Settings");
         buttonHome = findViewById(R.id.btnHome);
         buttonHome.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -72,8 +74,8 @@ public class SettingsActivity extends AppCompatActivity {
                 dialog.setOnShowListener(new DialogInterface.OnShowListener() {
                     @Override
                     public void onShow(DialogInterface arg0) {
-                        dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(getResources().getColor(R.color.cancelColour));
-                        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(getResources().getColor(R.color.logoutColour));
+                        dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(ContextCompat.getColor(context, R.color.YesColour));
+                        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(ContextCompat.getColor(context, R.color.NoColour));
                     }
                 });
                 dialog.show();
@@ -104,7 +106,7 @@ public class SettingsActivity extends AppCompatActivity {
     public void logout() {
         //create a json object and call API to log in
         APICaller apiCaller = new APICaller(getApplicationContext());
-        apiCaller.post(true, logoutObject(), buildMap(), AuthStrings.getInstance(getApplicationContext()).getLogoutLink(),new ServerCallback() {
+        apiCaller.post(true, logoutObject(), buildMap(), AuthStrings.getInstance(getApplicationContext()).getLinks().get("logout").toString(),new ServerCallback() {
                     @Override
                     public void onSuccess(JSONObject response) {
                         try {

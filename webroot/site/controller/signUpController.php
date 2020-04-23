@@ -1,23 +1,28 @@
 <?php
-include_once '../api_tasks/apiConnect.php';
 session_start();
+
+require_once '../api_tasks/ApiConnector.php';
+
 if(isset($_POST['signup'])){
-    try {
-        $dob = new DateTime($_POST['dob']);
-        $dob =  $dob->getTimestamp();
+    $dob = (new DateTime($_POST['dob']))->format(DATE_ISO8601);
+    $api = new ApiConnector();
+    $result = $api->request('POST', 'api/user/signup', array(
+            'first_name' => $_POST['firstName'],
+            'last_name' => $_POST['lastName'],
+            'password' => $_POST['password'],
+            'email_address' => $_POST['email'],
+            'date_of_birth' => $dob,
+        )
+    );
 
-
-    } catch (Exception $e) {
-    }
-    $api = new ApiConnect();
-    $result = $api->requestSignup($_POST['firstName'],$_POST['lastName'],$_POST['password'],$_POST['email'],$dob);
     if (!isset($result->error)){
-
         $_SESSION['confirmationLink'] = $result->confirmation_url;
-        echo '<script>location.href = "../public/signupSuccess.php"</script>';
+        header('Location: ./signup-success.php');
+        exit();
     }
     else {
-        echo '<script>location.href = "../public/errorPage.php" </script>';
+        header("Location: ./error.php?code=$result->error&message=$result->message");
+        exit();
     }
 }
 

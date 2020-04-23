@@ -1,6 +1,7 @@
 package com.kalma.Login;
 
 import android.app.DatePickerDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -10,6 +11,7 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.android.volley.VolleyError;
@@ -79,12 +81,19 @@ public class SignUpActivity extends AppCompatActivity {
                 attemptSignUp(firstName, lastName, password, email);
             }
         });
-
+        final DatePickerDialog datePicker = new DatePickerDialog(SignUpActivity.this);
+        datePicker.setOnDateSetListener(date);
         txtDOB.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                DatePickerDialog datePicker = new DatePickerDialog(SignUpActivity.this, android.R.style.Theme_Holo_Dialog, date, 1990, 0, 0);
                 datePicker.show();
+            }
+        });
+        datePicker.setOnShowListener(new DialogInterface.OnShowListener() {
+            @Override
+            public void onShow(DialogInterface arg0) {
+                datePicker.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(getResources().getColor(R.color.NoColour, null));
+                datePicker.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(getResources().getColor(R.color.YesColour, null));
             }
         });
     }
@@ -93,8 +102,9 @@ public class SignUpActivity extends AppCompatActivity {
         if (!(firstName.isEmpty() || lastName.isEmpty() || password.isEmpty() || email.isEmpty() || txtDOB.getText().toString().isEmpty())){
             if (validateString(firstName) && validateString(lastName)){
                 //convert date string into DateTime object and generate epoch value
-                long epochSecs = getEpochSecs();
-                signUp(firstName, lastName, password, email, epochSecs);
+                DateTimeFormatter formatter = DateTimeFormat.forPattern("dd/MM/yyy");
+                DateTime dateTimeGMT = new DateTime(formatter.parseDateTime(txtDOB.getText().toString()), DateTimeZone.UTC);
+                signUp(firstName, lastName, password, email, dateTimeGMT.toString(DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ss")));
             }
             else{
                 Toast toast = Toast.makeText(getApplicationContext(), "First name and Last can only contain letters 'A' - 'Z'", Toast.LENGTH_LONG);
@@ -106,13 +116,13 @@ public class SignUpActivity extends AppCompatActivity {
             toast.show();
         }
     }
-
+/*
     private long getEpochSecs() {
         DateTimeFormatter formatter = DateTimeFormat.forPattern("dd/MM/yyy");
         DateTime dateTimeGMT = new DateTime(formatter.parseDateTime(txtDOB.getText().toString()), DateTimeZone.UTC);
         return dateTimeGMT.getMillis() / 1000;
     }
-
+*/
     private void gotoLogin() {
         Intent intent = new Intent(this, LoginActivity.class);
         startActivity(intent);
@@ -121,7 +131,7 @@ public class SignUpActivity extends AppCompatActivity {
         Map<String, String> params = new HashMap<String, String>();
         return params;
     }
-    private void signUp(String firstName, String lastName, String password, String email, long DOB) {
+    private void signUp(String firstName, String lastName, String password, String email, String DOB) {
         APICaller apiCaller = new APICaller(getApplicationContext());
         apiCaller.post(false, buildSignUpJsonObject(firstName, lastName, password, email, DOB), buildMap(), getResources().getString(R.string.api_signup), new ServerCallback() {
                     @Override
@@ -170,14 +180,14 @@ public class SignUpActivity extends AppCompatActivity {
         char[] charArray = str.toCharArray();
         for (char ch : charArray) {
             //Check if letter value is between ascii 'a' and ascii 'z'
-            if (!((ch >= 'a' && ch <= 'z') || (ch != 39) || (ch != 45))) {
+            if (!((ch >= 'a' && ch <= 'z') || (ch == 39) || (ch == 45))) {
                 return false;
             }
         }
         return true;
     }
 
-    private JSONObject buildSignUpJsonObject(String firstName, String lastName, String password, String email, long DOB) {
+    private JSONObject buildSignUpJsonObject(String firstName, String lastName, String password, String email, String DOB) {
         //returns a json object based on input email and password
         JSONObject object = new JSONObject();
         try {

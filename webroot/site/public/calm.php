@@ -1,0 +1,386 @@
+<?php
+include_once '../controller/calmController.php';
+?>
+
+<!doctype html>
+<link lang='en'>
+<?php include_once './components/global_head_inner.php' ?>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js"></script>
+<link rel="stylesheet" href="assets/stylesheets/trackerPages.css">
+</head>
+<body>
+<?php include_once './components/navbar_top.php'; ?>
+<!--Add sleep period overlay-->
+<div id="addingCalm" class="modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Add Mindful Minutes Data</h2>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form method="post" action="calm.php">
+                    <label>Start Time:</label>
+                    <br>
+                    <input class="form-control" type="date" name="startDate" required>
+                    <input class="form-control" type="time" name="startTime" required>
+
+                    <label>End Time:</label>
+                    <br>
+                    <input class="form-control" type="date" name="endDate" required>
+                    <input class="form-control" type="time" name="endTime" required>
+
+                    <label>Description:</label>
+                    <br>
+                    <input class="form-control" type="text" name="description" >
+                    <div class="modal-footer">
+                        <input type="submit" class="btn btn-primary" value="Submit" name="addCalm">
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="overlayEdit" class="modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Edit Data</h2>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form method="post" action="calm.php">
+                    <label>Start Time:</label>
+                    <input id="editId" name="editId" value="0" hidden>
+                    <br>
+                    <input id="editStartDate" class="form-control" type="date" name="newStartDate" value="2020-02-01" required>
+                    <input id="editStartTime" class="form-control" type="time" name="newStartTime" value="20:00" required>
+
+                    <label>End Time:</label>
+                    <br>
+                    <input id="editEndDate" class="form-control" type="date" name="newEndDate" required>
+                    <input id="editEndTime" class="form-control" type="time" name="newEndTime" required>
+
+                    <label>Description:</label>
+                    <br>
+                    <input id="editDesc"  class="form-control" type="text" name="newDescription" required>
+                    <div class="modal-footer">
+                        <input type="submit" class="btn btn-primary" value="Save" name="editCalm">
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="overlayDelete" class="modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Are you sure?</h2>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form method="post" action="calm.php">
+                    <input id="deleteId" name="deleteId" value="0" hidden>
+                    <input type="submit" class="btn btn-primary" value="Yes" name="editSleep">
+                    <input type="button" class="btn btn-secondary" data-dismiss="modal" value="No">
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Main Body-->
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-7 offset-lg-1">
+            <div class="alert alert-danger alert-dismissible fade text-center <?= isset($message->error) ? "show" : "hide"?>" role="alert">
+                <?= $message->message. " (" . $message->error.")" ?? ""; ?>
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <h1 style="margin-top: 20px">Mindful Minutes</h1>
+            <button class="btn btn-primary date-selector" onclick=showWeekChart(); style="margin-left: 5px">Week</button>
+            <button class="btn btn-primary date-selector" onclick=showMonthChart();>Month</button>
+            <br>
+            <div style="margin-top: 10px; margin-left: 5px">
+                <!--Date choosers-->
+                <form id="weekForm" method="get" action="calm.php"style="display: none">
+                    <input onchange=document.getElementById('weekSubmit').click(); style="text-align: center" type="week" id="weekDate" value="<?php echo $setWeekDate ?>" name="weekDate">
+                    <input type="submit" id="weekSubmit" hidden>
+                </form>
+                <form id="monthForm" method="get" action="calm.php"style="display: none">
+                    <input onchange=document.getElementById('monthSubmit').click(); style="text-align: center" type="month" value="<?php echo $setMonthDate ?>" name="monthDate">
+                    <input type="submit" id="monthSubmit" hidden>
+                </form>
+            </div>
+            <br>
+            <!--Graphs-->
+            <canvas id="myWeekChart" width="400" height="250" style="display: none"></canvas>
+            <canvas id="myMonthChart" width="400" height="250" style="display: none"></canvas>
+        </div>
+        <!--Average Display-->
+        <div class="col-lg-3">
+            <div class="outer">
+                <div class="module">
+                    <h2 style="font-size: x-large">Average Mindful Minutes (Overall):</h2>
+                    <hr>
+                    <?php echo $average?> Minutes a day
+                </div>
+                <div class="module">
+                    <h2 style="font-size: x-large">Progress Today:</h2>
+                    <hr>
+                    <?php echo $progress_message?>% of your daily goal
+                </div>
+            </div>
+            <!--Add data button-->
+            <div style="text-align: center">
+                <button id="add-button" type="button" class="btn btn-primary" data-toggle="modal" data-target="#addingSleep">
+                    Add Data
+                </button>
+            </div>
+        </div>
+    </div>
+    <br>
+    <hr>
+    <br>
+    <!--Data table-->
+    <div class="row" style="margin-bottom: 200px">
+        <div class="col-lg-10 offset-sm-1">
+            <table class="table">
+                <tr>
+                    <th></th>
+                    <th>Start Time</th>
+                    <th>End Time</th>
+                    <th>Duration</th>
+                    <th>Description</th>
+                    <th>Progress Percentage</th>
+                </tr>
+                <?php
+                foreach ($dataPoints->periods as $data) {
+                    if (isset($data->id)) {
+                        $StartTime = date('Y-m-d H:i', strtotime($data->start_time));
+                        $EndTime = date('Y-m-d H:i', strtotime($data->stop_time));
+                        $desc = "$data->description";
+                        $send = "edit({$data->id},'{$StartTime}','{$EndTime}','{$desc}')";
+                        echo
+                            "<tr>
+                            <td><a href=\"#\" data-toggle=\"modal\" data-target=\"#overlayEdit\" onclick=\"$send\">
+                            <i class=\"fas fa-pencil-alt\"></i></a> 
+                            <a href=\"#\" data-toggle=\"modal\" data-target=\"#overlayDelete\" onclick='remove($data->id)'>
+                            <i  class=\"fas fa-trash\"></a></td></td>    
+                            <td>". date('d/m/Y H:i', strtotime($data->start_time))."</td>
+                            <td>".date('d/m/Y H:i', strtotime($data->stop_time))."</td>
+                            <td>$data->duration_text</td>
+                            <td>$data->description</td>
+                            <td>$data->progress_percentage %</td>
+                        </tr>";
+                    }
+                }
+                ?>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    function remove(id){
+        document.getElementById("deleteId").value = id;
+    }
+    function edit(id, fullStart, fullEnd, desc){
+        let start = new Date(fullStart);
+        let m = start.getMonth() + 1;
+        let d = start.getDate();
+        m = m > 9 ? m : "0"+m;
+        d = d > 9 ? d : "0"+d;
+        let startDate = start.getFullYear() + "-" + m + "-" + d;
+        let hour = start.getHours();
+        hour = hour > 9 ? hour :"0"+hour;
+        let min = start.getMinutes();
+        min = min > 9 ? min :"0"+min;
+        let startTime = hour + ":" + min;
+
+        let end = new Date(fullEnd);
+        m = end.getMonth() + 1;
+        d = end.getDate();
+        m = m > 9 ? m : "0"+m;
+        d = d > 9 ? d : "0"+d;
+        let endDate = end.getFullYear() + "-" + m + "-" + d;
+        hour = end.getHours();
+        hour = hour > 9 ? hour :"0"+hour;
+        min = end.getMinutes();
+        min = min > 9 ? min :"0"+min;
+        let endTime = hour+ ":" + min;
+        document.getElementById("editId").value = id;
+        document.getElementById("editStartDate").value = startDate;
+        document.getElementById("editStartTime").value = startTime;
+        document.getElementById("editEndDate").value = endDate;
+        document.getElementById("editEndTime").value = endTime;
+        document.getElementById("editDesc").value = desc;
+    }
+
+    function on() {
+        document.getElementById("overlay").style.display = "block";
+    }
+
+    function off() {
+        document.getElementById("overlay").style.display = "none";
+        document.getElementById("overlayEdit").style.display = "none";
+        document.getElementById("overlayDelete").style.display = "none";
+    }
+
+
+
+    function showWeekChart() {
+        document.getElementById('myWeekChart').style.removeProperty('display');
+        renderWeekChart();
+        document.getElementById('myMonthChart').style.display = 'none';
+        document.getElementById('weekForm').style.removeProperty('display');
+        document.getElementById('monthForm').style.display = 'none';
+    }
+    function showMonthChart() {
+        document.getElementById('myMonthChart').style.removeProperty('display');
+        renderMonthChart();
+        document.getElementById('myWeekChart').style.setProperty('display', 'none');
+        document.getElementById('monthForm').style.removeProperty('display');
+        document.getElementById('weekForm').style.display = 'none';
+    }
+    function renderWeekChart() {
+        const style = getComputedStyle(document.body);
+        const textColor = style.getPropertyValue('--c-text-on-bg');
+        var ctx = document.getElementById("myWeekChart").getContext('2d');
+        var myChart = new Chart(ctx, {
+            type: 'horizontalBar',
+            data: {
+                labels: ["Mon", "Tue", "Wed", "Thus", "Fri", "Sat","Sun"],
+                datasets: [{
+                    label: 'Minutes Meditated',
+                    data: <?php
+                    echo "[";
+                    foreach ($weekPoints as $point)
+                    {
+                        echo $point. ",";
+                    }
+                    echo"]";
+                    ?>,
+                    backgroundColor: "#ffc400",
+                    borderColor:"#c79400",
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+
+                    xAxes: [{
+                        gridLines: {
+                            zeroLineColor: textColor,
+                            color: textColor,
+                        },
+                        scaleLabel: {
+                            display: true,
+                            labelString: "Number of minutes meditated",
+                            fontColor:textColor,
+                        },
+                        ticks: {
+                            fontColor:textColor,
+                        }
+                    }],
+                    yAxes: [{
+                        gridLines: {
+                            display: false,
+                        },
+                        scaleLabel: {
+                            display: true,
+                            labelString: "Days of the week",
+                            fontColor:textColor,
+                        },
+                        ticks: {
+                            fontColor:textColor,
+                            beginAtZero:true
+                        }
+                    }]
+                }
+            }
+        });
+    }
+
+    function renderMonthChart(){
+        const style = getComputedStyle(document.body);
+        const textColor = style.getPropertyValue('--c-text-on-bg');
+        var ctx2 = document.getElementById("myMonthChart").getContext('2d');
+        var myChart2 = new Chart(ctx2, {
+            type: 'horizontalBar',
+            data: {
+                labels: [<?php echo $monthLabels ?>],
+                datasets: [{
+                    label: 'Minutes Meditated',
+                    data: <?php
+                    echo "[";
+                    foreach ($monthPoints as $point)
+                    {
+                        echo $point. ",";
+                    }
+                    echo"]";
+                    ?>,
+                    backgroundColor: "#ffc400",
+                    borderColor:"#c79400",
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    xAxes: [{
+                        gridLines: {
+                            zeroLineColor: textColor,
+                            color: textColor,
+                        },
+                        scaleLabel: {
+                            display: true,
+                            labelString: "Number of minutes meditated",
+                            fontColor:textColor,
+                        },
+                        ticks: {
+                            fontColor:textColor,
+                        }
+                    }],
+                    yAxes: [{
+                        gridLines: {
+                            display: false,
+                        },
+                        scaleLabel: {
+                            display: true,
+                            labelString: "Days of the month",
+                            fontColor:textColor,
+                        },
+
+                        ticks: {
+                            fontColor:textColor,
+                            beginAtZero:true
+                        }
+                    }]
+                }
+            }
+        });
+    }
+</script>
+<?php
+//displays the correct chart based on what was already selected
+if (isset($_GET['weekDate'])){
+    echo '<script> document.onload = showWeekChart()</script>';
+}
+else if (isset($_GET['monthDate'])){
+    echo '<script> document.onload = showMonthChart()</script>';
+}
+else {
+    echo '<script> document.onload = showWeekChart()</script>';
+}
+?>
+</body>
+

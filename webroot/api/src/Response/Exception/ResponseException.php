@@ -17,6 +17,7 @@ use \Exception;
 
 class ResponseException extends Exception
 {
+    const INVALID_DATE_FORMAT = array(400, 1101, 'One or more of the form fields isn\'t valid.', 'Invalid date format.');
 
     private int $status;
     private string $detail;

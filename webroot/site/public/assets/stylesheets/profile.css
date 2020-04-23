@@ -1,0 +1,111 @@
+#aside, #main {
+    padding: 10px;
+    margin: 10px 0 0;
+    border-radius: 10px;
+    background: var(--c-bg-shade);
+}
+
+#main {
+    padding: 10px;
+    margin-bottom: 15px
+}
+
+.profile-section {
+    margin-bottom: 10px;
+    border-radius: 5px;
+    background: var(--c-bg);
+    padding: 10px;
+}
+
+.profile-section:last-of-type {
+    margin: 0;
+}
+
+.user-name {
+    font-size: 20px;
+    font-family: var(--f-brand);
+    font-weight: 700;
+    margin-bottom: 5px;
+}
+
+.user-info {
+    background: var(--c-bg);
+    border-radius: 5px;
+    padding: 10px;
+    position: relative;
+}
+
+.email-address, .date-of-birth {
+    font-weight: 200;
+    opacity: 0.7;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    position: relative;
+    width: 100%;
+}
+
+.email-address, .date-of-birth {
+    content: '';
+    display: inline-block;
+}
+
+.list-item {
+    margin-bottom: 5px;
+    padding: 5px;
+    border-bottom: 1px solid var(--c-bg-shade);
+}
+
+.list-item:hover {
+    background: var(--c-bg-shade);
+    border-radius: 5px;
+}
+
+.list-header {
+    font-weight: 600;
+}
+
+.list-header + hr {
+    border-top: 2px solid var(--c-bg-shade);
+    margin-top: 5px;
+    margin-bottom: 10px;
+}
+
+.list-item-controls {
+    text-align: center;
+}
+
+.list-item-controls span {
+    margin-left: 10px;
+}
+
+@media (min-width: 576px) {
+    .list-item {
+        border: none;
+    }
+
+    .list-item-controls {
+        text-align: right;
+        padding-right: 30px;
+    }
+}
+
+.target-name {
+    font-weight: 600;
+}
+
+.modal  .modal-content {
+    background: var(--c-bg);
+}
+
+.modal .modal-header {
+    border-bottom: 1px solid var(--c-secondary);
+}
+
+.modal  .modal-footer {
+    border-top: 1px solid var(--c-secondary);
+}
+
+.modal .close {
+    color: var(--c-text-on-bg);
+}

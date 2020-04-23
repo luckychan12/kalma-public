@@ -14,13 +14,14 @@
 namespace Kalma\Api\Business;
 
 use DateTime;
+use DateTimeZone;
 use DomainException;
 use Exception;
 use Firebase\JWT\BeforeValidException;
 use Firebase\JWT\ExpiredException;
 use Firebase\JWT\SignatureInvalidException;
 use Kalma\Api\Core\Config;
-use Kalma\Api\Core\DatabaseHandler;
+use Kalma\Api\Core\DatabaseConnector;
 use Kalma\Api\Core\Logger;
 use Kalma\Api\Response\Exception\ResponseException;
 use UnexpectedValueException;
@@ -50,7 +51,7 @@ class UserManager
     {
         $this->validateUserData($user_data);
 
-        $db = DatabaseHandler::getConnection();
+        $db = DatabaseConnector::getConnection();
 
         $rows = $db->fetch('SELECT user_id FROM `user` WHERE `email_address` = :email_address',
                 array('email_address' => $user_data['email_address']));
@@ -66,7 +67,7 @@ class UserManager
             'password_hash' => password_hash($user_data['password'], PASSWORD_BCRYPT),
             'first_name' => $user_data['first_name'],
             'last_name' => $user_data['last_name'],
-            'date_of_birth' => date('y-m-d', $user_data['date_of_birth']),
+            'date_of_birth' => $user_data['date_of_birth'],
         );
 
         $rows = $db->fetch
@@ -184,20 +185,21 @@ class UserManager
 
     /**
      * Return true if the user meets the age requirement, else false;
-     * @param  int  $dob_timestamp The user's date of birth in seconds since the Unix epoch
+     * @param string $dob_timestamp The user's date of birth in seconds since the Unix epoch
      * @return bool
+     * @throws ResponseException
      */
-    private function validateAge(int $dob_timestamp) : bool
+    private function validateAge(string $dob_timestamp) : bool
     {
         $min_age = 16;
         try {
-            $dob = new DateTime("@$dob_timestamp");
+            $dob = new DateTime($dob_timestamp, new DateTimeZone('UTC'));
             $now = new DateTime();
             $age = $now->diff($dob);
             return $age->y >= $min_age;
         } catch (Exception $e) {
             Logger::log(Logger::ERROR, "Failed to parse date timestamp '$dob_timestamp' in AccountManager::validateAge()");
-            return false;
+            throw new ResponseException(400, 1101, 'One or more of the form fields isn\'t valid.', 'Invalid date format.');
         }
     }
 
@@ -228,7 +230,7 @@ class UserManager
             throw new ResponseException(401, 2111, 'Sorry, we couldn\'t activate your account.', 'Unexpected error: ' . $e->getMessage());
         }
 
-        $conn = DatabaseHandler::getConnection();
+        $conn = DatabaseConnector::getConnection();
         $rows_affected = $conn->execute("UPDATE `user` SET `activated` = b'1' WHERE `user_id` = :user_id",
             array('user_id' => $payload['sub']));
 
@@ -247,7 +249,7 @@ class UserManager
      */
     public function verifyCredentials(string $email, string $pass) : int
     {
-        $db = DatabaseHandler::getConnection();
+        $db = DatabaseConnector::getConnection();
         $rows = $db->fetch
         (
             'SELECT user_id, password_hash, activated FROM `user` WHERE email_address = (:email_address)',
@@ -282,7 +284,7 @@ class UserManager
      */
     public function createSession(int $user_id, string $client_fingerprint) : array
     {
-        $db = DatabaseHandler::getConnection();
+        $db = DatabaseConnector::getConnection();
         $rows = $db->fetch
         (
             'CALL `create_session` (:user_id, :client_fingerprint)',
@@ -322,7 +324,7 @@ class UserManager
         }
 
         $session_id = $payload['sid'];
-        $db = DatabaseHandler::getConnection();
+        $db = DatabaseConnector::getConnection();
         $rows = $db->fetch(
             'SELECT `user_id`, `client_fingerprint` FROM `session` WHERE `session`.`session_id` = :session_id;',
             array('session_id' => $session_id),

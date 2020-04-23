@@ -1,6 +1,6 @@
 <?php
 /**
- * Parses URIs to assign the appropriate resource
+ * Parses URIs to assign the appropriate Endpoint
  *
  * LICENSE: This code is licensed under a Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License
  *
@@ -29,10 +29,10 @@ class Router
     {
         // Define routes
         // Handlers follow the format:
-        //     array( 'Resource' , 'action' [, ACCESS_LEVEL] )
-        // Where: "Resource" is the name of a class extending Resource
-        //        "action" is the name of a method belonging to the Resource, which will be called to get a response
-        //        "ACCESS_LEVEL" is an optional integer indicating the access level required to access the resource
+        //     array( 'Endpoint' , 'action' [, ACCESS_LEVEL] )
+        // Where: "Endpoint" is the name of a class extending Endpoint
+        //        "action" is the name of a method belonging to the Endpoint, which will be called to get a response
+        //        "ACCESS_LEVEL" is an optional integer indicating the access level required to access the endpoint
         $this->dispatcher = simpleDispatcher(function(RouteCollector $root)
         {
             // Operations relating to users & data associated with users
@@ -51,37 +51,38 @@ class Router
                 $user->addGroup('/{id:\d+}', function(RouteCollector $account) {
 
                     // User account endpoint
-                    $account->addRoute('GET', '/account', ['User', 'read',    Auth::ACCESS_USER]);
+                    $account->addRoute('GET', '/account',         ['User', 'read',     Auth::ACCESS_USER]);
+                    $account->addRoute('PUT', '/account/targets', ['User', 'setTargets', Auth::ACCESS_USER]);
 
                     // Sleep data CRUD operations
-                    $account->addRoute('GET',    '/sleep',          ['SleepPeriod', 'read',   Auth::ACCESS_USER]);
-                    $account->addRoute('POST',   '/sleep/create',   ['SleepPeriod', 'create', Auth::ACCESS_USER]);
-                    $account->addRoute('PUT',    '/sleep/update',   ['SleepPeriod', 'update', Auth::ACCESS_USER]);
-                    $account->addRoute('DELETE', '/sleep/delete',   ['SleepPeriod', 'delete', Auth::ACCESS_USER]);
+                    $account->addRoute('GET',    '/sleep',  ['SleepPeriod', 'read',   Auth::ACCESS_USER]);
+                    $account->addRoute('POST',   '/sleep',  ['SleepPeriod', 'create', Auth::ACCESS_USER]);
+                    $account->addRoute('PUT',    '/sleep',  ['SleepPeriod', 'update', Auth::ACCESS_USER]);
+                    $account->addRoute('DELETE', '/sleep',  ['SleepPeriod', 'delete', Auth::ACCESS_USER]);
 
                     // Calm data CRUD operations
-                    $account->addRoute('GET',    '/calm',          ['CalmPeriod', 'read',   Auth::ACCESS_USER]);
-                    $account->addRoute('POST',   '/calm/create',   ['CalmPeriod', 'create', Auth::ACCESS_USER]);
-                    $account->addRoute('PUT',    '/calm/update',   ['CalmPeriod', 'update', Auth::ACCESS_USER]);
-                    $account->addRoute('DELETE', '/calm/delete',   ['CalmPeriod', 'delete', Auth::ACCESS_USER]);
+                    $account->addRoute('GET',    '/calm',   ['CalmPeriod', 'read',   Auth::ACCESS_USER]);
+                    $account->addRoute('POST',   '/calm',   ['CalmPeriod', 'create', Auth::ACCESS_USER]);
+                    $account->addRoute('PUT',    '/calm',   ['CalmPeriod', 'update', Auth::ACCESS_USER]);
+                    $account->addRoute('DELETE', '/calm',   ['CalmPeriod', 'delete', Auth::ACCESS_USER]);
 
                     // Daily steps CRUD operations
-                    $account->addRoute('GET',    '/steps',          ['StepsDaily', 'read',   Auth::ACCESS_USER]);
-                    $account->addRoute('POST',   '/steps/create',   ['StepsDaily', 'create', Auth::ACCESS_USER]);
-                    $account->addRoute('PUT',    '/steps/update',   ['StepsDaily', 'update', Auth::ACCESS_USER]);
-                    $account->addRoute('DELETE', '/steps/delete',   ['StepsDaily', 'delete', Auth::ACCESS_USER]);
+                    $account->addRoute('GET',    '/steps',   ['StepsDaily', 'read',   Auth::ACCESS_USER]);
+                    $account->addRoute('POST',   '/steps',   ['StepsDaily', 'create', Auth::ACCESS_USER]);
+                    $account->addRoute('PUT',    '/steps',   ['StepsDaily', 'update', Auth::ACCESS_USER]);
+                    $account->addRoute('DELETE', '/steps',   ['StepsDaily', 'delete', Auth::ACCESS_USER]);
 
                     // Weight logging CRUD operations
-                    $account->addRoute('GET',    '/weight',          ['WeightLog', 'read',   Auth::ACCESS_USER]);
-                    $account->addRoute('POST',   '/weight/create',   ['WeightLog', 'create', Auth::ACCESS_USER]);
-                    $account->addRoute('PUT',    '/weight/update',   ['WeightLog', 'update', Auth::ACCESS_USER]);
-                    $account->addRoute('DELETE', '/weight/delete',   ['WeightLog', 'delete', Auth::ACCESS_USER]);
+                    $account->addRoute('GET',    '/weight',   ['WeightLog', 'read',   Auth::ACCESS_USER]);
+                    $account->addRoute('POST',   '/weight',   ['WeightLog', 'create', Auth::ACCESS_USER]);
+                    $account->addRoute('PUT',    '/weight',   ['WeightLog', 'update', Auth::ACCESS_USER]);
+                    $account->addRoute('DELETE', '/weight',   ['WeightLog', 'delete', Auth::ACCESS_USER]);
 
                     // Height logging CRUD operations
-                    $account->addRoute('GET',    '/height',          ['HeightLog', 'read',   Auth::ACCESS_USER]);
-                    $account->addRoute('POST',   '/height/create',   ['HeightLog', 'create', Auth::ACCESS_USER]);
-                    $account->addRoute('PUT',    '/height/update',   ['HeightLog', 'update', Auth::ACCESS_USER]);
-                    $account->addRoute('DELETE', '/height/delete',   ['HeightLog', 'delete', Auth::ACCESS_USER]);
+                    $account->addRoute('GET',    '/height',   ['HeightLog', 'read',   Auth::ACCESS_USER]);
+                    $account->addRoute('POST',   '/height',   ['HeightLog', 'create', Auth::ACCESS_USER]);
+                    $account->addRoute('PUT',    '/height',   ['HeightLog', 'update', Auth::ACCESS_USER]);
+                    $account->addRoute('DELETE', '/height',   ['HeightLog', 'delete', Auth::ACCESS_USER]);
                 });
 
             });
@@ -95,14 +96,14 @@ class Router
      * array (
      *     'uri' => 'modified/uri'              // The given URI, as modified to be passed to the dispatcher
      *     'status' => 0..2,                    // 0: NOT_FOUND, 1: METHOD_NOT_ALLOWED, 2: FOUND
-     *     'resource' => 'ResourceClassName',   // (Optional) The name of the Resource class to call the action on
-     *     'action' => 'actionMethodName',      // (Optional) The name of the public method to call in the Resource class
+     *     'endpoint' => 'EndpointClassName',   // (Optional) The name of the Endpoint class to call the action on
+     *     'action' => 'actionMethodName',      // (Optional) The name of the public method to call in the Endpoint class
      *     'allowed_methods' => ['GET'...]      // (Optional) An array of all allowed HTTP methods for this route
      * )
      *
      * @param string $method
-     * @param string $uri The request URI to find a route for
-     * @return array          A 2+ element array containing
+     * @param string $uri    The request URI to find a route for
+     * @return array         A 2+ element array containing
      * @throws ResponseException
      */
     public function getRoute(string $method, string $uri) : array
@@ -125,7 +126,7 @@ class Router
             default:
                 $handler = $routeInfo[1];
                 return array(
-                    'resource' => $handler[0],
+                    'endpoint' => $handler[0],
                     'action' => $handler[1],
                     'args' => $routeInfo[2],
                     'access_level' => $handler[2] ?? Auth::ACCESS_PUBLIC,
