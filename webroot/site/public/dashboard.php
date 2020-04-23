@@ -33,7 +33,10 @@ include_once "../controller/dashboardController.php";
                             <div class="col-lg-5 col-xl-7 stat-progress">
                                 <div class="progress">
                                     <div class="progress-bar" style="width: $stat->width%" role="progressbar" aria-valuenow="$stat->value" aria-valuemin="0" aria-valuemax="100"></div>
-                                    <div class="progress-bar progress-target" style="left: $stat->target_offset%;" role="progressbar" aria-valuenow="$stat->target" aria-valuemin="0" aria-valuemax="100"></div>
+                                    <div class="progress-bar progress-target" style="left: $stat->target_offset%;" role="progressbar" 
+                                         aria-valuenow="$stat->target" aria-valuemin="0" aria-valuemax="100"
+                                         data-toggle="tooltip" data-placement="top" title="Target: $stat->target">
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -65,7 +68,10 @@ HTML;
                             <div class="col-lg-5 col-xl-7 stat-progress">
                                 <div class="progress">
                                     <div class="progress-bar" style="width: $stat->width%" role="progressbar" aria-valuenow="$stat->value" aria-valuemin="0" aria-valuemax="100"></div>
-                                    <div class="progress-bar progress-target" style="left: $stat->target_offset%;" role="progressbar" aria-valuenow="$stat->target" aria-valuemin="0" aria-valuemax="100"></div>
+                                    <div class="progress-bar progress-target" style="left: $stat->target_offset%;" role="progressbar" 
+                                         aria-valuenow="$stat->target" aria-valuemin="0" aria-valuemax="100"
+                                         data-toggle="tooltip" data-placement="top" title="Target: $stat->target">
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -97,7 +103,10 @@ HTML;
                             <div class="col-lg-5 col-xl-7 stat-progress">
                                 <div class="progress">
                                     <div class="progress-bar" style="width: $stat->width%" role="progressbar" aria-valuenow="$stat->value" aria-valuemin="0" aria-valuemax="100"></div>
-                                    <div class="progress-bar progress-target" style="left: $stat->target_offset%;" role="progressbar" aria-valuenow="$stat->target" aria-valuemin="0" aria-valuemax="100"></div>
+                                    <div class="progress-bar progress-target" style="left: $stat->target_offset%;" role="progressbar" 
+                                         aria-valuenow="$stat->target" aria-valuemin="0" aria-valuemax="100"
+                                         data-toggle="tooltip" data-placement="top" title="Target: $stat->target">
+                                    </div>
                                 </div>
                             </div>
                         </div>
