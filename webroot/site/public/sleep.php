@@ -265,16 +265,6 @@ include_once '../controller/sleepController.php';
         document.getElementById("editSleepQuality").value =quality;
     }
 
-    function on() {
-        document.getElementById("overlay").style.display = "block";
-    }
-
-    function off() {
-        document.getElementById("overlay").style.display = "none";
-        document.getElementById("overlayEdit").style.display = "none";
-        document.getElementById("overlayDelete").style.display = "none";
-    }
-
 
     function showWeekChart() {
         document.getElementById('myWeekChart').style.removeProperty('display');
