@@ -141,7 +141,7 @@ include_once '../controller/calmController.php';
             </div>
             <!--Add data button-->
             <div style="text-align: center">
-                <button id="add-button" type="button" class="btn btn-primary" data-toggle="modal" data-target="#addingSleep">
+                <button id="add-button" type="button" class="btn btn-primary" data-toggle="modal" data-target="#addingCalm">
                     Add Data
                 </button>
             </div>
