@@ -283,7 +283,7 @@ class User extends Endpoint
 
         $body = $req->getParsedBody();
 
-        if (!isset($body['targets']) || !is_array('targets')) {
+        if (!isset($body['targets']) || !is_array($body['targets'])) {
             throw new InvalidBodyAttributesException("The 'targets' object is missing or not an object.");
         }
 
