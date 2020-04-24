@@ -61,7 +61,7 @@ function format_periods(array $periods, string $name, array $rgb, bool $offsetDa
                 $total_duration += $period->duration;
             }
         }
-        $labels[] = $label;
+        $labels[] = $label . ' ' . $day->format('d');
         $data[] = $total_duration;
     }
 
@@ -103,7 +103,7 @@ function format_steps(array $entries, array $rgb) : object {
     $i = 0;
     foreach ($week_day as $day) {
         $label = $day->format('D');
-        $labels[] = $label;
+        $labels[] = $label . ' ' . $day->format('d');
         if ($i < count($entries)) {
             $entry = $entries[$i];
             $day_logged = DateTime::createFromFormat(DATE_ISO8601, $entry->date_logged)->format('D');
@@ -147,6 +147,26 @@ function average_duration(array $periods) : int
     return floor($sum / count($periods));
 }
 
+/**
+ * Calculate the average quality out of 5, of an array of periodic data served by the API
+ * @param array $periods
+ * @return int
+ */
+function average_quality(array $periods) : int
+{
+    if (count($periods) < 1) return 0;
+    $sum = 0;
+    foreach ($periods as $period) {
+        $sum += $period->sleep_quality;
+    }
+    return floor($sum / count($periods));
+}
+
+/**
+ * Calculate the average number of steps in a day
+ * @param array $entries
+ * @return int
+ */
 function average_steps(array $entries) : int
 {
     if (count($entries) < 1) return 0;
@@ -155,6 +175,25 @@ function average_steps(array $entries) : int
         $sum += $entry->step_count;
     }
     return floor($sum / count($entries));
+}
+
+/**
+ * Filter only periods that occurred today, and return their sum duration
+ * @param array $periods
+ * @return int
+ */
+function total_duration_today(array $periods) : int
+{
+    if (count($periods) < 1) return 0;
+    $sum = 0;
+    foreach ($periods as $period) {
+        $start_day = DateTime::createFromFormat(DATE_ISO8601, $period->start_time)->sub(DateInterval::createFromDateString('8 hours'));
+        $start_label = $start_day->format('m-d');
+        if ($start_label === date('m-d')) {
+            $sum += $period->duration;
+        }
+    }
+    return $sum;
 }
 
 /**
@@ -181,9 +220,17 @@ function to_time_string(int $mins) : string
 function build_periodic_stats(object $periodic_data) : array
 {
     $avg_duration = average_duration($periodic_data->periods);
+    $total_today = total_duration_today($periodic_data->periods);
     $target = $periodic_data->target;
     if ($target === null || $target === 0) $target = 510; // Default to 8h 30m
     return array(
+        (object)array(
+            'label' => 'Today',
+            'value' => to_time_string($total_today),
+            'width' => $total_today < 1 ? 1 : ($total_today / $target) * 100    ,
+            'target' => to_time_string($target),
+            'target_offset' => 98,
+        ),
         (object)array(
             'label' => '7-day Average',
             'value' => to_time_string($avg_duration),
@@ -220,6 +267,14 @@ $steps_data = get($data->links->steps, $params);
 
 if ($sleep_data !== null) {
     $data->sleep_stats = build_periodic_stats($sleep_data);
+    $avg_quality = average_quality($sleep_data->periods);
+    $data->sleep_stats[] = (object)array(
+        'label' => 'Avg. Quality',
+        'value' => $avg_quality,
+        'width' => $avg_quality < 1 ? 1 : ($avg_quality / 5) * 100,
+        'target' => 5,
+        'target_offset' => 100,
+    );
     $data->sleep_periods = format_periods($sleep_data->periods, 'Daily Sleep', [156, 39, 176], true);
 }
 else {
@@ -235,15 +290,31 @@ else {
 }
 
 if ($steps_data !== null) {
-    $avg_steps = average_steps($steps_data->entries);
+    $entries = $steps_data->entries;
+    $total_today = 0;
+    if (count($entries) > 0) {
+        $last_entry = $entries[count($entries) - 1];
+        $entry_day = DateTime::createFromFormat(DATE_ISO8601, $last_entry->date_logged)->format('Y-m-d');
+        if ($entry_day === date('Y-m-d')) {
+            $total_today = $last_entry->steps_count;
+        }
+    }
+    $avg_steps = average_steps($entries);
     $steps_target = $steps_data->target;
     if ($steps_target === null || $steps_target === 0) $steps_target = 10000; // Default to 10 000
     $data->steps_stats = array(
         (object)array(
-            'label' => '7-day Average',
-            'value' => to_time_string($avg_steps),
-            'width' => $avg_steps < 1 ? 1 : ($avg_steps / $steps_target) * 75,
+            'label' => 'Today',
+            'value' => $total_today,
+            'width' => $total_today < 1 ? 1 : ($total_today / $steps_target) * 100    ,
             'target' => to_time_string($steps_target),
+            'target_offset' => 98,
+        ),
+        (object)array(
+            'label' => '7-day Average',
+            'value' => $avg_steps,
+            'width' => $avg_steps < 1 ? 1 : ($avg_steps / $steps_target) * 75,
+            'target' => $steps_target,
             'target_offset' => 74,
         ),
     );

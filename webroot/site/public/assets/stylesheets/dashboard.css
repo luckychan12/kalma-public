@@ -2,12 +2,25 @@
     background: var(--c-bg-shade);
     padding: 10px;
     border-radius: 10px;
+    border: 2px solid transparent;
 }
 
 .chart-group > .chart {
     background: var(--c-bg);
     border-radius: 5px;
     padding: 10px;
+}
+
+.chart-link {
+    color: var(--c-text-on-bg);
+}
+
+.chart-link:hover {
+    color: var(--c-text-on-bg);
+}
+
+.chart-link:hover > .chart-group {
+    border: 2px solid var(--c-secondary);
 }
 
 .stat-list {
@@ -19,10 +32,6 @@
 
 .stat-label {
     font-weight: bold;
-}
-
-.stat-value {
-
 }
 
 .stat-list .error {
