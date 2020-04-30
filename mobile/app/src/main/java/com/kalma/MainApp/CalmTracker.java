@@ -64,7 +64,7 @@ import net.danlew.android.joda.JodaTimeAndroid;
 public class CalmTracker extends AppCompatActivity {
     Context context = this;
 
-    EditText txtStartDate, txtStopDate;
+    EditText txtStartDate, txtStopDate, txtGraphDate;
     Button buttonProfile, buttonSettings, buttonHome, buttonSend;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,8 +93,31 @@ public class CalmTracker extends AppCompatActivity {
                 selecting[0].setText(sdf.format(myCalendar.getTime()));
             }
         };
+        final DatePickerDialog.OnDateSetListener date2 = new DatePickerDialog.OnDateSetListener() {
+            //Convert datepicker value into string and fill textbox
+            @Override
+            public void onDateSet(DatePicker view, int year, int monthOfYear,
+                                  int dayOfMonth) {
+                myCalendar.set(Calendar.YEAR, year);
+                myCalendar.set(Calendar.MONTH, monthOfYear);
+                myCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+                SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.UK);
+                selecting[0].setText(sdf.format(myCalendar.getTime()));
+                DateTimeZone.setDefault(DateTimeZone.forTimeZone(TimeZone.getDefault()));
+                DateTimeFormatter formatter = DateTimeFormat.forPattern("dd/MM/yyy").withZone(DateTimeZone.getDefault());
+                DateTime today = new DateTime(formatter.parseDateTime(selecting[0].getText().toString()), DateTimeZone.getDefault())
+                        .withHourOfDay(16);
+                DateTime lastWeek = today.minusWeeks(1).minusDays(1);
+                lastWeek = lastWeek.withHourOfDay(16);
+                AuthStrings.getInstance(context).setLastStart(lastWeek);
+                AuthStrings.getInstance(context).setLastToday(today);
+                getData(today, lastWeek);
+            }
+        };
         final DatePickerDialog datePicker = new DatePickerDialog(context);
+        final DatePickerDialog datePicker2 = new DatePickerDialog(context);
         datePicker.setOnDateSetListener(date);
+        datePicker2.setOnDateSetListener(date2);
         txtStartDate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -109,6 +132,13 @@ public class CalmTracker extends AppCompatActivity {
                 datePicker.show();
             }
         });
+        txtGraphDate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                selecting[0] = txtGraphDate;
+                datePicker2.show();
+            }
+        });
         datePicker.setOnShowListener(new DialogInterface.OnShowListener() {
             @Override
             public void onShow(DialogInterface arg0) {
@@ -116,7 +146,13 @@ public class CalmTracker extends AppCompatActivity {
                 datePicker.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(ContextCompat.getColor(context, R.color.YesColour));
             }
         });
-
+        datePicker2.setOnShowListener(new DialogInterface.OnShowListener() {
+            @Override
+            public void onShow(DialogInterface arg0) {
+                datePicker2.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(ContextCompat.getColor(context, R.color.NoColour));
+                datePicker2.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(ContextCompat.getColor(context, R.color.YesColour));
+            }
+        });
 
         buttonSend = findViewById(R.id.btnAddData);
         buttonSend.setOnClickListener(new View.OnClickListener() {
@@ -151,10 +187,12 @@ public class CalmTracker extends AppCompatActivity {
         });
 
 
-        DateTime today = new DateTime().plusDays(1).withHourOfDay(0);
+        DateTime today = new DateTime().plusDays(1);
         DateTime lastWeek = today.minusWeeks(1).minusDays(1);
-        lastWeek = lastWeek.withHourOfDay(0);
-        getData(lastWeek);
+        lastWeek = lastWeek.withHourOfDay(16);
+        AuthStrings.getInstance(context).setLastStart(lastWeek);
+        AuthStrings.getInstance(context).setLastToday(today);
+        getData(today, lastWeek);
     }
 
     private Map buildMap() {
@@ -163,10 +201,12 @@ public class CalmTracker extends AppCompatActivity {
         return params;
     }
 
-    private void getData(DateTime date) {
+    private void getData(DateTime today, final DateTime prevWeek ) {
         //create a json object and call API to log in
-        String lastWeekStr = date.toString(DateTimeFormat.forPattern("yyyy-MM-dd"));
-        String getLink = AuthStrings.getInstance(getApplicationContext()).getLinks().get("calm").toString() + "?from=" + lastWeekStr;
+        String lastWeekStr = prevWeek.toString(DateTimeFormat.forPattern("yyyy-MM-dd"));
+        String todayStr = today.toString(DateTimeFormat.forPattern("yyyy-MM-dd"));
+
+        String getLink = AuthStrings.getInstance(getApplicationContext()).getLinks().get("calm").toString() + "?from=" + lastWeekStr + "&to=" + todayStr;
         String url = context.getResources().getString(R.string.api_url) + getLink;
         Log.i("REQUEST", url);
         APICaller apiCaller = new APICaller(context.getApplicationContext());
@@ -237,8 +277,8 @@ public class CalmTracker extends AppCompatActivity {
 
 
     private void processData(DataEntry[] data) {
-        DateTime startDate = new DateTime().minusWeeks(1).minusDays(0).withHourOfDay(0);
-        DateTime stopDate = new DateTime().plusDays(1).withHourOfDay(0);
+        DateTime startDate = AuthStrings.getInstance(context).getLastStart();
+        DateTime stopDate = AuthStrings.getInstance(context).getLastToday().withHourOfDay(16);
 
         List<LineGraphEntry> graphEntries = new ArrayList<LineGraphEntry>();
         int days = Days.daysBetween(startDate, stopDate).getDays();

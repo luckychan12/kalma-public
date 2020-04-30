@@ -22,11 +22,29 @@ public class AuthStrings {
     private static DateTime authTokenExp;
     private static DateTime refreshTokenExp;
     private static Context context;
+    private static DateTime lastStart;
+    private static DateTime lastToday;
 
     //private Constructor
     private AuthStrings(Context ctx){
         context = ctx.getApplicationContext();
         authToken = getAuthToken();
+    }
+
+    public DateTime getLastStart() {
+        return lastStart;
+    }
+
+    public void setLastStart(DateTime lastStart) {
+        AuthStrings.lastStart = lastStart;
+    }
+
+    public DateTime getLastToday() {
+        return lastToday;
+    }
+
+    public void setLastToday(DateTime lastToday) {
+        AuthStrings.lastToday = lastToday;
     }
 
     //return instance of class if already created or call constructor
