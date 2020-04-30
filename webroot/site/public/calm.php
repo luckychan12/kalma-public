@@ -57,8 +57,8 @@ include_once '../controller/calmController.php';
                     <label>Start Time:</label>
                     <input id="editId" name="editId" value="0" hidden>
                     <br>
-                    <input id="editStartDate" class="form-control" type="date" name="newStartDate" value="2020-02-01" required>
-                    <input id="editStartTime" class="form-control" type="time" name="newStartTime" value="20:00" required>
+                    <input id="editStartDate" class="form-control" type="date" name="newStartDate" value="2020-02-01" onchange="setEditDate()" required>
+                    <input id="editStartTime" class="form-control" type="time" name="newStartTime" value="20:00" onchange="setEditTime()" required>
 
                     <label>End Time:</label>
                     <br>
@@ -275,6 +275,23 @@ include_once '../controller/calmController.php';
 </div>
 
 <script>
+    function setEditDate(){
+        let addStartDate =  document.getElementById('editStartDate').value;
+        let endDate = new Date(addStartDate);
+        let m = endDate.getMonth() + 1;
+        let d = endDate.getDate();
+        m = m > 9 ? m : "0"+ m;
+        d = d > 9 ? d : "0"+ d;
+        document.getElementById('editEndDate').value = endDate.getFullYear() + "-" + m + "-" + d;
+        document.getElementById('editEndDate').min = addStartDate;
+        document.getElementById('editEndDate').max = addStartDate;
+    }
+    function setEditTime(){
+        let startTime = document.getElementById('editStartTime').value;
+
+        document.getElementById('editEndTime').value = startTime;
+        document.getElementById('editEndTime').min = startTime;
+    }
 
     function setDateToday(){
         let today = new Date();
@@ -344,7 +361,9 @@ include_once '../controller/calmController.php';
         let endTime = hour+ ":" + min;
         document.getElementById("editId").value = id;
         document.getElementById("editStartDate").value = startDate;
+        setEditDate();
         document.getElementById("editStartTime").value = startTime;
+        setEditTime()
         document.getElementById("editEndDate").value = endDate;
         document.getElementById("editEndTime").value = endTime;
         document.getElementById("editDesc").value = desc;
