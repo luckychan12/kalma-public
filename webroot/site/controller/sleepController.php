@@ -105,6 +105,10 @@ $end = date('Y-m-d H:i', $end);
 $weekPoints = array();
 $weekPoints = array(0,0,0,0,0,0,0);
 $average = 0;
+$averageStartTime = 0;
+$totalStartTime = 0;
+$totalEndTime = 0;
+$averageEndTime=0;
 $i = 0;
 
 foreach ($dataPoints->periods as $data) {
@@ -122,6 +126,18 @@ foreach ($dataPoints->periods as $data) {
             }
             $weekPoints[date("N", strtotime($data->start_time)) + $n] =$weekPoints[date("N", strtotime($data->start_time)) + $n] +  (float)number_format(($data->duration / 60), 2, ".","" );
         }
+        if(date('H', strtotime($data->start_time)) > 16){
+            $totalStartTime += (date('H', strtotime($data->start_time))-16)*60 + date('i', strtotime($data->start_time));
+        }
+        else{
+            $totalStartTime += (date('H', strtotime($data->start_time))+8)*60 + date('i', strtotime($data->start_time));
+        }
+        if(date('H', strtotime($data->stop_time)) > 16){
+            $totalEndTime += (date('H', strtotime($data->stop_time))-16)*60 + date('i', strtotime($data->stop_time));
+        }
+        else{
+            $totalEndTime += (date('H', strtotime($data->stop_time))+8)*60 + date('i', strtotime($data->stop_time));
+        }
     }
 
 
@@ -133,6 +149,18 @@ if ($average > 0) {
     $hours = floor($total);
     $mins = ($total-$hours) *60;
     $average =sprintf("%2.0f Hours %2.0f Minutes", $hours, $mins);
+    $total =(($totalStartTime / $i)/60);
+    $hours = floor($total);
+    $mins = ($total-$hours) *60;
+    $hours += 16;
+    if ($hours >23){ $hours -= 24;}
+    $averageStartTime = sprintf("%02.0f:%02.0f", $hours, $mins);
+    $total =(($totalEndTime / $i)/60);
+    $hours = floor($total);
+    $mins = ($total-$hours) *60;
+    $hours += 16;
+    if ($hours >23){ $hours -= 24;}
+    $averageEndTime = sprintf("%02.0f:%02.0f", $hours, $mins);
 }
 
 

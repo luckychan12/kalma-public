@@ -105,6 +105,8 @@ $end = date('Y-m-d H:i', $end);
 $weekPoints = array();
 $weekPoints = array(0,0,0,0,0,0,0);
 $average = 0;
+$totalStartTime = 0;
+$totalEndTime = 0;
 $i = 0;
 
 foreach ($dataPoints->periods as $data) {
@@ -119,6 +121,8 @@ foreach ($dataPoints->periods as $data) {
             $n = -1;
             $weekPoints[date("N", strtotime($data->start_time)) + $n] = $data->duration;
         }
+        $totalStartTime += (date('H', strtotime($data->start_time)))*60 + date('i', strtotime($data->start_time));
+        $totalEndTime += (date('H', strtotime($data->stop_time)))*60 + date('i', strtotime($data->stop_time));
     }
 
 
@@ -127,6 +131,14 @@ foreach ($dataPoints->periods as $data) {
 
 if ($average > 0) {
     $average =number_format((($average / $i))) ;
+    $total =(($totalStartTime / $i)/60);
+    $hours = floor($total);
+    $mins = ($total-$hours) *60;
+    $averageStartTime = sprintf("%02.0f:%02.0f", $hours, $mins);
+    $total =(($totalEndTime / $i)/60);
+    $hours = floor($total);
+    $mins = ($total-$hours) *60;
+    $averageEndTime = sprintf("%02.0f:%02.0f", $hours, $mins);
 }
 
 

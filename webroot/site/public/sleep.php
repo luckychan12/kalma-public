@@ -24,12 +24,12 @@ include_once '../controller/sleepController.php';
                 <form method="post" action="sleep.php">
                     <label>Start Time:</label>
                     <br>
-                    <input class="form-control" type="date" name="startDate" required>
-                    <input class="form-control" type="time" name="startTime" required>
+                    <input id="addStartDate" class="form-control" type="date" name="startDate" onchange="setEndDate()" required>
+                    <input id="addStartTime"class="form-control" type="time" name="startTime" onchange="setEndTime()" required>
                     <label>End Time:</label>
                     <br>
-                    <input class="form-control" type="date" name="endDate" required>
-                    <input class="form-control" type="time" name="endTime" required>
+                    <input id="addEndDate" class="form-control" type="date" name="endDate" onchange="setEndTime()" required>
+                    <input id="addEndTime" class="form-control" type="time" name="endTime" required>
                     <label>Sleep Quality:</label>
                     <br>
                     <input class="form-control" type="number" max="5" min="1"  name="sleepQuality" required>
@@ -86,7 +86,7 @@ include_once '../controller/sleepController.php';
             </div>
             <div class="modal-body">
                 <form method="post" action="sleep.php">
-                    <input id="deleteId" name="deleteId" value="0" hidden>
+                    <input id="deleteId" name="deleteId" hidden>
                         <input type="submit" class="btn btn-primary" value="Yes" name="editSleep">
                         <input type="button" class="btn btn-secondary" data-dismiss="modal" value="No">
                 </form>
@@ -137,6 +137,16 @@ include_once '../controller/sleepController.php';
                     <hr>
                     <?php echo $progress_message?>% of your daily goal
                 </div>
+                <div class="module">
+                    <h2 style="font-size: x-large">Average Start Time (overall):</h2>
+                    <hr>
+                    <?php echo $averageStartTime?>
+                </div>
+                <div class="module">
+                    <h2 style="font-size: x-large">Average End Time (overall):</h2>
+                    <hr>
+                    <?php echo $averageEndTime?>
+                </div>
             </div>
             <!--Add data button-->
             <div style="text-align: center">
@@ -152,11 +162,17 @@ include_once '../controller/sleepController.php';
     <div class="row">
         <div class="offset-md-1">
             <form method="post" action="sleep.php">
+                <label>Search by date:</label>
                 <input id="dateSearch" type="date" name="searchDate" value="<?php if(isset($_POST['searchDate'])){echo $_POST['searchDate'];} ?>">
                 <input class="btn btn-primary" type="submit" value="Search">
             </form>
+            <form  method="post" action="sleep.php">
+                <label>Search by time: </label>
+                <input id="timeSearch" type="time" name="searchTime" value="<?php if(isset($_POST['searchTime'])){echo $_POST['searchTime'];} ?>">
+                <input class="btn btn-primary" type="submit" value="Search">
+            </form>
             <form method="post" action="sleep.php">
-                <input class="btn btn-primary" type="submit" value="Cancel" name="showAll">
+                <input class="btn btn-secondary" type="submit" value="Cancel" name="showAll">
             </form>
         </div>
     </div>
@@ -178,7 +194,7 @@ include_once '../controller/sleepController.php';
                     $searchDate = date('Y-m-d', strtotime($_POST['searchDate']));
                     foreach ($dataPoints->periods as $data) {
                         if (isset($data->id)) {
-                             if($searchDate ==  date('Y-m-d', strtotime($data->start_time))) {
+                             if($searchDate ==  date('Y-m-d', strtotime($data->start_time)) || $searchDate ==  date('Y-m-d', strtotime($data->stop_time))) {
                                  $StartTime = date('Y-m-d H:i', strtotime($data->start_time));
                                  $EndTime = date('Y-m-d H:i', strtotime($data->stop_time));
                                  $send = "edit({$data->id},'{$StartTime}','{$EndTime}',{$data->sleep_quality})";
@@ -196,6 +212,31 @@ include_once '../controller/sleepController.php';
                                         <td>$data->progress_percentage %</td>
                                      </tr>";
                              }
+                        }
+                    }
+                }
+                elseif(isset($_POST['searchTime'])){
+                    $searchTime = date('H', strtotime($_POST['searchTime']));
+                    foreach ($dataPoints->periods as $data) {
+                        if (isset($data->id)) {
+                            if($searchTime ==  date('H', strtotime($data->start_time)) || $searchTime ==  date('H', strtotime($data->stop_time))) {
+                                $StartTime = date('Y-m-d H:i', strtotime($data->start_time));
+                                $EndTime = date('Y-m-d H:i', strtotime($data->stop_time));
+                                $send = "edit({$data->id},'{$StartTime}','{$EndTime}',{$data->sleep_quality})";
+                                echo
+
+                                    "<tr>
+                                        <td><a href=\"#\" data-toggle=\"modal\" data-target=\"#overlayEdit\" onclick=\"$send\";>
+                                        <i class=\"fas fa-pencil-alt\"></i></a> 
+                                        <a href=\"#\" data-toggle=\"modal\" data-target=\"#overlayDelete\" onclick='remove($data->id)'>
+                                        <i  class=\"fas fa-trash\"></a></td>  
+                                        <td>" . date('d/m/Y H:i', strtotime($data->start_time)) . "</td>
+                                        <td>" . date('d/m/Y H:i', strtotime($data->stop_time)) . "</td>
+                                        <td>$data->duration_text</td>
+                                        <td>$data->sleep_quality</td>
+                                        <td>$data->progress_percentage %</td>
+                                     </tr>";
+                            }
                         }
                     }
                 }
@@ -230,7 +271,60 @@ include_once '../controller/sleepController.php';
 </div>
 
 <script>
-    function remove(id){f
+    function setDateToday(){
+        let today = new Date();
+        let m = today.getMonth() + 1;
+        let d = today.getDate();
+        m = m > 9 ? m : "0"+ m;
+        d = d > 9 ? d : "0"+ d;
+        document.getElementById('addStartDate').value = today.getFullYear() + "-" + m + "-" + d;
+        let min = today.getMinutes();
+        let h = today.getHours();
+        min = min > 9 ? min : "0"+ min;
+        h = h > 9 ? h : "0"+ h;
+        document.getElementById('addStartTime').value = h + ":" + min;
+    }
+    function setEndTime(){
+        let startTime = document.getElementById('addStartTime').value;
+
+        document.getElementById('addEndTime').value = startTime;
+        if (document.getElementById('addStartDate').value == document.getElementById('addEndDate').value)
+        {
+            document.getElementById('addEndTime').min = startTime;
+            document.getElementById('addEndTime').max = null;
+        }
+        else
+        {
+            document.getElementById('addEndTime').max = startTime;
+            document.getElementById('addEndTime').min = null;
+        }
+    }
+
+    function setEndDate(){
+        let addStartDate =  document.getElementById('addStartDate').value;
+        let endDate = new Date(addStartDate);
+        let m = endDate.getMonth() + 1;
+        let d = endDate.getDate();
+        m = m > 9 ? m : "0"+ m;
+        d = d > 9 ? d : "0"+ d;
+        document.getElementById('addEndDate').value = endDate.getFullYear() + "-" + m + "-" + d;
+        document.getElementById('addEndDate').min = addStartDate;
+        let currentDate = endDate.getDate();
+        endDate.setDate(currentDate + 1);
+        m = endDate.getMonth() + 1;
+        d = endDate.getDate();
+        m = m > 9 ? m : "0"+ m;
+        d = d > 9 ? d : "0"+ d;
+        document.getElementById('addEndDate').max = endDate.getFullYear() + "-" + m + "-" + d;
+    }
+
+    window.onload = function(){
+        setDateToday();
+        setEndDate();
+        setEndTime();
+    };
+
+    function remove(id){
         document.getElementById("deleteId").value = id;
     }
     function edit(id, fullStart, fullEnd, quality){
