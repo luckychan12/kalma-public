@@ -56,11 +56,11 @@ include_once '../controller/sleepController.php';
                     <label>Start Time:</label>
                     <input id="editId" name="editId" value="0" hidden>
                     <br>
-                    <input id="editStartDate" class="form-control" type="date" name="startDate" value="2020-02-01" required>
-                    <input id="editStartTime" class="form-control" type="time" name="startTime" value="20:00" required>
+                    <input id="editStartDate" class="form-control" type="date" name="editStartDate" value="2020-02-01" onchange="setEditDate()" required>
+                    <input id="editStartTime" class="form-control" type="time" name="startTime" value="20:00" onchange="setEditTime()" required>
                     <label>End Time:</label>
                     <br>
-                    <input id="editEndDate" class="form-control" type="date" name="endDate" required>
+                    <input id="editEndDate" class="form-control" type="date" name="endDate" onchange="setEditTime()" required>
                     <input id="editEndTime" class="form-control" type="time" name="endTime" required>
                     <label>Sleep Quality:</label>
                     <br>
@@ -271,6 +271,40 @@ include_once '../controller/sleepController.php';
 </div>
 
 <script>
+    function setEditDate(){
+        let addStartDate =  document.getElementById('editStartDate').value;
+        let endDate = new Date(addStartDate);
+        let m = endDate.getMonth() + 1;
+        let d = endDate.getDate();
+        m = m > 9 ? m : "0"+ m;
+        d = d > 9 ? d : "0"+ d;
+        document.getElementById('editEndDate').value = endDate.getFullYear() + "-" + m + "-" + d;
+        document.getElementById('editEndDate').min = addStartDate;
+        let currentDate = endDate.getDate();
+        endDate.setDate(currentDate + 1);
+        m = endDate.getMonth() + 1;
+        d = endDate.getDate();
+        m = m > 9 ? m : "0"+ m;
+        d = d > 9 ? d : "0"+ d;
+        document.getElementById('editEndDate').max = endDate.getFullYear() + "-" + m + "-" + d;
+    }
+
+    function setEditTime(){
+        let startTime = document.getElementById('editStartTime').value;
+
+        document.getElementById('editEndTime').value = startTime;
+        if (document.getElementById('editStartDate').value == document.getElementById('editEndDate').value)
+        {
+            document.getElementById('editEndTime').min = startTime;
+            document.getElementById('editEndTime').max = null;
+        }
+        else
+        {
+            document.getElementById('editEndTime').max = startTime;
+            document.getElementById('editEndTime').min = null;
+        }
+    }
+
     function setDateToday(){
         let today = new Date();
         let m = today.getMonth() + 1;
@@ -353,8 +387,10 @@ include_once '../controller/sleepController.php';
         let endTime = hour+ ":" + min;
         document.getElementById("editId").value = id;
         document.getElementById("editStartDate").value = startDate;
+        setEditDate();
         document.getElementById("editStartTime").value = startTime;
         document.getElementById("editEndDate").value = endDate;
+        setEditTime();
         document.getElementById("editEndTime").value = endTime;
         document.getElementById("editSleepQuality").value =quality;
     }

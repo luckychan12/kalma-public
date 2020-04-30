@@ -25,7 +25,7 @@ if(isset($_POST['startDate'])){
 //Deals with editing new data
 if(isset($_POST['editId'])){
     $id = $_POST['editId'];
-    $newStartTime = new DateTime($_POST['startDate'] .' '. $_POST['startTime']);
+    $newStartTime = new DateTime($_POST['editStartDate'] .' '. $_POST['startTime']);
     $newStartTime->setTimezone($GMT);
     $newStartTime = $newStartTime->format(DateTime::ISO8601);
     $newEndTime = new DateTime($_POST['endDate'] .' '. $_POST['endTime']);
