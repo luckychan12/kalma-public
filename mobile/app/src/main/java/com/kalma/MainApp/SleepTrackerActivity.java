@@ -52,6 +52,7 @@ import org.json.JSONObject;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -65,7 +66,7 @@ import java.util.TimeZone;
 public class SleepTrackerActivity extends AppCompatActivity {
     Context context = this;
 
-    EditText txtStartDate, txtStopDate;
+    EditText txtStartDate, txtStopDate, txtGraphDate;
     Button buttonProfile, buttonSettings, buttonHome, buttonSend;
 
     @Override
@@ -89,6 +90,7 @@ public class SleepTrackerActivity extends AppCompatActivity {
 
         txtStartDate = (EditText)findViewById(R.id.txtStartdate);
         txtStopDate = (EditText)findViewById(R.id.txtStopdate);
+        txtGraphDate = (EditText)findViewById(R.id.txtGraphStartDate);
         final EditText[] selecting = {null};
 
         final DatePickerDialog.OnDateSetListener date = new DatePickerDialog.OnDateSetListener() {
@@ -103,8 +105,32 @@ public class SleepTrackerActivity extends AppCompatActivity {
                 selecting[0].setText(sdf.format(myCalendar.getTime()));
             }
         };
+        final DatePickerDialog.OnDateSetListener date2 = new DatePickerDialog.OnDateSetListener() {
+            //Convert datepicker value into string and fill textbox
+            @Override
+            public void onDateSet(DatePicker view, int year, int monthOfYear,
+                                  int dayOfMonth) {
+                myCalendar.set(Calendar.YEAR, year);
+                myCalendar.set(Calendar.MONTH, monthOfYear);
+                myCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+                SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.UK);
+                selecting[0].setText(sdf.format(myCalendar.getTime()));
+                DateTimeZone.setDefault(DateTimeZone.forTimeZone(TimeZone.getDefault()));
+                DateTimeFormatter formatter = DateTimeFormat.forPattern("dd/MM/yyy").withZone(DateTimeZone.getDefault());
+                DateTime today = new DateTime(formatter.parseDateTime(selecting[0].getText().toString()), DateTimeZone.getDefault())
+                        .withHourOfDay(16);
+                DateTime lastWeek = today.minusWeeks(1).minusDays(1);
+                lastWeek = lastWeek.withHourOfDay(16);
+                AuthStrings.getInstance(context).setLastStart(lastWeek);
+                AuthStrings.getInstance(context).setLastToday(today);
+                getData();
+            }
+        };
+
         final DatePickerDialog datePicker = new DatePickerDialog(context);
+        final DatePickerDialog datePicker2 = new DatePickerDialog(context);
         datePicker.setOnDateSetListener(date);
+        datePicker2.setOnDateSetListener(date2);
         txtStartDate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -119,6 +145,13 @@ public class SleepTrackerActivity extends AppCompatActivity {
                 datePicker.show();
             }
         });
+        txtGraphDate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                selecting[0] = txtGraphDate;
+                datePicker2.show();
+            }
+        });
         datePicker.setOnShowListener(new DialogInterface.OnShowListener() {
             @Override
             public void onShow(DialogInterface arg0) {
@@ -126,7 +159,13 @@ public class SleepTrackerActivity extends AppCompatActivity {
                 datePicker.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(ContextCompat.getColor(context, R.color.YesColour));
             }
         });
-
+        datePicker2.setOnShowListener(new DialogInterface.OnShowListener() {
+            @Override
+            public void onShow(DialogInterface arg0) {
+                datePicker2.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(ContextCompat.getColor(context, R.color.NoColour));
+                datePicker2.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(ContextCompat.getColor(context, R.color.YesColour));
+            }
+        });
 
         buttonSend = findViewById(R.id.btnAddData);
         buttonSend.setOnClickListener(new View.OnClickListener() {
@@ -164,17 +203,20 @@ public class SleepTrackerActivity extends AppCompatActivity {
         DateTime today = new DateTime().plusDays(1);
         DateTime lastWeek = today.minusWeeks(1).minusDays(1);
         lastWeek = lastWeek.withHourOfDay(16);
-        getData(lastWeek);
+        AuthStrings.getInstance(context).setLastStart(lastWeek);
+        AuthStrings.getInstance(context).setLastToday(today);
+        getData();
     }
 
 
-
-
-
-    private void getData(DateTime date) {
+    private void getData( ) {
         //create a json object and call API to log in
-        String lastWeekStr = date.toString(DateTimeFormat.forPattern("yyyy-MM-dd"));
-        String getLink = AuthStrings.getInstance(getApplicationContext()).getLinks().get("sleep").toString() + "?from=" + lastWeekStr;
+        DateTime prevWeek = AuthStrings.getInstance(context).getLastStart();
+        DateTime today = AuthStrings.getInstance(context).getLastToday();
+        String lastWeekStr = prevWeek.toString(DateTimeFormat.forPattern("yyyy-MM-dd"));
+        String todayStr = today.toString(DateTimeFormat.forPattern("yyyy-MM-dd"));
+
+        String getLink = AuthStrings.getInstance(getApplicationContext()).getLinks().get("sleep").toString() + "?from=" + lastWeekStr + "&to=" + todayStr;
         String url = context.getResources().getString(R.string.api_url) + getLink;
         Log.i("REQUEST", url);
         APICaller apiCaller = new APICaller(context.getApplicationContext());
@@ -235,8 +277,8 @@ public class SleepTrackerActivity extends AppCompatActivity {
     }
 
     private void processData(DataEntry[] sleepDataEntries) {
-        DateTime startDate = new DateTime().minusWeeks(1).minusDays(0).withHourOfDay(16);
-        DateTime stopDate = new DateTime().plusDays(1).withHourOfDay(16);
+        DateTime startDate = AuthStrings.getInstance(context).getLastStart();
+        DateTime stopDate = AuthStrings.getInstance(context).getLastToday().withHourOfDay(16);
 
         List<LineGraphEntry> graphEntries = new ArrayList<LineGraphEntry>();
         int days = Days.daysBetween(startDate, stopDate).getDays();
@@ -294,14 +336,13 @@ public class SleepTrackerActivity extends AppCompatActivity {
         YAxis yAxis = chart.getAxisLeft();
         yAxis.setAxisMinimum(0f);
         XAxis xAxis = chart.getXAxis();
-
         xAxis.setValueFormatter(new ValueFormatter() {
             @Override
             public String getFormattedValue(float value) {
                 return xLabel.get((int) value);
             }
         });
-        xAxis.setLabelCount(5);
+        xAxis.setLabelCount(xLabel.size());
         chart.getAxisRight().setEnabled(false);
         chart.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
         chart.getDescription().setEnabled(false);
@@ -333,6 +374,18 @@ public class SleepTrackerActivity extends AppCompatActivity {
         DateTime stopDateTime = new DateTime(formatter.parseDateTime(txtStopDate.getText().toString()), DateTimeZone.getDefault())
                 .withHourOfDay(stopTimePicker.getHour())
                 .withMinuteOfHour(stopTimePicker.getMinute());
+
+        if (startDateTime.isAfter(stopDateTime)){
+            Toast toast = Toast.makeText(getApplicationContext(), "Stop time must be after start time", Toast.LENGTH_LONG);
+            toast.show();
+            return;
+        }
+        if (stopDateTime.isAfter(new DateTime())){
+            Toast toast = Toast.makeText(getApplicationContext(), "You cannot make entries for the future!", Toast.LENGTH_LONG);
+            toast.show();
+            return;
+        }
+
         int rating = Integer.parseInt(spinner.getSelectedItem().toString());
         String startISO8601 = startDateTime.toString(DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ss").withZoneUTC());
         String stopISO68601 = stopDateTime.toString(DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ss").withZoneUTC());
@@ -374,19 +427,19 @@ public class SleepTrackerActivity extends AppCompatActivity {
                     public void onSuccess(JSONObject response) {
                         try {
                             //retrieve access token and store.
-                            JSONObject responseBody = response;
                             Toast toast = Toast.makeText(getApplicationContext(), response.getString("message"), Toast.LENGTH_LONG);
                             toast.show();
                             Log.i("Response SEND DATA", response.toString());
                         } catch (JSONException je) {
                             Log.e("JSONException", "onErrorResponse: ", je);
                         }
+                        getData();
                     }
                     @Override
                     public void onFail(VolleyError error) {
                         try {
                             //retrieve error message and display
-                            String jsonInput = new String(error.networkResponse.data, "utf-8");
+                            String jsonInput = new String(error.networkResponse.data, StandardCharsets.UTF_8);
                             JSONObject responseBody = new JSONObject(jsonInput);
                             String message = responseBody.getString("message");
                             Log.w("Error.Response", jsonInput);
@@ -394,8 +447,6 @@ public class SleepTrackerActivity extends AppCompatActivity {
                             toast.show();
                         } catch (JSONException je) {
                             Log.e("JSONException", "onErrorResponse: ", je);
-                        } catch (UnsupportedEncodingException err) {
-                            Log.e("EncodingError", "onErrorResponse: ", err);
                         }
                     }
                 }

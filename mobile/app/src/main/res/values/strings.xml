@@ -31,7 +31,7 @@
     <string name="sleep_tracker">Sleep Tracker</string>
     <string name="weight_logger">Weight Logger</string>
     <string name="mindful_minutes">Mindful Minutes</string>
-    <string name="daily_step_count">Daily Step count</string>
+    <string name="daily_step_count">Daily Step count\nCOMING SOON</string>
     <string name="homelayout">HomeLayout</string>
     <string name="user_id">User ID:</string>
     <string name="email_address">Email Address:</string>
@@ -50,6 +50,9 @@
     <string name="sleep_quality_rating">Sleep Quality Rating</string>
     <string name="stop_date">Stop Date</string>
     <string name="description">Description</string>
+    <string name="progress_to_goal">Progress to goal:</string>
+    <string name="view_from_date">View From Date</string>
+    <string name="display_data_from">Display data from:</string>
 
 
 </resources>
