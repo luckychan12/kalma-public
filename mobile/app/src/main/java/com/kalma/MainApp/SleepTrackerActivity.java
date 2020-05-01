@@ -123,7 +123,7 @@ public class SleepTrackerActivity extends AppCompatActivity {
                 lastWeek = lastWeek.withHourOfDay(16);
                 AuthStrings.getInstance(context).setLastStart(lastWeek);
                 AuthStrings.getInstance(context).setLastToday(today);
-                getData(today, lastWeek);
+                getData();
             }
         };
 
@@ -205,12 +205,14 @@ public class SleepTrackerActivity extends AppCompatActivity {
         lastWeek = lastWeek.withHourOfDay(16);
         AuthStrings.getInstance(context).setLastStart(lastWeek);
         AuthStrings.getInstance(context).setLastToday(today);
-        getData(today, lastWeek);
+        getData();
     }
 
 
-    private void getData(DateTime today, final DateTime prevWeek ) {
+    private void getData( ) {
         //create a json object and call API to log in
+        DateTime prevWeek = AuthStrings.getInstance(context).getLastStart();
+        DateTime today = AuthStrings.getInstance(context).getLastToday();
         String lastWeekStr = prevWeek.toString(DateTimeFormat.forPattern("yyyy-MM-dd"));
         String todayStr = today.toString(DateTimeFormat.forPattern("yyyy-MM-dd"));
 
@@ -431,6 +433,7 @@ public class SleepTrackerActivity extends AppCompatActivity {
                         } catch (JSONException je) {
                             Log.e("JSONException", "onErrorResponse: ", je);
                         }
+                        getData();
                     }
                     @Override
                     public void onFail(VolleyError error) {

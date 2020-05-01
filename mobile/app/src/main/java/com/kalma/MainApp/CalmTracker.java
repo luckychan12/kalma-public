@@ -111,7 +111,7 @@ public class CalmTracker extends AppCompatActivity {
                 lastWeek = lastWeek.withHourOfDay(16);
                 AuthStrings.getInstance(context).setLastStart(lastWeek);
                 AuthStrings.getInstance(context).setLastToday(today);
-                getData(today, lastWeek);
+                getData();
             }
         };
         final DatePickerDialog datePicker = new DatePickerDialog(context);
@@ -192,7 +192,7 @@ public class CalmTracker extends AppCompatActivity {
         lastWeek = lastWeek.withHourOfDay(16);
         AuthStrings.getInstance(context).setLastStart(lastWeek);
         AuthStrings.getInstance(context).setLastToday(today);
-        getData(today, lastWeek);
+        getData();
     }
 
     private Map buildMap() {
@@ -201,8 +201,10 @@ public class CalmTracker extends AppCompatActivity {
         return params;
     }
 
-    private void getData(DateTime today, final DateTime prevWeek ) {
+    private void getData() {
         //create a json object and call API to log in
+        DateTime prevWeek = AuthStrings.getInstance(context).getLastStart();
+        DateTime today = AuthStrings.getInstance(context).getLastToday();
         String lastWeekStr = prevWeek.toString(DateTimeFormat.forPattern("yyyy-MM-dd"));
         String todayStr = today.toString(DateTimeFormat.forPattern("yyyy-MM-dd"));
 
@@ -416,6 +418,7 @@ public class CalmTracker extends AppCompatActivity {
                         } catch (JSONException je) {
                             Log.e("JSONException", "onErrorResponse: ", je);
                         }
+                        getData();
                     }
                     @Override
                     public void onFail(VolleyError error) {
