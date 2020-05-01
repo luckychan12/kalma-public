@@ -365,6 +365,17 @@ public class CalmTracker extends AppCompatActivity {
         DateTime stopDateTime = new DateTime(formatter.parseDateTime(txtStopDate.getText().toString()), DateTimeZone.getDefault())
                 .withHourOfDay(stopTimePicker.getHour())
                 .withMinuteOfHour(stopTimePicker.getMinute());
+
+        if (startDateTime.isAfter(stopDateTime)){
+            Toast toast = Toast.makeText(getApplicationContext(), "Stop time must be after start time", Toast.LENGTH_LONG);
+            toast.show();
+            return;
+        }
+        if (stopDateTime.isAfter(new DateTime())){
+            Toast toast = Toast.makeText(getApplicationContext(), "You cannot make entries for the future!", Toast.LENGTH_LONG);
+            toast.show();
+            return;
+        }
         String description = desc.getText().toString();
         String startISO8601 = startDateTime.toString(DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ss").withZoneUTC());
         String stopISO68601 = stopDateTime.toString(DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ss").withZoneUTC());

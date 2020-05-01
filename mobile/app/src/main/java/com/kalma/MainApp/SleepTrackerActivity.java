@@ -209,9 +209,6 @@ public class SleepTrackerActivity extends AppCompatActivity {
     }
 
 
-
-
-
     private void getData(DateTime today, final DateTime prevWeek ) {
         //create a json object and call API to log in
         String lastWeekStr = prevWeek.toString(DateTimeFormat.forPattern("yyyy-MM-dd"));
@@ -375,6 +372,18 @@ public class SleepTrackerActivity extends AppCompatActivity {
         DateTime stopDateTime = new DateTime(formatter.parseDateTime(txtStopDate.getText().toString()), DateTimeZone.getDefault())
                 .withHourOfDay(stopTimePicker.getHour())
                 .withMinuteOfHour(stopTimePicker.getMinute());
+
+        if (startDateTime.isAfter(stopDateTime)){
+            Toast toast = Toast.makeText(getApplicationContext(), "Stop time must be after start time", Toast.LENGTH_LONG);
+            toast.show();
+            return;
+        }
+        if (stopDateTime.isAfter(new DateTime())){
+            Toast toast = Toast.makeText(getApplicationContext(), "You cannot make entries for the future!", Toast.LENGTH_LONG);
+            toast.show();
+            return;
+        }
+
         int rating = Integer.parseInt(spinner.getSelectedItem().toString());
         String startISO8601 = startDateTime.toString(DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ss").withZoneUTC());
         String stopISO68601 = stopDateTime.toString(DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ss").withZoneUTC());
