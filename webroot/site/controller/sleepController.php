@@ -1,66 +1,57 @@
 <?php
 session_start();
-date_default_timezone_set('Europe/London');
-include_once "../api_tasks/ApiConnector.php";
-$api = new ApiConnector();
-$GMT = new DateTimeZone('GMT');
 
-//Deals with adding new data
+require_once "../controller/ensureFingerprint.php";
+require_once "../api_tasks/ApiConnector.php";
+
+const UTC = DateTimeZone::UTC;
+$api = ApiConnector::getConnection();
+
+
+// If the user is not logged in, redirect to login
+if (!isset($_SESSION['auth'])) {
+    $protocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === "on") ? 'http' : 'http';
+    header('Location: ./loginAndSignup?redirect=' . urlencode("$protocol://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]"));
+}
+
+
+// If there is an edit/create form submission
 if(isset($_POST['startDate'])){
-    $newStartTime = new DateTime($_POST['startDate'] .' '. $_POST['startTime']);
-    $newStartTime->setTimezone($GMT);
-    $newStartTime = $newStartTime->format(DateTime::ISO8601);
-    $newEndTime = new DateTime($_POST['endDate'] .' '. $_POST['endTime']);
-    $newEndTime->setTimezone($GMT);
-    $newEndTime = $newEndTime->format(DateTime::ISO8601);
-    $newPeriod['start_time'] =  $newStartTime;
-    $newPeriod['stop_time'] = $newEndTime;
-    $newPeriod['sleep_quality'] = $_POST['sleepQuality'];
-    $data['periods'] = array($newPeriod);
-    if(isset($_SESSION['links'])) {
-        $message = $api->request('POST',$_SESSION['links']->sleep, $data, true);
+    $periods = [
+        [
+            'start_time' => (new DateTime($_POST['startDate'] .' '. $_POST['startTime']))->format(DATE_ISO8601),
+            'stop_time' => (new DateTime($_POST['endDate'] .' '. $_POST['endTime']))->format(DATE_ISO8601),
+            'sleep_quality' => $_POST['sleepQuality']
+        ],
+    ];
+
+    // Default to creating a new period
+    $method = 'POST';
+
+    // Include the period ID if an existing period is being edited,
+    // and use the PUT method to Update the CRUD resource
+    if (isset($_POST['editId'])) {
+        $periods[0]['id'] = (int)$_POST['editId'];
+        $method = 'PUT';
     }
+
+    // Send the request
+    $message = $api->request($method, $_SESSION['links']->sleep, ['periods' => $periods], true);
 }
 
-//Deals with editing new data
-if(isset($_POST['editId'])){
-    $id = $_POST['editId'];
-    $newStartTime = new DateTime($_POST['editStartDate'] .' '. $_POST['startTime']);
-    $newStartTime->setTimezone($GMT);
-    $newStartTime = $newStartTime->format(DateTime::ISO8601);
-    $newEndTime = new DateTime($_POST['endDate'] .' '. $_POST['endTime']);
-    $newEndTime->setTimezone($GMT);
-    $newEndTime = $newEndTime->format(DateTime::ISO8601);
-    $sleep_quality =$_POST['sleepQuality'];
-    $period['id'] = (int)$id;
-    $period['start_time'] = $newStartTime;
-    $period['stop_time'] = $newEndTime;
-    $period['sleep_quality'] = (int)$sleep_quality;
-    $periods = array($period);
-    $data['periods'] = $periods;
-    if(isset($_SESSION['links'])) {
-        $message = $api->request('PUT', $_SESSION['links']->sleep, $data, true);
-    }
-}
 
-//Deals with deleting new data
+// Deals with deleting existing data
 if(isset($_POST['deleteId'])){
-    $data['periods'] = array((int)$_POST['deleteId']);
-    if(isset($_SESSION['links'])) {
-        $message = $api->request('DELETE', $_SESSION['links']->sleep, $data, true);
-    }
+    $data['periods'] = [(int)$_POST['deleteId']];
+    $message = $api->request('DELETE', $_SESSION['links']->sleep, $data, true);
 }
+
 
 //Reads the data for the page
-if(isset($_SESSION['links'])) {
-    $dataPoints = $api->getData($_SESSION['links']->sleep);
-    if (isset($dataPoints->error)) {
-        $_SESSION['links'] = null;
-        header("Location: ./error.php?code=$dataPoints->error&message=$dataPoints->message");
-    }
-}
-else{
-    header('Location: ./errorPage.php');
+$dataPoints = $api->getData($_SESSION['links']->sleep);
+if (isset($dataPoints->error)) {
+    $_SESSION['links'] = null;
+    header("Location: ./error.php?code=$dataPoints->error&message=$dataPoints->message");
 }
 
 //When you select a new week
