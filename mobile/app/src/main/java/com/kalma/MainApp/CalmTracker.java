@@ -79,6 +79,7 @@ public class CalmTracker extends AppCompatActivity {
 
         txtStartDate = (EditText)findViewById(R.id.txtStartdate);
         txtStopDate = (EditText)findViewById(R.id.txtStopdate);
+        txtGraphDate = (EditText)findViewById(R.id.txtGraphStartDate);
         final EditText[] selecting = {null};
 
         final DatePickerDialog.OnDateSetListener date = new DatePickerDialog.OnDateSetListener() {
