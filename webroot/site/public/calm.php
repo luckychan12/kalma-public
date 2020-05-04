@@ -100,7 +100,7 @@ include_once '../controller/calmController.php';
     <div class="row">
         <div class="col-lg-7 offset-lg-1">
             <div class="alert alert-danger alert-dismissible fade text-center <?= isset($message->error) ? "show" : "hide"?>" role="alert">
-                <?= $message->message. " (" . $message->error.")" ?? ""; ?>
+                <?= isset($message) && isset($message->error) ? "$message->message ($message->error)" : ''; ?>
                 <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
