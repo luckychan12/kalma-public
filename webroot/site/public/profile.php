@@ -131,7 +131,7 @@ HTML;
 <<<HTML
                         <div class="form-group">
                             <label for="email">$target_name</label><br>
-                            <input class="form-control target-field" type="number" name="{$target}" id="${target}_target" step="1000" value="$value">
+                            <input class="form-control target-field" type="number" name="{$target}" id="${target}_target" min="0" max="1000000" step="1000"  value="$value" oninput="validate(this)">
                         </div>
 HTML;
                             }
@@ -152,6 +152,18 @@ HTML;
         let targetsLink = "<?= $_SESSION['links']->account ?>/targets";
         let accessToken = "<?= $_SESSION['auth']->access_token ?>";
         let fingerprint = "<?= $_SESSION['fingerprint']?>"
+
+        let lastNumber = document.getElementById('steps_target').value;
+        function validate(input){
+            if (!Number.isInteger(input.value)){
+                input.value = lastNumber;
+            }
+            else{
+                let checked = Number(input.value);
+                lastNumber = checked;
+                input.value = checked;
+            }
+        }
     </script>
     <script type="text/javascript" src="assets/scripts/profile.js"></script>
 </body>
