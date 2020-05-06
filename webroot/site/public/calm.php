@@ -57,17 +57,17 @@ include_once '../controller/calmController.php';
                     <label>Start Time:</label>
                     <input id="editId" name="editId" value="0" hidden>
                     <br>
-                    <input id="editStartDate" class="form-control" type="date" name="newStartDate" value="2020-02-01" onchange="setEditDate()" required>
-                    <input id="editStartTime" class="form-control" type="time" name="newStartTime" value="20:00" onchange="setEditTime()" required>
+                    <input id="editStartDate" class="form-control" type="date" name="startDate" value="2020-02-01" onchange="setEditDate()" required>
+                    <input id="editStartTime" class="form-control" type="time" name="startTime" value="20:00" onchange="setEditTime()" required>
 
                     <label>End Time:</label>
                     <br>
-                    <input id="editEndDate" class="form-control" type="date" name="newEndDate" required>
-                    <input id="editEndTime" class="form-control" type="time" name="newEndTime" required>
+                    <input id="editEndDate" class="form-control" type="date" name="endDate" required>
+                    <input id="editEndTime" class="form-control" type="time" name="endTime" required>
 
                     <label>Description:</label>
                     <br>
-                    <input id="editDesc"  class="form-control" type="text" name="newDescription" required>
+                    <input id="editDesc"  class="form-control" type="text" name="description">
                     <div class="modal-footer">
                         <input type="submit" class="btn btn-primary" value="Save" name="editCalm">
                     </div>

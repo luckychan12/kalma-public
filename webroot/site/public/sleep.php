@@ -56,7 +56,7 @@ include_once '../controller/sleepController.php';
                     <label>Start Time:</label>
                     <input id="editId" name="editId" value="0" hidden>
                     <br>
-                    <input id="editStartDate" class="form-control" type="date" name="editStartDate" value="2020-02-01" onchange="setEditDate()" required>
+                    <input id="editStartDate" class="form-control" type="date" name="startDate" value="2020-02-01" onchange="setEditDate()" required>
                     <input id="editStartTime" class="form-control" type="time" name="startTime" value="20:00" onchange="setEditTime()" required>
                     <label>End Time:</label>
                     <br>
