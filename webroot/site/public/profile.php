@@ -155,7 +155,7 @@ HTML;
 
         let lastNumber = document.getElementById('steps_target').value;
         function validate(input){
-            if (!Number.isInteger(input.value)){
+            if (input.value == 0){
                 input.value = lastNumber;
             }
             else{
