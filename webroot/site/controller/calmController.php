@@ -21,7 +21,7 @@ if(isset($_POST['startDate'])){
         [
             'start_time' => (new DateTime($_POST['startDate'] .' '. $_POST['startTime']))->format(DATE_ISO8601),
             'stop_time' => (new DateTime($_POST['endDate'] .' '. $_POST['endTime']))->format(DATE_ISO8601),
-            'description' => $_POST['description']
+            'description' => filter_var($_POST['description'], FILTER_SANITIZE_STRING)
         ],
     ];
 

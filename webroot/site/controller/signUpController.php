@@ -7,8 +7,8 @@ if(isset($_POST['signup'])){
     $dob = (new DateTime($_POST['dob']))->format(DATE_ISO8601);
     $api = new ApiConnector();
     $result = $api->request('POST', 'api/user/signup', array(
-            'first_name' => $_POST['firstName'],
-            'last_name' => $_POST['lastName'],
+            'first_name' => filter_var($_POST['firstName'], FILTER_SANITIZE_STRING),
+            'last_name' => filter_var($_POST['lastName'], FILTER_SANITIZE_STRING),
             'password' => $_POST['password'],
             'email_address' => $_POST['email'],
             'date_of_birth' => $dob,
