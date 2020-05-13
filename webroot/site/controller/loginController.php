@@ -29,6 +29,7 @@ if(isset($_POST['login'])) {
         if(isset($_POST['remember'])) {
             setcookie('refresh', $data->refresh_token);
         }
+
         header('Location: ./dashboard.php');
     }
     else {

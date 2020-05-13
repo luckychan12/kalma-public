@@ -1,5 +1,12 @@
 <?php
-    require_once __DIR__ . '/../controller/loginController.php';
+    if (isset($_POST['login'])) {
+        require_once __DIR__ . '/../controller/loginController.php';
+    }
+
+    if (isset($_POST['signup'])) {
+        require_once __DIR__ . '/../controller/signupController.php';
+    }
+
 ?>
 
 <!doctype html>
@@ -42,7 +49,7 @@
             <div class="col-lg-5">
                 <hr class="d-lg-none">
                 <h2>Sign up</h2>
-                <form id="signupForm" class="form-signup" action="../controller/signUpController.php" method="post">
+                <form id="signupForm" class="form-signup" action="#" method="post">
                     <div class="form-group">
                         <label for="email">Email Address:</label><br>
                         <input class="form-control" type="email" placeholder="Email" name="email" id="email" required>
