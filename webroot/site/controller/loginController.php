@@ -4,9 +4,7 @@
  * Sends to the dashboard page or invalid the login page
  */
 
-if (session_status() !== PHP_SESSION_ACTIVE) {
-    session_start();
-}
+session_start();
 
 require_once "../controller/ensureFingerprint.php";
 require_once "../api_tasks/ApiConnector.php";
