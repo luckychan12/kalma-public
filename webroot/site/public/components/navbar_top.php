@@ -1,5 +1,5 @@
 <nav class="navbar navbar-dark navbar-expand-lg navbar-top">
-    <a class="navbar-brand" href="#">Kalma</a>
+    <span class="navbar-brand">Kalma</span> <span class="navbar-separator">|</span>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTop" aria-controls="navbarTop" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
     </button>
