@@ -91,7 +91,7 @@ include_once "../controller/dashboardController.php";
             </div>
             <div class="col-md-6 offset-md-3 col-xl-4 offset-xl-0 mb-4">
                 <div class="chart-group" id="stepsCard">
-                    <h2>Daily Steps</h2>
+                    <h2>Daily Steps <small style="position: relative; top: -4px; font-size: 16px; color: var(--c-secondary-dark)">(Coming Soon!)</small></h2>
                     <canvas class="chart logged" id="stepsChart"></canvas>
                     <script type="text/javascript">
                         $("#stepsChart").data('chart-data', <?= json_encode($data->steps_log);?>);
