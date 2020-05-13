@@ -109,11 +109,7 @@ a:hover {
 
 .navbar.navbar-top > .navbar-brand {
     font-family: var(--f-brand);
-    color: var(--c-text-on-primary);
-}
-
-.navbar.navbar-top > .navbar-brand:hover {
-    color: var(--c-secondary);
+    color: var(--c-secondary-light);
 }
 
 .navbar.navbar-top .nav-link {
@@ -146,5 +142,13 @@ a:hover {
     .navbar.navbar-top .dropdown-menu {
         background-color: var(--c-bg-light);
     }
+}
+
+.navbar .navbar-separator {
+    color: var(--c-primary-light);
+    font-weight: bold;
+    position: relative;
+    top: -1px;
+    left: -4px;
 }
 
