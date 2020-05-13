@@ -67,7 +67,7 @@ class UserManager
             'password_hash' => password_hash($user_data['password'], PASSWORD_BCRYPT),
             'first_name' => $user_data['first_name'],
             'last_name' => $user_data['last_name'],
-            'date_of_birth' => $user_data['date_of_birth'],
+            'date_of_birth' => DateTime::createFromFormat(DATE_ISO8601, $user_data['last_name'])->format('Y-m-d'),
         );
 
         $rows = $db->fetch
