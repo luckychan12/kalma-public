@@ -1,12 +1,6 @@
 <?php
-    if (isset($_POST['login'])) {
-        require_once __DIR__ . '/../controller/loginController.php';
-    }
-
-    if (isset($_POST['signup'])) {
-        require_once __DIR__ . '/../controller/signupController.php';
-    }
-
+    require_once __DIR__ . '/../controller/loginController.php';
+    require_once __DIR__ . '/../controller/signupController.php';
 ?>
 
 <!doctype html>
