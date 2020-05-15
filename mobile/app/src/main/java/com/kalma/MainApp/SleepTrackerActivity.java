@@ -117,10 +117,9 @@ public class SleepTrackerActivity extends AppCompatActivity {
                 selecting[0].setText(sdf.format(myCalendar.getTime()));
                 DateTimeZone.setDefault(DateTimeZone.forTimeZone(TimeZone.getDefault()));
                 DateTimeFormatter formatter = DateTimeFormat.forPattern("dd/MM/yyy").withZone(DateTimeZone.getDefault());
-                DateTime today = new DateTime(formatter.parseDateTime(selecting[0].getText().toString()), DateTimeZone.getDefault())
-                        .withMinuteOfHour(0).withSecondOfMinute(0);
+                DateTime today = new DateTime(formatter.parseDateTime(selecting[0].getText().toString()), DateTimeZone.getDefault());
                 DateTime lastWeek = today.minusWeeks(1);
-                lastWeek = lastWeek.withHourOfDay(16).withMinuteOfHour(0).withSecondOfMinute(0);
+                lastWeek = lastWeek.withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0);
                 AuthStrings.getInstance(context).setLastStart(lastWeek);
                 AuthStrings.getInstance(context).setLastToday(today);
                 getData();
@@ -212,7 +211,7 @@ public class SleepTrackerActivity extends AppCompatActivity {
     private void getData( ) {
         //create a json object and call API to log in
         DateTime prevWeek = AuthStrings.getInstance(context).getLastStart();
-        DateTime today = AuthStrings.getInstance(context).getLastToday();
+        DateTime today = AuthStrings.getInstance(context).getLastToday().plusDays(1);
         String lastWeekStr = prevWeek.toString(DateTimeFormat.forPattern("yyyy-MM-dd"));
         String todayStr = today.toString(DateTimeFormat.forPattern("yyyy-MM-dd"));
 
@@ -318,7 +317,7 @@ public class SleepTrackerActivity extends AppCompatActivity {
             entries.add(new Entry(i, graphEntries.get(i).getValue()));
         }
 
-        LineDataSet dataSet = new LineDataSet(entries, "Time slept");
+        LineDataSet dataSet = new LineDataSet(entries, "Time slept (on the night of)");
         //todo styling here
         //dataSet.setColor(...);
         dataSet.setLineWidth(1);
