@@ -114,7 +114,7 @@ public class HomeActivity extends AppCompatActivity {
 
     private void getCalmData() {
         //create a json object and call API to log in
-        DateTime last = (new DateTime()).minusDays(1);
+        DateTime last = (new DateTime()).withHourOfDay(0);
         String lastWeekStr = last.toString(DateTimeFormat.forPattern("yyyy-MM-dd"));
 
         String getLink = Objects.requireNonNull(AuthStrings.getInstance(getApplicationContext()).getLinks().get("calm")).toString() + "?from=" + lastWeekStr;

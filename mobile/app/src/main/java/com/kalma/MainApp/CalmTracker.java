@@ -15,7 +15,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
-import android.widget.Spinner;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
@@ -58,6 +57,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
 
 import net.danlew.android.joda.JodaTimeAndroid;
 
@@ -106,12 +106,12 @@ public class CalmTracker extends AppCompatActivity {
                 selecting[0].setText(sdf.format(myCalendar.getTime()));
                 DateTimeZone.setDefault(DateTimeZone.forTimeZone(TimeZone.getDefault()));
                 DateTimeFormatter formatter = DateTimeFormat.forPattern("dd/MM/yyy").withZone(DateTimeZone.getDefault());
-                DateTime today = new DateTime(formatter.parseDateTime(selecting[0].getText().toString()), DateTimeZone.getDefault())
-                        .withHourOfDay(16);
-                DateTime lastWeek = today.minusWeeks(1).minusDays(1);
-                lastWeek = lastWeek.withHourOfDay(16);
+                DateTime today = new DateTime(formatter.parseDateTime(selecting[0].getText().toString()), DateTimeZone.getDefault());
+                DateTime lastWeek = today.minusWeeks(1);
+                lastWeek = lastWeek.withHourOfDay(0);
                 AuthStrings.getInstance(context).setLastStart(lastWeek);
                 AuthStrings.getInstance(context).setLastToday(today);
+
                 getData();
             }
         };
@@ -187,10 +187,10 @@ public class CalmTracker extends AppCompatActivity {
             }
         });
 
+        DateTime today = new DateTime();
+        DateTime lastWeek = today.minusWeeks(1);
+        lastWeek = lastWeek.withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0);
 
-        DateTime today = new DateTime().plusDays(1);
-        DateTime lastWeek = today.minusWeeks(1).minusDays(1);
-        lastWeek = lastWeek.withHourOfDay(16);
         AuthStrings.getInstance(context).setLastStart(lastWeek);
         AuthStrings.getInstance(context).setLastToday(today);
         getData();
@@ -205,7 +205,7 @@ public class CalmTracker extends AppCompatActivity {
     private void getData() {
         //create a json object and call API to log in
         DateTime prevWeek = AuthStrings.getInstance(context).getLastStart();
-        DateTime today = AuthStrings.getInstance(context).getLastToday();
+        DateTime today = AuthStrings.getInstance(context).getLastToday().plusDays(1);
         String lastWeekStr = prevWeek.toString(DateTimeFormat.forPattern("yyyy-MM-dd"));
         String todayStr = today.toString(DateTimeFormat.forPattern("yyyy-MM-dd"));
 
@@ -268,44 +268,46 @@ public class CalmTracker extends AppCompatActivity {
         );
     }
 
-    private void addHours(List<LineGraphEntry> graphEntries, int i, Interval calcInterval) {
+    private void addMins(List<LineGraphEntry> graphEntries, int i, Interval calcInterval) {
         Duration intervalDuration = calcInterval.toDuration();
-        float millis = Float.parseFloat(Double.toString(intervalDuration.getMillis()));
-        float hours = (millis / 3.6f) * 1E-6f;
-        BigDecimal bd = new BigDecimal(Double.toString(hours));
+        long millis = (long)(intervalDuration.getMillis());
+        float mins = TimeUnit.MILLISECONDS.toMinutes(millis);
+        BigDecimal bd = new BigDecimal(Double.toString(mins));
         bd = bd.setScale(3, RoundingMode.HALF_UP);
-        hours = bd.floatValue();
-        graphEntries.get(i).setValue(graphEntries.get(i).getValue() + hours);
+        mins = bd.floatValue();
+        graphEntries.get(i).setValue(graphEntries.get(i).getValue() + mins);
     }
 
 
     private void processData(DataEntry[] data) {
         DateTime startDate = AuthStrings.getInstance(context).getLastStart();
-        DateTime stopDate = AuthStrings.getInstance(context).getLastToday().withHourOfDay(16);
+        DateTime stopDate = AuthStrings.getInstance(context).getLastToday().withHourOfDay(0);
 
         List<LineGraphEntry> graphEntries = new ArrayList<LineGraphEntry>();
-        int days = Days.daysBetween(startDate, stopDate).getDays();
+        int days = Days.daysBetween(startDate.withHourOfDay(0),  stopDate.withHourOfDay(0)).getDays();
 
-        for (int i = 0; i < days; i++) {
+        for (int i = 0; i <= days; i++) {
             DateTime newDate = startDate.plusDays(i);
             graphEntries.add(new LineGraphEntry(newDate, 0));
         }
 
 
         for (DataEntry entry : data) {
-            for (int i = 0; i < graphEntries.size() - 1; i++) {
-                Interval interval = new Interval(graphEntries.get(i).getDate(), graphEntries.get(i + 1).getDate());
+            for (int i = 0; i < graphEntries.size(); i++) {
+
+                Interval interval = new Interval(graphEntries.get(i).getDate().withHourOfDay(0),
+                        graphEntries.get(i).getDate().withHourOfDay(23).withMinuteOfHour(59).withSecondOfMinute(59));
                 if (interval.contains(entry.getStartTime())) {
                     if (interval.contains(entry.getStopTime())) {
                         Interval calcInterval = new Interval(entry.getStartTime(), entry.getStopTime());
-                        addHours(graphEntries, i, calcInterval);
+                        addMins(graphEntries, i, calcInterval);
                     } else {
                         Interval calcInterval = new Interval(entry.getStartTime(), interval.getEnd());
-                        addHours(graphEntries, i, calcInterval);
+                        addMins(graphEntries, i, calcInterval);
                     }
                 } else if (interval.contains(entry.getStopTime())) {
                     Interval calcInterval = new Interval(interval.getStart(), entry.getStopTime());
-                    addHours(graphEntries, i, calcInterval);
+                    addMins(graphEntries, i, calcInterval);
                 }
             }
         }
@@ -323,7 +325,7 @@ public class CalmTracker extends AppCompatActivity {
             entries.add(new Entry(i, graphEntries.get(i).getValue()));
         }
 
-        LineDataSet dataSet = new LineDataSet(entries, "Time slept");
+        LineDataSet dataSet = new LineDataSet(entries, "Mindful Minutes");
         //todo styling here
         //dataSet.setColor(...);
         dataSet.setLineWidth(1);
