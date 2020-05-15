@@ -50,18 +50,18 @@ function format_periods(array $periods, string $name, array $rgb, bool $offsetDa
     // Iterate over the last 7 days
     $labels = $data = [];
     foreach ($week_day as $day) {
-        $label = $day->format('D');
+        $label = $day->format('D d');
         // Count total minutes recorded on this day
         $total_duration = 0;
         foreach ($periods as $period) {
             $start_time = DateTime::createFromFormat(DATE_ISO8601, $period->start_time);
             if ($offsetDay) $start_time = $start_time->sub(DateInterval::createFromDateString('8 hours'));
-            $period_day = $start_time->format('D');
+            $period_day = $start_time->format('D d');
             if ($period_day == $label) {
                 $total_duration += $period->duration;
             }
         }
-        $labels[] = $label . ' ' . $day->format('d');
+        $labels[] = $label;
         $data[] = $total_duration;
     }
 
