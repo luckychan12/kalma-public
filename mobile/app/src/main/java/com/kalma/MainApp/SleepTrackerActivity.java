@@ -118,9 +118,9 @@ public class SleepTrackerActivity extends AppCompatActivity {
                 DateTimeZone.setDefault(DateTimeZone.forTimeZone(TimeZone.getDefault()));
                 DateTimeFormatter formatter = DateTimeFormat.forPattern("dd/MM/yyy").withZone(DateTimeZone.getDefault());
                 DateTime today = new DateTime(formatter.parseDateTime(selecting[0].getText().toString()), DateTimeZone.getDefault())
-                        .withHourOfDay(16);
-                DateTime lastWeek = today.minusWeeks(1).minusDays(1);
-                lastWeek = lastWeek.withHourOfDay(16);
+                        .withMinuteOfHour(0).withSecondOfMinute(0);
+                DateTime lastWeek = today.minusWeeks(1);
+                lastWeek = lastWeek.withHourOfDay(16).withMinuteOfHour(0).withSecondOfMinute(0);
                 AuthStrings.getInstance(context).setLastStart(lastWeek);
                 AuthStrings.getInstance(context).setLastToday(today);
                 getData();
@@ -200,9 +200,9 @@ public class SleepTrackerActivity extends AppCompatActivity {
         });
 
 
-        DateTime today = new DateTime().plusDays(1);
-        DateTime lastWeek = today.minusWeeks(1).minusDays(1);
-        lastWeek = lastWeek.withHourOfDay(16);
+        DateTime today = new DateTime().withMinuteOfHour(0).withSecondOfMinute(0);
+        DateTime lastWeek = today.minusWeeks(1);
+        lastWeek = lastWeek.withHourOfDay(16).withMinuteOfHour(0).withSecondOfMinute(0);
         AuthStrings.getInstance(context).setLastStart(lastWeek);
         AuthStrings.getInstance(context).setLastToday(today);
         getData();
@@ -216,7 +216,8 @@ public class SleepTrackerActivity extends AppCompatActivity {
         String lastWeekStr = prevWeek.toString(DateTimeFormat.forPattern("yyyy-MM-dd"));
         String todayStr = today.toString(DateTimeFormat.forPattern("yyyy-MM-dd"));
 
-        String getLink = AuthStrings.getInstance(getApplicationContext()).getLinks().get("sleep").toString() + "?from=" + lastWeekStr + "&to=" + todayStr;
+        String getLink = Objects.requireNonNull(AuthStrings.getInstance(getApplicationContext()).getLinks().get("sleep")).toString()
+                + "?from=" + lastWeekStr + "&to=" + todayStr;
         String url = context.getResources().getString(R.string.api_url) + getLink;
         Log.i("REQUEST", url);
         APICaller apiCaller = new APICaller(context.getApplicationContext());
@@ -225,8 +226,7 @@ public class SleepTrackerActivity extends AppCompatActivity {
                     public void onSuccess(JSONObject response) {
                        // Log.e("RESPONSE", response.toString() );
                         try {
-                            JSONObject responseBody = response;
-                            JSONArray periods = responseBody.getJSONArray(  "periods");
+                            JSONArray periods = response.getJSONArray(  "periods");
                             DataEntry[] entries  = new DataEntry[periods.length()];
                             DateTimeFormatter parser = ISODateTimeFormat.dateTimeParser();
                             for (int i = 0; i < periods.length(); i++) {
@@ -281,9 +281,8 @@ public class SleepTrackerActivity extends AppCompatActivity {
         DateTime stopDate = AuthStrings.getInstance(context).getLastToday().withHourOfDay(16);
 
         List<LineGraphEntry> graphEntries = new ArrayList<LineGraphEntry>();
-        int days = Days.daysBetween(startDate, stopDate).getDays();
-
-        for (int i = 0; i < days; i++) {
+        int days = Days.daysBetween(startDate.withHourOfDay(0), stopDate.withHourOfDay(0)).getDays();
+        for (int i = 0; i <= days; i++) {
             DateTime newDate = startDate.plusDays(i);
             graphEntries.add(new LineGraphEntry(newDate, 0));
         }
@@ -336,13 +335,14 @@ public class SleepTrackerActivity extends AppCompatActivity {
         YAxis yAxis = chart.getAxisLeft();
         yAxis.setAxisMinimum(0f);
         XAxis xAxis = chart.getXAxis();
+        xAxis.setLabelCount(xLabel.size());
+        xAxis.setGranularity(1f);
         xAxis.setValueFormatter(new ValueFormatter() {
             @Override
             public String getFormattedValue(float value) {
                 return xLabel.get((int) value);
             }
         });
-        xAxis.setLabelCount(xLabel.size());
         chart.getAxisRight().setEnabled(false);
         chart.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
         chart.getDescription().setEnabled(false);
