@@ -109,7 +109,7 @@ foreach ($dataPoints->periods as $data) {
         if (($startTime >= $start) && ($startTime <= $end)) {
 
             $n = -1;
-            $weekPoints[date("N", strtotime($data->start_time)) + $n] = $data->duration;
+            $weekPoints[date("N", strtotime($data->start_time)) + $n] += $data->duration;
         }
         $totalStartTime += (date('H', strtotime($data->start_time)))*60 + date('i', strtotime($data->start_time));
         $totalEndTime += (date('H', strtotime($data->stop_time)))*60 + date('i', strtotime($data->stop_time));
@@ -161,7 +161,7 @@ foreach ($dataPoints->periods as $data)
         $startTime = date('Y-m-d H:i', strtotime($data->start_time));
         if (($startTime >= $start) && ($startTime <= $end)) {
             $n = -1;
-            $monthPoints[date("j", strtotime($data->start_time)) + $n] = $data->duration;
+            $monthPoints[date("j", strtotime($data->start_time)) + $n] += $data->duration;
         }
         //finds the progress message for the current sleep period
         $startTime = date('Y-m-d', strtotime($data->start_time));
