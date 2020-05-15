@@ -116,20 +116,13 @@ public class SignUpActivity extends AppCompatActivity {
             toast.show();
         }
     }
-/*
-    private long getEpochSecs() {
-        DateTimeFormatter formatter = DateTimeFormat.forPattern("dd/MM/yyy");
-        DateTime dateTimeGMT = new DateTime(formatter.parseDateTime(txtDOB.getText().toString()), DateTimeZone.UTC);
-        return dateTimeGMT.getMillis() / 1000;
-    }
-*/
+
     private void gotoLogin() {
         Intent intent = new Intent(this, LoginActivity.class);
         startActivity(intent);
     }
     private Map buildMap() {
-        Map<String, String> params = new HashMap<String, String>();
-        return params;
+        return new HashMap<String, String>();
     }
     private void signUp(String firstName, String lastName, String password, String email, String DOB) {
         APICaller apiCaller = new APICaller(getApplicationContext());
@@ -138,8 +131,7 @@ public class SignUpActivity extends AppCompatActivity {
                     public void onSuccess(JSONObject response) {
                         try {
                             //tell user that the sign-up was successful
-                            JSONObject responseBody = response;
-                            String message = responseBody.getString("message");
+                            String message = response.getString("message");
                             Toast toast = Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG);
                             toast.show();
                             Log.d("Response", response.toString());

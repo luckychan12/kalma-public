@@ -209,7 +209,7 @@ public class CalmTracker extends AppCompatActivity {
         String lastWeekStr = prevWeek.toString(DateTimeFormat.forPattern("yyyy-MM-dd"));
         String todayStr = today.toString(DateTimeFormat.forPattern("yyyy-MM-dd"));
 
-        String getLink = AuthStrings.getInstance(getApplicationContext()).getLinks().get("calm").toString() + "?from=" + lastWeekStr + "&to=" + todayStr;
+        String getLink = Objects.requireNonNull(AuthStrings.getInstance(getApplicationContext()).getLinks().get("calm")).toString() + "?from=" + lastWeekStr + "&to=" + todayStr;
         String url = context.getResources().getString(R.string.api_url) + getLink;
         Log.i("REQUEST", url);
         APICaller apiCaller = new APICaller(context.getApplicationContext());
@@ -218,8 +218,7 @@ public class CalmTracker extends AppCompatActivity {
                     public void onSuccess(JSONObject response) {
                         // Log.e("RESPONSE", response.toString() );
                         try {
-                            JSONObject responseBody = response;
-                            JSONArray periods = responseBody.getJSONArray(  "periods");
+                            JSONArray periods = response.getJSONArray(  "periods");
                             DataEntry[] entries  = new DataEntry[periods.length()];
                             DateTimeFormatter parser = ISODateTimeFormat.dateTimeParser();
                             for (int i = 0; i < periods.length(); i++) {
@@ -410,7 +409,7 @@ public class CalmTracker extends AppCompatActivity {
     public void sendCreate(JSONObject body) {
         //create a json object and call API to log in
         APICaller apiCaller = new APICaller(getApplicationContext());
-        apiCaller.post(true, body, buildMap(), AuthStrings.getInstance(getApplicationContext()).getLinks().get("calm").toString(), new ServerCallback() {
+        apiCaller.post(true, body, buildMap(), Objects.requireNonNull(AuthStrings.getInstance(getApplicationContext()).getLinks().get("calm")).toString(), new ServerCallback() {
                     @Override
                     public void onSuccess(JSONObject response) {
                         try {
