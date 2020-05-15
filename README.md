@@ -20,6 +20,11 @@
         - Rapid user-facing application development
         
 ### Web App
+- **Technologies**
+    - PHP 7.4 Backend
+    - HTML5
+    - JavaScript (with jQuery, Charts.js, Bootstrap, Client.js)
+    - CSS3 (with Bootstrap)
 - **API Integration**
     - Login
     - Review & Search data, in relation to targets
