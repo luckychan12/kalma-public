@@ -1,6 +1,8 @@
 <resources>
-    <string name="default_email">dummy@example.com</string>
-    <string name="default_password">Password123!</string>
+    <string name="default_email"></string>
+    <string name="default_email2"></string>
+    <string name="default_email3"></string>
+    <string name="default_password"></string>
     <string name="api_url">https://kalma.club</string>
     <string name="api_login">/api/user/login</string>
     <string name="api_signup">/api/user/signup</string>
