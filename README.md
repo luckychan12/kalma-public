@@ -4,7 +4,7 @@
 ## Solution Summary Factsheet
 
 ### API
-- **List of Endpoints**
+- **List of Endpoints** - Vending JSON data
     - [User-/Session-related endpoints](https://github.com/fergcb/kalma/wiki/Documentation-%7C-API-Account-Resources)
     - [Data-related endpoints](https://github.com/fergcb/kalma/wiki/Documentation-%7C-API-Wellbeing-Resources)
 - **Technology Stack** = LAMP
@@ -20,6 +20,11 @@
         - Rapid user-facing application development
         
 ### Web App
+- **Technologies**
+    - PHP 7.4 Backend
+    - HTML5
+    - JavaScript (with jQuery, Charts.js, Bootstrap, Client.js)
+    - CSS3 (with Bootstrap)
 - **API Integration**
     - Login
     - Review & Search data, in relation to targets
@@ -30,7 +35,13 @@
     - Respects user's colour scheme preference
 
 ### Mobile App
+- **Technologies**
+    - Java (MP Android Charts, JodaTime, Volley)
+    - XML
+    - Android SDK 29
+    - Android Studio
 - **API Integration**
     - Login
     - Review & Search data, in relation to targets
     - Add sleep & calm data
+    - View Profile and user data
