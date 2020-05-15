@@ -4,7 +4,7 @@
 ## Solution Summary Factsheet
 
 ### API
-- **List of Endpoints**
+- **List of Endpoints** - Vending JSON data
     - [User-/Session-related endpoints](https://github.com/fergcb/kalma/wiki/Documentation-%7C-API-Account-Resources)
     - [Data-related endpoints](https://github.com/fergcb/kalma/wiki/Documentation-%7C-API-Wellbeing-Resources)
 - **Technology Stack** = LAMP
@@ -35,6 +35,8 @@
     - Respects user's colour scheme preference
 
 ### Mobile App
+- **Technologies**
+    - Android SDK (Java)
 - **API Integration**
     - Login
     - Review & Search data, in relation to targets
