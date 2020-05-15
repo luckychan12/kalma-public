@@ -36,8 +36,12 @@
 
 ### Mobile App
 - **Technologies**
-    - Android SDK (Java)
+    - Java (MP Android Charts, JodaTime, Volley)
+    - XML
+    - Android SDK 29
+    - Android Studio
 - **API Integration**
     - Login
     - Review & Search data, in relation to targets
     - Add sleep & calm data
+    - View Profile and user data
