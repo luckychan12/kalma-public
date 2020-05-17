@@ -26,6 +26,7 @@ import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
@@ -206,22 +207,20 @@ public class APICaller {
                         Log.i("RESPONSE LENGTH", Integer.toString(response.data.length));
                         String str = new String(response.data);
                         Log.i("RESPONSE", str);
-                        Log.i("RESPONSE2", response.data.toString());
+                        Log.i("RESPONSE2", Arrays.toString(response.data));
 
                         String jsonString = new String(response.data,
                                 HttpHeaderParser.parseCharset(response.headers, PROTOCOL_CHARSET));
 
                         JSONObject result = null;
 
-                        if (jsonString != null && jsonString.length() > 0)
+                        if (jsonString.length() > 0)
                             result = new JSONObject(jsonString);
 
                         return Response.success(result,
                                 HttpHeaderParser.parseCacheHeaders(response));
-                    } catch (UnsupportedEncodingException e) {
+                    } catch (UnsupportedEncodingException | JSONException e) {
                         return Response.error(new ParseError(e));
-                    } catch (JSONException je) {
-                        return Response.error(new ParseError(je));
                     }
                 }
             };

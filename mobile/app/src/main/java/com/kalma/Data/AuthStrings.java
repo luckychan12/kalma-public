@@ -1,5 +1,6 @@
 package com.kalma.Data;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.provider.Settings;
@@ -104,9 +105,10 @@ public class AuthStrings {
 
     public void unstoreRefreshToken(){
         SharedPreferences settings = context.getSharedPreferences("TOKENS", 0);
-        settings.edit().putString("RefreshToken", "").commit();
+        settings.edit().putString("RefreshToken", "").apply();
     }
 
+    @SuppressLint("HardwareIds")
     public Long getDeviceToken(){
         return Long.parseLong(Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID),16);
     }

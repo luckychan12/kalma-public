@@ -25,7 +25,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
-import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
@@ -73,15 +72,14 @@ public class LoginActivity extends AppCompatActivity {
                     public void onSuccess(JSONObject response) {
                         try {
                             //retrieve access token and store.
-                            JSONObject responseBody = response;
-                            String accessToken = responseBody.getString("access_token");
+                            String accessToken = response.getString("access_token");
                             DateTimeFormatter parser = ISODateTimeFormat.dateTimeParser();
-                            DateTime accessExp = parser.parseDateTime(responseBody.getString("access_expiry"));
-                            DateTime refreshExp = parser.parseDateTime(responseBody.getString("refresh_expiry"));
-                            JSONObject links = responseBody.getJSONObject("links");
+                            DateTime accessExp = parser.parseDateTime(response.getString("access_expiry"));
+                            DateTime refreshExp = parser.parseDateTime(response.getString("refresh_expiry"));
+                            JSONObject links = response.getJSONObject("links");
                             Log.d("out", response.toString());
-                            String refreshToken = responseBody.getString("refresh_token");
-                            Hashtable linksDict = new Hashtable(); ;
+                            String refreshToken = response.getString("refresh_token");
+                            Hashtable<String, String> linksDict = new Hashtable<String, String>(); ;
                             linksDict.put("account", links.getString("account"));
                             linksDict.put("logout", links.getString("logout"));
                             linksDict.put("sleep", links.getString("sleep"));
@@ -99,7 +97,7 @@ public class LoginActivity extends AppCompatActivity {
                         }
                     }
 
-                    private void StoreTokens(String accessToken, DateTime accessExp, DateTime refreshExp, Hashtable links, String refreshToken) {
+                    private void StoreTokens(String accessToken, DateTime accessExp, DateTime refreshExp, Hashtable<String, String> links, String refreshToken) {
                         AuthStrings authStrings = AuthStrings.getInstance(getApplicationContext());
                         authStrings.setAuthToken(accessToken, accessExp);
                         authStrings.setLinks(links);

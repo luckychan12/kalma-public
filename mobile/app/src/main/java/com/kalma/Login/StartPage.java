@@ -53,7 +53,6 @@ public class StartPage extends AppCompatActivity {
     private void openSignUpPage(){
         Intent intent = new Intent(this, SignUpActivity.class);
         startActivity(intent);
-        finish();
     }
 
     @Override
@@ -63,8 +62,7 @@ public class StartPage extends AppCompatActivity {
     }
 
     private Map buildMap() {
-        Map<String, String> params = new HashMap<String, String>();
-        return params;
+        return new HashMap<String, String>();
     }
 
     private void onSuccessfulLogin() {

@@ -112,7 +112,6 @@ public class SettingsActivity extends AppCompatActivity {
                         try {
                             String message = response.getString("message");
                             forgetTokens();
-                            Toast toast = Toast.makeText(getApplicationContext(), message , Toast.LENGTH_LONG);
                             Log.d("Response", response.toString());
                             Intent intent = new Intent(context, StartPage.class);
                             startActivity(intent);
