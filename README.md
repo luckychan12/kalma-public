@@ -10,6 +10,12 @@
 ## Documentation (GitHub Wiki)
 **Link:** https://github.com/fergcb/kalma/wiki
 
+## Project Board
+**Link:** https://trello.com/b/uo4QDWvF/kalmaclub
+
+## Project Roadmap
+**Link:** https://docs.google.com/spreadsheets/d/1Apogb5zVJYike07weu4tRtEedg2gZPVeRi-DnMahk7s/edit?usp=sharing
+
 ## Solution Summary Factsheet
 
 ### API
