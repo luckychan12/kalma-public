@@ -1,14 +1,12 @@
 # Kalma
-**PRCO204 Coursework Submission / Team D / Application Scenario**
 
-## Live Site
-**Link:** https://kalma.club
+#### This was a group project with a team size of 3
+
+## Documentation / Project Showcase (GitHub Wiki)
+**Link:** https://github.com/fergcb/kalma/wiki
 
 ## YouTube Video Demonstration
 **Link:** https://youtu.be/vBphoTUab5U
-
-## Documentation (GitHub Wiki)
-**Link:** https://github.com/fergcb/kalma/wiki
 
 ## Project Board
 **Link:** https://trello.com/b/uo4QDWvF/kalmaclub
