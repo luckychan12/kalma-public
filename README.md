@@ -58,3 +58,56 @@
     - Review & Search data, in relation to targets
     - Add sleep & calm data
     - View Profile and user data
+
+## Structure Diagrams
+
+### Mobile Structure Diagram
+![Structure Diagram](https://downloadmoredownloads.download/i/awyat8u9.png)
+
+### API Structure Diagram
+![Structure Diagram](https://downloadmoredownloads.download/i/y378ss15.png)
+
+
+
+## Live Web App Screenshots
+### Login And Signup
+![login and signup](https://i.imgur.com/WPCwG7o.png)
+
+### Dashboard
+![dashboard](https://i.imgur.com/emHEOSM.png)
+
+### Dashboard - Light Mode
+![dashboard, light mode](https://i.imgur.com/ITNGJSm.png)
+
+### Profile Page
+![profile page](https://i.imgur.com/lbzoG1p.png)
+
+### Sleep Page - Week Chart
+![sleep page, week chart](https://i.imgur.com/HWWFS9c.png)
+
+### Sleep Page - Historical Data
+![sleep page, historical data](https://i.imgur.com/YhzeuKp.png)
+
+
+
+## Live Mobile App Screenshots
+### Start Page
+![Start Page](https://downloadmoredownloads.download/i/jiqotn0h.png)
+
+### Login
+![Login](https://downloadmoredownloads.download/i/5cj8xk0n.png)
+
+### Sign Up
+![Sign Up](https://downloadmoredownloads.download/i/1bwh9q24.png)
+
+### Dashboard
+![dashboard](https://downloadmoredownloads.download/i/umutug12.png)
+
+### Profile Page
+![Profile Page](https://downloadmoredownloads.download/i/asbfb5a1.png)
+
+### Sleep Page
+![sleep page, chart](https://downloadmoredownloads.download/i/l79mfn2k.png)
+
+### Calm/mindful minutes Page
+![Calm Page](https://downloadmoredownloads.download/i/8nstv4ne.png)
